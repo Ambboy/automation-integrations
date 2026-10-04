@@ -1,0 +1,119 @@
+Upload files for use in tasks.
+
+See REST overview — response format.
+
+Upload File
+
+Uploading is two requests: POST /files creates the file record and returns a presigned upload_url; the bytes are then PUT to that URL. The SDKs (client.files.upload) and belt file upload do both steps.
+
+1. Create the record
+
+POST /files
+
+Content-Type: application/json
+
+ | Field | Type | Required | Description
+
+ | files | array | Yes | One entry per file
+
+ | files[].uri | string | Yes | Send ""; the server assigns it
+
+ | files[].filename | string | No | File name
+
+ | files[].content_type | string | No | MIME type
+
+ | files[].size | number | No | Size in bytes
+
+ | files[].path | string | No | Custom storage path
+
+ | category | string | No | Storage category
+
+Response
+
+An array of file DTOs, one per entry:
+
+ | Field | Type | Description
+
+ | id | string | File ID
+
+ | uri | string | File URI for use in inputs
+
+ | upload_url | string | Presigned URL to PUT the bytes to
+
+ | filename | string | File name
+
+ | content_type | string | MIME type
+
+ | size | number | Size in bytes
+
+jsoncopy
+
+1[2  {3    "id": "file_abc123",4    "uri": "https://cloud.inference.sh/t/abc123/image.png",5    "upload_url": "https://storage.example/...signed...",6    "filename": "image.png",7    "content_type": "image/png",8    "size": 1024009  }10]
+
+2. Upload the bytes
+
+PUT {upload_url} with the raw body and a Content-Type header. No inference.sh auth header; the URL is presigned and short-lived. A 2xx means the file is ready and uri can be used in task inputs.
+
+cURL Example
+
+bashcopy
+
+1# 1. create the record2curl -X POST https://api.inference.sh/files \3  -H "Authorization: Bearer inf_your_key" \4  -H "Content-Type: application/json" \5  -d '{"files":[{"uri":"","filename":"image.png","content_type":"image/png","size":102400}]}'67# 2. upload the bytes to upload_url from the response8curl -X PUT "https://storage.example/...signed..." \9  -H "Content-Type: image/png" \10  --data-binary @/path/to/image.png
+
+CLI equivalent: belt file upload <path> (add --json for {filename, size, type, uri}; supports multiple paths in one command).
+
+List Files
+
+POST /files/list
+
+Cursor-paginated list of files in your workspace. GET /files accepts the same query parameters.
+
+Request body
+
+ | Field | Type | Description
+
+ | limit | number | Page size (default 10)
+
+ | cursor | string | Pagination cursor from a previous response
+
+ | direction | string | next or prev
+
+ | filters | array | Field filters (for example content_type with like operator)
+
+ | search | object | { "term", "fields" } for substring match (CLI --search / -q searches filename)
+
+Response
+
+Standard cursor list shape: items (array of file DTOs), has_next, has_previous, next_cursor, prev_cursor.
+
+CLI equivalent: belt file list (add --json for the raw payload; --type image filters by MIME category; --search photo or -q avatar filters by filename).
+
+Delete File
+
+DELETE /files/{id}
+
+Permanently delete a file by ID. Requires files:write scope.
+
+CLI equivalent: belt file delete <id> (add --force or --yes to skip the confirmation prompt).
+
+Using Uploaded Files
+
+Use the returned uri in task inputs:
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/run \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "app": "image-processor",6    "input": {7      "image": "inf://files/abc123/image.png"8    }9  }'
+
+Supported Types
+
+Common MIME types:
+
+image/png, image/jpeg, image/webp
+
+audio/mpeg, audio/wav
+
+video/mp4
+
+application/pdf
+
+text/plain

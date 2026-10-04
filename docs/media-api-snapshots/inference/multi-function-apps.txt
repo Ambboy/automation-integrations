@@ -1,0 +1,193 @@
+Expose multiple entry points from a single app to share resources and reduce cold starts.
+
+Why Multi-Function?
+
+Instead of deploying separate apps for related operations, multi-function apps let you:
+
+Share model loading — Load heavy models once, use across functions
+
+Reduce cold starts — Warm workers serve any function immediately
+
+Logical grouping — Keep related operations together
+
+Example use cases:
+
+Image models: generate, upscale, inpaint
+
+LLMs: chat (history-aware) vs completion (raw text)
+
+Data pipelines: process, validate, export
+
+Function Discovery
+
+Functions are automatically discovered from public methods on your App class.
+
+Discovery Rules
+
+Python
+
+A method becomes a function if it meets all these criteria:
+
+ | Rule | Description
+
+ | Public | Name doesn't start with _
+
+ | Not reserved | Not setup or unload (lifecycle methods)
+
+ | Has type hints | Both input parameter and return type annotated
+
+ | Pydantic models | Input/output types are Pydantic models
+
+ | Single parameter | Exactly one parameter (besides self)
+
+Node.js
+
+A method becomes a function if:
+
+ | Rule | Description
+
+ | Public | Name doesn't start with _
+
+ | Not reserved | Not setup, unload, onCancel, constructor
+
+ | Has schema exports | {PascalName}Input and {PascalName}Output Zod schemas exported
+
+Example
+
+PythonNode.js
+
+1from inferencesh import BaseApp, BaseAppInput, BaseAppOutput23class GenerateInput(BaseAppInput):4    prompt: str5    steps: int = 3067class UpscaleInput(BaseAppInput):8    image_uri: str9    scale: float = 2.01011class ImageOutput(BaseAppOutput):12    uri: str13    width: int14    height: int1516class App(BaseApp):17    async def setup(self, config):18        self.model = load_diffusion_model()1920    # ✓ Discoverable: public, typed, Pydantic models21    async def generate(self, input: GenerateInput) -> ImageOutput:22        image = self.model.generate(input.prompt, steps=input.steps)23        return ImageOutput(uri=save(image), width=512, height=512)2425    # ✓ Discoverable26    async def upscale(self, input: UpscaleInput) -> ImageOutput:27        image = load(input.image_uri)28        result = self.model.upscale(image, input.scale)29        return ImageOutput(uri=save(result), width=1024, height=1024)3031    # ✗ Not discoverable: starts with underscore32    async def _helper(self, data):33        pass3435    # ✗ Not discoverable: no type hints36    async def process(self, input):37        pass
+
+Input and Output Schemas
+
+Each function has independent typed input/output schemas:
+
+pythoncopy
+
+1class ChatInput(BaseAppInput):2    messages: list[dict]3    max_tokens: int = 100045class ChatOutput(BaseAppOutput):6    response: str7    tokens_used: int89class CompletionInput(BaseAppInput):10    prompt: str11    max_tokens: int = 10001213class CompletionOutput(BaseAppOutput):14    text: str15    tokens_used: int1617class App(BaseApp):18    async def chat(self, input: ChatInput) -> ChatOutput:19        ...2021    async def completion(self, input: CompletionInput) -> CompletionOutput:22        ...
+
+Schema Generation
+
+When you deploy, the system generates functions_schema.json:
+
+jsoncopy
+
+1{2  "generate": {3    "input_schema": { ... },4    "output_schema": { ... }5  },6  "upscale": {7    "input_schema": { ... },8    "output_schema": { ... }9  }10}
+
+Pydantic Compatibility
+
+Both Pydantic V1 and V2 are supported:
+
+pythoncopy
+
+1# Pydantic V12from pydantic import BaseModel34# Pydantic V25from pydantic import BaseModel67# Both work — the system detects the version automatically
+
+Calling Functions
+
+Specify the function parameter when calling the app.
+
+CLI
+
+bashcopy
+
+1# Call specific function2belt app run user/image-model --function upscale --input '{"image_uri": "inf://...", "scale": 4.0}'34# Call default function (run)5belt app run user/image-model --input '{"prompt": "a sunset"}'
+
+Python SDK
+
+pythoncopy
+
+1from inferencesh import Inference23client = Inference(api_key="...")45# Call specific function6result = client.run({7    "app": "user/image-model@abc123",8    "function": "upscale",9    "input": {"image_uri": "inf://...", "scale": 4.0}10})1112# Call default function13result = client.run({14    "app": "user/image-model@abc123",15    "input": {"prompt": "a sunset"}16})
+
+JavaScript SDK
+
+typescriptcopy
+
+1import { Inference } from '@anthropic/inference-sdk';23const client = new Inference({ apiKey: '...' });45// Call specific function6const result = await client.run({7  app: 'user/image-model@abc123',8  function: 'upscale',9  input: { image_uri: 'inf://...', scale: 4.0 }10});
+
+REST API
+
+An unknown function name returns 422 with code validation_error. The data array includes a field error on /function listing the available function names for that app version.
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/apps/run \2  -H "Authorization: Bearer $API_KEY" \3  -H "Content-Type: application/json" \4  -d '{5    "app": "user/image-model@abc123",6    "function": "upscale",7    "input": {"image_uri": "inf://...", "scale": 4.0}8  }'
+
+Default Function
+
+If no function is specified, resolution order is:
+
+Explicit default_function in inf.yml (if set)
+
+A function named run (if present)
+
+The sole function (when the app has exactly one entry point)
+
+Otherwise, an error — use -f / --function to pick one
+
+belt app get and belt app sample list other functions with descriptions and copy-pasteable belt app run / belt app sample commands when an app has multiple entry points.
+
+pythoncopy
+
+1class App(BaseApp):2    # This becomes the default function3    async def run(self, input: GenerateInput) -> ImageOutput:4        return await self.generate(input)56    async def generate(self, input: GenerateInput) -> ImageOutput:7        ...
+
+Common Patterns
+
+Multiple Related Operations
+
+pythoncopy
+
+1class App(BaseApp):2    async def setup(self, config):3        self.model = load_model()  # Shared across all functions45    async def generate(self, input: GenerateInput) -> ImageOutput:6        """Generate from text prompt."""7        ...89    async def img2img(self, input: Img2ImgInput) -> ImageOutput:10        """Transform existing image."""11        ...1213    async def inpaint(self, input: InpaintInput) -> ImageOutput:14        """Fill masked regions."""15        ...1617    async def upscale(self, input: UpscaleInput) -> ImageOutput:18        """Increase resolution."""19        ...
+
+Chat vs Completion Modes
+
+pythoncopy
+
+1class App(BaseApp):2    async def chat(self, input: ChatInput) -> ChatOutput:3        """Conversation with message history."""4        messages = input.messages5        response = self.model.chat(messages)6        return ChatOutput(response=response)78    async def completion(self, input: CompletionInput) -> CompletionOutput:9        """Single-shot text completion."""10        text = self.model.complete(input.prompt)11        return CompletionOutput(text=text)
+
+Process / Validate / Export Pipeline
+
+pythoncopy
+
+1class App(BaseApp):2    async def process(self, input: ProcessInput) -> ProcessOutput:3        """Transform raw data."""4        ...56    async def validate(self, input: ValidateInput) -> ValidateOutput:7        """Check data quality."""8        ...910    async def export(self, input: ExportInput) -> ExportOutput:11        """Format for delivery."""12        ...
+
+Validation and Debugging
+
+Check Discovery Locally
+
+Run validation to see discovered functions:
+
+bashcopy
+
+1belt app validate
+
+Output:
+
+codecopy
+
+1✓ discovered 3 functions: [generate, upscale, inpaint]
+
+Why Methods Get Skipped
+
+Run with verbose mode to see skip reasons:
+
+bashcopy
+
+1belt app validate --verbose
+
+Output:
+
+codecopy
+
+1Checking method: generate2  ✓ public method3  ✓ not reserved4  ✓ has return type hint5  ✓ has 1 parameter6  ✓ parameter has type hint7  ✓ input type is Pydantic model8  ✓ output type is Pydantic model9  → DISCOVERED1011Checking method: _helper12  ✗ private method (starts with _)13  → SKIPPED1415Checking method: process16  ✗ missing return type hint17  → SKIPPED
+
+Test Functions Locally
+
+bashcopy
+
+1# Test specific function2belt app dev --function upscale --input '{"image_uri": "...", "scale": 2.0}'34# Test default function5belt app dev --input '{"prompt": "test"}'
+
+Next
+
+Multi-Function App Example — Quick overview
+
+Sessions — Enable stateful multi-call interactions

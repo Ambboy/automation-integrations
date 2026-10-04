@@ -1,0 +1,265 @@
+List your workspace's plan limits and feature flags. Entitlements are enforced when you create API keys, connectors, knowledge bases, private apps, upload files, or run tasks. Most limits are checked at request time; concurrent task limits are enforced by the task scheduler. See Concurrent task limits.
+
+Use GET /entitlements to see entitlement rows (limits and sources). Use GET /entitlements/usage to see current usage vs limits.
+
+Organizations
+
+When your team belongs to an organization, the organization workspace (type: org, same ID as the org) owns the company subscription. Its primary team_plan and any add-on rows on that workspace materialize org-scoped tier entitlements (source: tier). While those rows are active, they replace each member team's own tier limits for the same resources — member teams keep their Starter team_plan row for bookkeeping, but org-scope tier wins at enforcement time.
+
+Countable limits (for example api_keys, seats, storage_mb, concurrency) pool usage across every team in the org when the winning entitlement row is org-scoped. GET /entitlements/usage from a member team reflects that pooled usage against the org-wide cap.
+
+The organization workspace does not receive the automatic Starter team_plan at creation. With no primary plan on the org workspace, there are no org-scope tier rows until you subscribe from that workspace or a complimentary contract is assigned there. Member teams still have Starter until an org plan is in effect.
+
+Add-ons purchased on the organization workspace are org-scoped the same way as the base plan. See Organizations — Billing and Subscription API.
+
+List entitlements
+
+GET /entitlements
+
+Returns all entitlement rows for the API key's workspace. Requires the billing:read scope.
+
+Example:
+
+bashcopy
+
+1curl https://api.inference.sh/entitlements \2  -H "Authorization: Bearer inf_your_key"
+
+Response (array of entitlement objects):
+
+jsoncopy
+
+1[2  {3    "id": "ent_abc123",4    "team_id": "team_xyz",5    "resource": "api_keys",6    "type": "limit",7    "enabled": true,8    "unlimited": false,9    "limit": 5,10    "source": "tier",11    "enforcement": "block"12  }13]
+
+Fields
+
+ | Field | Type | Description
+
+ | resource | string | What is limited — see Resources below
+
+ | type | string | Entitlement type from the plan definition
+
+ | enabled | boolean | Whether the resource or feature is enabled
+
+ | unlimited | boolean | When true, no numeric cap applies
+
+ | limit | number | Maximum allowed (when not unlimited)
+
+ | source | string | Origin: tier, addon, trial, whitelist, or override
+
+ | enforcement | string | block (hard deny when exceeded) or warn (allow with warning). Omitted on entitlement rows defaults to warn. Plan definitions in GET /plans can set enforcement per limit — the Starter tier uses block on concurrency, rate_per_min, and triggers.
+
+ | expires_at | string | ISO timestamp when a trial or override expires (optional)
+
+When multiple rows exist for the same resource, the API resolves the highest-priority source: override > whitelist > trial > tier / addon. Rows from tier and addon are merged for the same resource — boolean features use OR, numeric limits are summed, any unlimited row makes the merged result unlimited, and any block row makes the merged enforcement block.
+
+Get usage
+
+GET /entitlements/usage
+
+Returns current usage vs limits for countable resources, inflight task concurrency, and boolean feature gates. Requires the billing:read scope.
+
+Unlike GET /entitlements, this endpoint includes live usage counts — for example how many API keys exist, how much storage is used, and how many tasks are currently in flight.
+
+Example:
+
+bashcopy
+
+1curl https://api.inference.sh/entitlements/usage \2  -H "Authorization: Bearer inf_your_key"
+
+Response (array of usage objects):
+
+jsoncopy
+
+1[2  {3    "resource": "api_keys",4    "label": "api keys",5    "type": "limit",6    "usage": 3,7    "limit": 5,8    "unlimited": false9  },10  {11    "resource": "storage_mb",12    "label": "storage",13    "type": "limit",14    "unit": "mb",15    "usage": 128,16    "limit": 1024,17    "unlimited": false18  },19  {20    "resource": "concurrency",21    "label": "concurrent tasks",22    "type": "limit",23    "usage": 2,24    "limit": 3,25    "unlimited": false26  },27  {28    "resource": "feature:webhooks",29    "label": "webhooks",30    "type": "boolean",31    "enabled": true32  },33  {34    "resource": "feature:seedance",35    "label": "seedance video generation",36    "type": "boolean",37    "enabled": false38  }39]
+
+Usage fields
+
+ | Field | Type | Description
+
+ | resource | string | Resource identifier (same values as Resources)
+
+ | label | string | Human-readable name (for example concurrent tasks, api keys)
+
+ | unit | string | Display unit from the plan (for example mb, days) — optional
+
+ | type | string | limit (numeric cap) or boolean (feature gate)
+
+ | usage | number | Current usage (limit-type resources only)
+
+ | limit | number | Maximum allowed when not unlimited (limit-type only)
+
+ | unlimited | boolean | When true, no numeric cap applies (limit-type only)
+
+ | enabled | boolean | Whether the feature is enabled (boolean-type only)
+
+When no entitlement row exists for a limit-type resource, the response sets unlimited: true and still returns the current usage.
+
+What is counted
+
+ | Resource | Usage source
+
+ | api_keys | Number of API keys for the workspace
+
+ | storage_mb | Total uploaded file storage in megabytes
+
+ | seats | Number of workspace members
+
+ | triggers | Trigger subscriptions linked to agents
+
+ | concurrency | Inflight tasks — queued (received, queued) plus in-progress (dispatched, preparing, serving, setting_up, running, cancelling, uploading)
+
+Concurrent task limits
+
+The concurrency resource caps how many tasks your workspace can have in flight at once. Limits come from your subscription plan (see limits.concurrency on GET /plans) and merge with add-on rows the same way as other entitlements.
+
+Unlike api_keys, storage_mb, and most other limits, concurrency is not checked when you call POST /tasks. The task is accepted and enters Queued; the scheduler enforces the cap when it assigns a worker. That is different from task_executions, which is checked at task creation and returns limit_exceeded (402) when the billing-period cap is reached.
+
+ | enforcement on the entitlement row | Scheduler behavior when at the cap
+
+ | warn (default when unset) | Task is dispatched anyway; the over-limit condition is logged server-side
+
+ | block | Task stays Queued until another run completes and frees a slot
+
+The Starter tier sets enforcement: block on concurrency (limit of 1). Paid tiers use warn unless a plan or entitlement row sets block. Inspect the enforcement field on GET /entitlements rows or on each limit in GET /plans.
+
+Inspect live inflight usage with GET /entitlements/usage (resource: "concurrency"). In the web app, settings → workspace → subscription shows the same row.
+
+Store apps can also declare per-app caps (max_concurrency, max_concurrency_per_team on the store listing). Those are separate scheduler limits scoped to one app, not your workspace-wide plan cap.
+
+Boolean features (for example feature:webhooks, feature:byok, feature:seedance) appear only when an entitlement row exists for that feature.
+
+In the web app, settings → workspace → subscription shows the same usage rows with progress bars: yellow at 80% of a finite limit, orange at the cap.
+
+Resources
+
+Common resource values returned by GET /entitlements:
+
+ | Resource | Typical use
+
+ | api_keys | Number of API keys
+
+ | connectors | MCP connectors
+
+ | knowledge_bases | Knowledge entries
+
+ | private_apps | Private app deployments
+
+ | storage_mb | Total uploaded file storage
+
+ | task_executions | Task runs per billing period
+
+ | concurrency | Concurrent tasks (inflight runs)
+
+ | rate_per_min | API rate per minute
+
+ | seats | Workspace members
+
+ | triggers | Agent trigger subscriptions (event, schedule, or manual)
+
+ | retention_days | Data retention period in days (plan policy; not usage-counted)
+
+ | feature:scopes | Custom API key scopes
+
+ | feature:webhooks | Webhooks
+
+ | feature:byok | Bring your own keys
+
+ | feature:seedance | Seedance video generation
+
+ | feature:publish_apps | Publishing apps to the store
+
+ | feature:auto_recharge | Auto-recharge billing
+
+ | feature:invoices | Invoice billing
+
+ | feature:team_billing | Workspace billing features
+
+Limit vs feature gate semantics
+
+How the API treats a missing entitlement row depends on the resource type and where it is checked:
+
+ | Context | No entitlement row | Row with enabled: false
+
+ | limit resources (for example api_keys, concurrency) | No restriction — GET /entitlements/usage reports unlimited: true | Uses limit / unlimited, not enabled
+
+ | boolean plan features (standard entitlement checks) | No restriction | Feature blocked
+
+ | Store app required_feature | Denied — explicit grant required | Denied
+
+Capacity limits follow an opt-out model: no row means no cap. Store app feature gates follow an opt-in model: your workspace must have a boolean entitlement row with enabled: true for the listed required_feature. A missing row is not treated as unrestricted access.
+
+When limits block a request
+
+Hard-blocked entitlements return API errors before the operation completes. On the Starter tier, concurrency, rate_per_min, and triggers use enforcement: block — exceeding those limits returns limit_exceeded (402) at request time (rate_per_min, triggers) or keeps tasks Queued (concurrency; see Concurrent task limits). Other Starter limits (for example storage_mb, seats) use the default warn mode until you upgrade.
+
+ | Code | HTTP | Meaning
+
+ | limit_exceeded | 402 | Numeric limit reached
+
+ | feature_not_available | 403 | Boolean feature disabled on your tier
+
+ | payment_required | 402 | Insufficient prepaid balance (separate from plan limits)
+
+ | entitlement_unavailable | 500 | The entitlement lookup failed, so plan limits could not be verified. Retriable.
+
+When the API cannot read entitlement rows (for example on a transient database error), paths that check plan limits return entitlement_unavailable (HTTP 500) with detail could not verify plan limits, try again. The server did not determine that you are over a cap or missing a feature. Retry after a short delay. The underlying error is logged server-side and not included in the response. Gated features fail closed on this error.
+
+Error metadata
+
+When a plan limit blocks a request, structured metadata is attached to the error response. Clients that drive upgrade flows (the web app, belt CLI) read these fields from the raw response body.
+
+ | Field | Description
+
+ | resource | Resource identifier (for example api_keys, concurrency)
+
+ | resource_label | Human-readable label (for example concurrent tasks)
+
+ | limit | Plan limit that was exceeded
+
+ | current | Usage at the time of the request
+
+ | upgrade_available | Always true for entitlement errors. The CLI appends an upgrade URL; the web app opens the upgrade modal
+
+ | addon_plan_id | Optional — plan ID for an addon that unlocks the blocked feature (present when a store app requires a purchasable addon)
+
+ | addon_plan_name | Optional — display name of the addon plan
+
+ | addon_plan_price | Optional — monthly price in cents for the addon plan
+
+Errors are RFC 9457 application/problem+json with a human-readable detail and the metadata fields under a top-level meta extension member (RFC 9457 allows extension members on problem details):
+
+jsoncopy
+
+1{2  "type": "https://api.inference.sh/errors/limit_exceeded",3  "title": "Payment Required",4  "status": 402,5  "detail": "You have reached the limit of 3 concurrent tasks",6  "meta": {7    "resource": "concurrency",8    "resource_label": "concurrent tasks",9    "limit": 3,10    "current": 3,11    "upgrade_available": true12  }13}
+
+When a store app blocks on a purchasable addon (for example feature:seedance), meta also includes the addon fields:
+
+jsoncopy
+
+1{2  "type": "https://api.inference.sh/errors/feature_not_available",3  "title": "Forbidden",4  "status": 403,5  "detail": "this app requires the seedance video generation add-on.",6  "meta": {7    "resource": "feature:seedance",8    "resource_label": "seedance video generation",9    "upgrade_available": true,10    "addon_plan_id": "plan_seedance_addon",11    "addon_plan_name": "Seedance",12    "addon_plan_price": 99913  }14}
+
+Official SDKs expose the raw problem body on APIError.response_body (Python) or InferenceError.responseBody (JavaScript). Parse meta from the JSON when you need structured entitlement fields. The belt / infsh CLI checks meta.upgrade_available on problem+json responses to append an upgrade URL to the error message. When addon_plan_id is present, the URL points to settings → workspace → add-ons; otherwise it points to the subscription page. You can also inspect limits proactively with GET /entitlements/usage.
+
+Web app upgrade modal
+
+When a workspace API call returns limit_exceeded or feature_not_available with upgrade_available: true, the app opens the upgrade modal and passes error metadata (resource, resource_label, limit, current, and detail). The modal lists self-serve plans above your current tier and highlights the recommended plan — the cheapest tier that lifts the blocked resource. For numeric limits it shows current / limit only when limit is greater than zero.
+
+When addon_plan_id is present (for example a blocked feature:seedance run on a store app), the web app shows an add-on purchase modal instead of a tier upgrade, with the addon name and monthly price from addon_plan_name and addon_plan_price. The primary CTA reads subscribe - $X/mo and routes to settings → workspace → add-ons to complete checkout (same flow as the add-ons page cards). Most add-ons do not require a base subscription; some set required_plan_ids on the plan (see Subscription API: add-on subscriptions).
+
+Feature-gated store apps
+
+Some store apps declare a required_feature on their listing (for example feature:seedance). Before dispatch, the API resolves that entitlement for your workspace and requires an explicit grant: a boolean row with enabled: true. If no row exists, or the row has enabled: false, task dispatch returns feature_not_available (403) before the run starts.
+
+This is stricter than capacity limits, where a missing row means no restriction. For gated store apps, access is denied unless the feature is positively enabled on your workspace.
+
+Check GET /entitlements/usage for boolean feature status, or inspect required_feature on GET /store/apps/{appId}. See Store API — Get app store listing.
+
+See billing and plan limits in the REST overview for modal behavior, web app links, and credit balance errors.
+
+Related
+
+REST overview — authentication and response format
+
+Tasks API — run apps (may return payment_required)
+
+Troubleshooting — common limit and balance errors

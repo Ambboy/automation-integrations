@@ -1,0 +1,136 @@
+Run published agents from external sites without API keys. Requests go to the /embed route group on the API host.
+
+The hosted chat UI at https://app.inference.sh/embed/agents/{namespace}/{name} uses these endpoints internally. Build your own UI with the same API.
+
+→ Publishing and embedding agents: setup in the web app, origins, themes, and iframe snippets
+→ Publications API — create and manage publications (POST /publications, etc.)
+
+Base URL
+
+codecopy
+
+1https://api.inference.sh/embed
+
+No Authorization header is required. The API uses anonymous access with credentials cookies when present.
+
+Origin validation
+
+Published agents validate the request Origin header against the publication's allowed_origins:
+
+ | allowed_origins | Behavior
+
+ | Empty | All origins allowed
+
+ | List of URLs | Origin must match an entry exactly, or the list may include *
+
+ | Mismatch | 403 forbidden — origin not allowed
+
+Configure origins in the web app's Publish tab before calling the embed API from a browser.
+
+Get published agent info
+
+GET /embed/agents/{namespace}/{name}
+
+Returns agent metadata and optional publication theme for styling your UI.
+
+Response
+
+ | Field | Description
+
+ | name | Agent display name
+
+ | namespace, name | Agent ref components
+
+ | version | Active version (description, example prompts, etc.)
+
+ | theme | Optional light / dark color tokens when configured
+
+Example
+
+bashcopy
+
+1curl "https://api.inference.sh/embed/agents/myteam/support-agent" \2  -H "Origin: https://example.com"
+
+Run agent
+
+POST /embed/agents/run
+
+Start or continue a chat with a published agent. Billing runs on the publisher's workspace.
+
+Request
+
+ | Field | Type | Required | Description
+
+ | agent | string | Yes | Agent ref (namespace/name)
+
+ | chat_id | string | No | Existing chat ID (omit for a new chat)
+
+ | input | object | Yes | Message payload (text, optional attachments)
+
+ | stream | boolean | No | If true, response is SSE instead of JSON
+
+Example (JSON response):
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/embed/agents/run \2  -H "Content-Type: application/json" \3  -H "Origin: https://example.com" \4  -d '{5    "agent": "myteam/support-agent",6    "input": { "text": "Hello" }7  }'
+
+Example (streaming): set "stream": true and use Accept: text/event-stream. Events match chat streaming.
+
+Errors
+
+ | HTTP | When
+
+ | 404 | Agent not published or ref not found
+
+ | 403 | Origin not in allowed_origins
+
+ | 402 | Publisher workspace has insufficient balance
+
+Chat and tool endpoints
+
+After a run creates a chat, use these paths under /embed (same shapes as the authenticated Agents API, but scoped to embed access):
+
+ | Method | Path | Purpose
+
+ | GET | /chats/{id} | Chat metadata (status, output, context, channel_context)
+
+ | GET | /chats/{id}/status | Chat status only
+
+ | POST | /chats/{id} | Send a follow-up message
+
+ | POST | /chats/{id}/stop | Stop generation
+
+ | GET | /chats/{id}/stream | SSE message stream
+
+ | POST | /tools/{toolId} | Submit client tool result
+
+ | POST | /tools/{toolId}/invoke | Approve a pending tool
+
+ | POST | /tools/{toolId}/reject | Reject a pending tool
+
+Embed chat access is limited to chats created in the embed session (creator-scoped). Execution and billing use the agent owner's workspace.
+
+JavaScript SDK
+
+Point the SDK at the embed base URL and omit the API key:
+
+typescriptcopy
+
+1import { createClient } from '@inferencesh/sdk';2import { AgentChatProvider, useAgentChat } from '@inferencesh/sdk/agent';34const embedClient = createClient({5  baseUrl: 'https://api.inference.sh/embed',6  getToken: () => '',7  credentials: 'include',8});910// Use embedClient with AgentChatProvider — same hooks as authenticated chat11// For template agents with declared context fields, pass context on agentConfig:12// agentConfig={{ agent: 'my-team/pricing-agent@latest', context: { version_id: 'v1' } }}
+
+Host context tools (deprecated)
+
+get_host_context and send_to_host are disabled. internal_tools.host_context is ignored and agents are not offered either tool. A replacement for passing host page context to embedded agents is planned. See Internal tools.
+
+Related
+
+Publishing and embedding agents
+
+Publications API
+
+Agents API
+
+Streaming API
+
+Client tools

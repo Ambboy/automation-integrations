@@ -1,0 +1,247 @@
+Manage private inference engines that run workers on your hardware. Use these endpoints to list engines, inspect status, and perform safe restarts without dropping in-flight tasks.
+
+Requires API key scopes engines:read (list/get) and engines:write (drain, update, stop, restart).
+
+→ Workers · Installing the engine · Configuration
+
+Register engine
+
+POST /engines/register
+
+Called by the inferencesh-engine binary on startup (after registration). Creates a new engine record for your workspace or re-registers an existing one, allocates workers from detected hardware, and returns worker IDs the engine uses for task routing.
+
+Requires engines:write. You normally do not call this manually — install the engine and run engine serve instead.
+
+Request
+
+ | Field | Type | Description
+
+ | local_engine_state | object | Engine ID, name, config, and public key from local state
+
+ | api_url | string | API base URL the engine connects to
+
+ | system_info | object | Host OS, architecture, and detected hardware
+
+ | worker_config | object | Worker allocation preferences from engine.yml
+
+Response
+
+ | Field | Type | Description
+
+ | engine_id | string | Assigned or confirmed engine ID
+
+ | workers | array | Allocated workers with id, gpus, cpus, and rams
+
+On first run, the API creates a new engine with status pending. On subsequent starts, the engine sends its saved ID; the API updates hardware info and worker allocation, sets status to pending, and clears any prior stop reason (starting the process is an explicit start, including after you Stop an engine in the workspace).
+
+Register does not set running. The engine opens its WebSocket after register; that connection moves status to running. Between register and connect you may briefly see pending in list or get responses — nothing in the API waits on running during that gap.
+
+After connect, the engine maintains the WebSocket for task dispatch, drain/update signals, and heartbeats. The API treats that connection as the source of truth for whether the engine is online. See Installing the engine for setup steps.
+
+List engines
+
+GET /engines or POST /engines/list
+
+Cursor-paginated list of engines for your workspace.
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/engines/list \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"limit": 20}'
+
+Get engine
+
+GET /engines/{id}
+
+Returns an engine DTO. List responses (POST /engines/list) use the same shape per item.
+
+ | Field | Type | Description
+
+ | id | string | Engine ID
+
+ | name | string | Display name
+
+ | status | string | Lifecycle state — see table below
+
+ | engine_version | string | Installed inferencesh-engine binary version (e.g. v1.10.15). Set from engine telemetry heartbeats; empty until the first telemetry sync after connect. Also shown in the web app's Engines detail view
+
+ | api_url | string | API base URL the engine connects to
+
+ | workers | array | Worker DTOs with status, GPU/CPU allocation, and current task_id when busy
+
+ | system_info | object | Optional host telemetry (OS, GPUs, RAM). Also includes engine_version, mirrored from the top-level field
+
+ | instance | object | Cloud instance metadata when provisioned through inference.sh
+
+ | Status | Meaning
+
+ | running | Connected over WebSocket and accepting tasks
+
+ | pending | Register completed; WebSocket not connected yet
+
+ | draining | Connected; finishing in-flight tasks and rejecting new work
+
+ | restarting | Connected; draining before a process restart (for example after Update)
+
+ | disconnected | WebSocket closed; reversible when the engine reconnects
+
+ | stopping | Shutting down
+
+ | stopped | Fully stopped
+
+While connected, heartbeats report the finer states above (running, draining, or restarting). When the WebSocket drops, status moves to disconnected even if the host process is still running. A new connection moves the engine back to running from disconnected, pending, or restarting, and can revive a stopped engine after a disconnect-only stop. A Stop you issued or a completed drain is final for reconnect alone — run the engine again (engine serve) so register clears the stop and sets pending, then connect sets running.
+
+If an engine stays disconnected for about five minutes, the API finalizes it: workers are marked inactive, in-flight tasks fail, and cloud instances may be torn down. Brief outages (for example during an API deployment) normally recover when the engine reconnects before that window.
+
+While the engine is still in that reconnect grace (disconnected, not yet finalized), worker liveness follows the engine, not a separate wall-clock on each worker heartbeat. A WebSocket drop does not, by itself, retire workers or fail their in-flight tasks — work can keep running on the host and resume dispatch when the connection returns. Workers are retired when the engine is finalized, when you stop or delete the engine, or when the engine stays connected but has not reported a given worker in its heartbeats for about 90 seconds (for example, a crashed worker slot). API downtime does not count against workers either: engine heartbeats stop being recorded at the same time, so workers are not marked gone during a platform restart.
+
+JavaScript SDK: EngineStatusDisconnected, EngineStatusRestarting, and other status constants ship in @inferencesh/sdk ≥ v0.6.12. EngineDTO includes engine_version, matching the REST API response. Python SDK: EngineDTO in inferencesh.types includes the same field — use it when calling GET /engines/{id} directly.
+
+bashcopy
+
+1curl "https://api.inference.sh/engines/eng_abc123" \2  -H "Authorization: Bearer inf_your_key"
+
+Match engines to resource requirements
+
+POST /engines/resources
+
+Check which workers can satisfy a given resource profile before you run an app with infra: "private" or choose between cloud and private capacity. The web app's run form uses this endpoint to show available private workers and cloud price ranges.
+
+Authentication is optional (guest workspaces get public cloud availability only). With an API key, your workspace's private workers are included in the response.
+
+Request
+
+ | Field | Type | Required | Description
+
+ | resources | object | Yes | Resource requirements to match
+
+ | resources.gpu.count | integer | No | GPUs required (0 for CPU-only)
+
+ | resources.gpu.vram | integer | No | Minimum VRAM per GPU (bytes)
+
+ | resources.gpu.type | string | No | any, none, nvidia, amd, intel, or apple
+
+ | resources.ram | integer | No | Minimum system RAM (bytes)
+
+Pass the resources block from the app variant you plan to run (see App configuration). Values are in bytes — the same internal representation stored on deployed app versions after CLI deploy.
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/engines/resources \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "resources": {6      "gpu": { "count": 1, "vram": 24000000000, "type": "nvidia" },7      "ram": 160000000008    }9  }'
+
+Response
+
+ | Field | Type | Description
+
+ | private.workers | array | Matching workers in your workspace
+
+ | cloud.can_run | boolean | Whether shared cloud workers can satisfy the profile
+
+ | cloud.min_price | integer | Lowest matching cloud worker price (cents per hour)
+
+ | cloud.max_price | integer | Highest matching cloud worker price (cents per hour)
+
+ | error | string | Present when matching failed
+
+Each worker summary includes id, engine_id, engine_name, status, GPU/CPU/RAM details, and the current task_id when busy.
+
+Use this before POST /run when you need to confirm capacity or pick specific workers — see Using private workers.
+
+→ Instance types · Workers concept
+
+Drain engine
+
+POST /engines/{id}/drain
+
+Gracefully prepare an engine for shutdown:
+
+Marks the engine as draining in the API.
+
+Sends a drain signal over the engine WebSocket.
+
+The engine stops accepting new tasks and waits for in-flight work to finish.
+
+When all workers are idle, the engine shuts down.
+
+The engine must be connected (online WebSocket). If it is offline, the API returns an error.
+
+Use drain before maintenance or when you want a clean shutdown without cutting off running tasks.
+
+bashcopy
+
+1curl -X POST "https://api.inference.sh/engines/eng_abc123/drain" \2  -H "Authorization: Bearer inf_your_key"
+
+While draining, new tasks routed to that engine are rejected with reason engine_draining.
+
+Update engine binary
+
+POST /engines/{id}/update
+
+Triggers a safe engine restart on a connected private engine:
+
+The API sends an update signal over the engine WebSocket.
+
+The engine checks https://dist.inference.sh/engine/manifest.json for a newer binary (same OS/arch). If one exists, it downloads and swaps the binary before restarting.
+
+The engine drains in-flight tasks and restarts the process (re-exec) after workers are idle — even when already on the latest version.
+
+This is the API equivalent of the web app's Update action on Engines or running engine update on the host. Use it for binary upgrades or a clean restart without killing running tasks.
+
+bashcopy
+
+1curl -X POST "https://api.inference.sh/engines/eng_abc123/update" \2  -H "Authorization: Bearer inf_your_key"
+
+The engine must be online. On hosts you manage directly, you can also update with the engine CLI — see Installing the engine.
+
+Extend cloud engine duration
+
+POST /engines/{id}/extend
+
+Adds runtime to a cloud-provisioned engine (Shadeform instance) before its auto-delete threshold. Requires engines:write. Your workspace balance is debited at hourly_price × additional_hours.
+
+Request
+
+ | Field | Type | Required | Description
+
+ | additional_hours | number | Yes | Hours to add (must be > 0)
+
+The engine must have an active instance with auto_delete.date_threshold and a positive hourly_price synced from the provider.
+
+bashcopy
+
+1curl -X POST "https://api.inference.sh/engines/eng_abc123/extend" \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"additional_hours": 3}'
+
+Returns the updated engine DTO with a new instance auto_delete threshold. Errors use 400 with code extend_failed when the instance cannot be extended (for example, missing threshold or price).
+
+Self-hosted engines on your own hardware do not use this endpoint — use Update engine binary or restart the service on the host.
+
+Stop engine
+
+POST /engines/{id}/stop
+
+Stops a managed engine instance. If the engine is connected, it receives a graceful stop signal, finishes in-flight tasks, then terminates (including cloud instance teardown when applicable). If the engine is offline, the API finalizes the stop immediately.
+
+Restart engine
+
+POST /engines/{id}/restart
+
+Restarts the underlying cloud instance (Shadeform) for engines provisioned through inference.sh. For self-hosted engines on your own hardware, use update or restart the inferencesh-engine process on the host.
+
+JavaScript SDK
+
+typescriptcopy
+
+1import { inference } from '@inferencesh/sdk';23const client = inference({ apiKey: 'inf_your_key' });45await client.engines.drain('eng_abc123');6await client.engines.updateBinary('eng_abc123'); // POST /engines/{id}/update7await client.engines.stop('eng_abc123');8await client.engines.restart('eng_abc123');9// POST /engines/{id}/extend — pass { additional_hours } in the request body (REST or HttpClient)
+
+client.engines also exposes list, get, create, update, delete, and stream.
+
+Related
+
+ | Guide | Topic
+
+ | Workers | Cloud vs private workers
+
+ | Installing the engine | Host setup and manual upgrades
+
+ | Using private workers | Routing tasks with infra: "private"
+
+ | Instance types | GPU catalog for cloud-provisioned engines

@@ -1,0 +1,446 @@
+openapi: 3.0.1
+info:
+  title: компоненты api invoice
+  version: '1'
+
+components:
+
+  schemas:
+
+    operations:
+      description: возмодные действия с документом (выводятся только допустимые)
+      type: object
+      properties: 
+        bill: 
+          description: можно выписать счет
+          type: boolean
+        reserve: 
+          description: можно в резерв
+          type: boolean
+        del_reserve: 
+          description: возможна отмена резерва
+          type: boolean
+        ship:
+          description: допустим комплект на склад (отгрузка)
+          type: boolean
+        from_op:
+          description: можно выписать на складе ОП
+          type: boolean
+        delivery:
+          description: допустимо создание доставки
+          type: boolean
+        copy:
+          description: можно копировать
+          type: boolean
+        edit:
+          description: можно редактировать
+          type: boolean
+        union:
+          description: можно объединять
+          type: boolean
+        split:
+          description: можно разделять
+          type: boolean
+        deal:
+          description: можно включать в сделку
+          type: boolean
+        change_date:
+          description: можно менять дату
+          type: boolean
+        change_cli:
+          description: можно менять контрагента
+          type: boolean
+        certificate:
+          description: можно печатать сертификаты
+          type: boolean
+        request:
+          description: можно запрашивать цены, сроки
+          type: boolean
+        return:
+          description: можно оформить возврат
+          type: boolean
+        pay_card:
+          description: можно оплатить
+          type: boolean
+        hist:
+          description: документ завершен (в истории)
+          type: boolean
+        stpol:
+          description: можно менять склад-получатель
+          type: boolean
+        cancel:
+          description: можно отменять заказ
+          type: boolean
+        deal_cli:
+          description: можно создать сделку клиенту по данному документу
+          type: boolean
+        price_request_vdiscount:
+          description: доступность выбора функции Скидка на объем
+          type: boolean
+        creServiceNote:
+          description: Операции создания СЗ на документы
+          type: boolean
+
+    list:
+      type: object
+      properties: 
+        rows: 
+          type: array
+          items: 
+            type: object
+            properties: 
+              id: 
+                type: string
+                description: id документа
+              can_look: 
+                type: boolean
+                description: доступность к полному просмотру и операциям документа
+              i: 
+                type: string
+                description: заказ через интернет (i)
+              usr_inv_num: 
+                type: string
+                description: номер документа
+              deal: 
+                type: string
+                description: ссылка на сделку (только для менеджеров)
+              deal_invnetnum: 
+                type: string
+                description: внутренний номер сделки
+              deal_state: 
+                type: string
+                description: код статуса
+              deal_standart: 
+                type: string
+                description: стандартная / нестандартная сделка
+              deal_text: 
+                type: string
+                description: текст статуса
+              deal_whomcre: 
+                type: string
+                description: инициатор создания сделки (400-ый признак)  
+              create_deal: 
+                type: string
+                description: ключ для возможности создания сделки                                                                
+              delivery: 
+                type: string
+                description: доставка
+              delivery_status: 
+                type: string
+                description: Код статуса доставки
+              delivery_name: 
+                type: string
+                description: Наименование статуса доставки                
+              cli_name:
+                type: string
+                description: имя контрагента в документе
+              inv_date: 
+                type: string
+                format: date
+                description: дата документа
+              st_code: 
+                type: integer
+                format: int32
+                description: склад
+              firm_code: 
+                type: string
+                description: фирма
+              st_dest: 
+                type: string
+                description: склад-получатель
+              status_code: 
+                type: string
+                description: код статуса
+              status_name: 
+                type: string
+                description: описание статуса
+              status_color: 
+                type: string
+                description: цвет статуса
+              configStageText: 
+                type: string
+                description: пояснение к статусу заказа (конфигурируемые, проектные и т.д.) 
+              inv_type: 
+                type: integer
+                format: int32
+                description: вид документа
+              inv_fact: 
+                type: string
+                description: состояние (усл/фак)
+              summa: 
+                type: string
+                description: сумма
+              pay: 
+                type: string
+                description: сумма оплат
+              pay_sum: 
+                type: string
+                description: сумма к оплате
+              pay_state: 
+                type: string
+                description: статус оплаты
+              pay_color: 
+                type: string
+                description: цвет поля с оплатой
+              pay_text: 
+                type: string
+                description: описание состояния оплаты
+              pay_date: 
+                type: string
+                description: требуемая дата оплаты
+              pay_date_color: 
+                type: string
+                description: цвет поля требуемая дата оплаты
+              pay_amper: 
+                type: boolean
+                description: оплата амперами
+              operations: 
+                $ref: 'invoice.yaml#/components/schemas/operations'
+              ps:
+                type: string
+                description: примечание
+              agreed:
+                type: string
+                description: согласованность (пусто - нет, 1 - согласован, 2 - разсогласован)
+              cli_code: 
+                type: integer
+                format: int32
+                description: код контрагента
+              cls17_code: 
+                type: string
+                description: код города (17 класс)
+              cls17_name: 
+                type: string
+                description: имя города (17 класс)
+              st_rc: 
+                type: integer
+                format: int32
+                description: склад ЛЦ
+              exp1c: 
+                type: string
+                description: выгрузка в 1С
+              rating: 
+                type: string
+                description: оценка
+              dd_status_code: 
+                type: string
+                description: код статуса ЭДО
+              dd_status_name: 
+                type: string
+                description: статус ЭДО
+              dd_status_color: 
+                type: string
+                description: цвет статуса ЭДО
+              invWhomcre: 
+                type: string
+                description: ФИО инициатора заказа          
+              hasTask:
+                type: boolean
+                description: флаг для определения наличия задач на документе
+        records: 
+          type: integer
+          format: int32
+        limit: 
+          type: boolean
+        inv_ankid: 
+          type: number
+          description: id анкеты
+
+    body:
+      type: object
+      properties: 
+        rows: 
+          type: array
+          items: 
+            type: object
+            properties: 
+              id: 
+                type: string
+              isFict:
+                description: yes, если в строке фиктивная номенклатура
+                type: logical
+              cmt: 
+                description: Комментарий к ФН
+                type: string
+              isService:
+                description: yes, если в строке услуга
+                type: logical
+              linenum: 
+                description: номер строки в документе
+                type: number
+              cliGdsCode: 
+                description: Код НСИ клиента
+                type: string
+              gdscode:
+                description: код товара
+                type: string
+              gdsname:
+                description: наименование товара
+                type: string
+              uhod:
+                description: уходимость товара
+                type: string
+              mnf_code:
+                description: код произволителя товара
+                type: number
+              manuf:
+                description: наименование произволителя товара
+                type: string
+              rsu_code:
+                description: Код поставщика
+                type: string
+              rse_code:
+                description: Код продавца
+                type: string
+              rag_code:
+                description: Код агента
+                type: string
+              class33:
+                description: 33 класс товара
+                type: string
+              art:
+                description: партия товара или артикул, если ее нет
+                type: string
+              article:
+                description: артикул товара
+                type: string
+              country:
+                description: страна произвотства
+                type: string
+              pack:
+                description: возможная упаковка товара (3)
+                type: string
+              pack_color:
+                description: подсветка поля с упаковкой
+                type: string
+              cnt: 
+                description: кол-во товара в документе
+                type: number
+              measure:
+                description: единица измерения
+                type: string
+              okeiMeasure:
+                description: единица измерения в формате ОКЕИ
+                type: string
+              rem:
+                description: остаток на складе
+                type: string
+              price:
+                description: цена с НДС
+                type: string
+              sum:
+                description: стоимость с НДС
+                type: string
+              i:
+                description: тип строки (ПЦ, ipro)
+                type: string
+              dateotgr:
+                description: срок поставки (для version = 3)
+                type: string
+              origDatePost:
+                description: Изначальная требуемая дата
+                type: string
+              uid_1:
+                description: Номер заявки (для version = 3)
+                type: string
+              uid_2:
+                description: Номер позиции заявки (для version = 3)
+                type: string
+              PrimArticle:
+                description: Код АСВ НСИ из заявки (для version = 3)
+                type: string
+              MinParty:
+                description: Мин. партия (для version = 3)
+                type: string
+              MTPZV:
+                description: Наименование МТР Клиента из заявки (для version = 3)
+                type: string
+              MTR:
+                description: Наименование МТР Клиента (для version = 3)
+                type: string
+              ACB:
+                description: Код АСВ НСИ (для version = 3)
+                type: string
+              analog:
+                description: Замена на аналог (для version = 3)
+                type: boolean
+              gdsImage:
+                description: путь к картинке товара
+                type: string
+              minpromtorg:
+                type: boolean
+                description: Логический ключ о нахождении товара в реестре Минпромторга
+                example: true
+              weight:
+                description: масса
+                type: number
+              volume:
+                description: объем
+                type: number
+              length:
+                description: длина
+                type: number
+              width:
+                description: ширина
+                type: number
+              height:
+                description: высота
+                type: number
+              digits:
+                description: число разрядов
+                type: number
+              st_code:
+                description: код склада
+                type: number
+        records:
+          description: всего строк
+          type: number
+        invnum:
+          description: номер документа
+          type: string
+        invnetnum:
+          description: внутренний номер документа
+          type: string
+        invdate:
+          description: дата документа
+          type: string
+          format: date
+        invsum:
+          description: сумма
+          type: number
+        paysum:
+          description: сумма оплат на документе
+          type: number
+        store:
+          description: код склада, на котором документ находится
+          type: number
+        invStatus:
+          description: статус докумена
+          type: string
+        cli_code: 
+          type: integer
+          format: int32
+          description: код контрагента
+        cli_name:
+          type: string
+          description: имя контрагента в документе
+        ClientType:
+          type: string
+          description: Тип контрагента в документе (ЧЛ - частное лицо / ЮЛ - юридическое лицо)          
+        operations: 
+          $ref: 'invoice.yaml#/components/schemas/operations'
+        bonus: 
+          description: бонусные баллы по документу (фактические или возможные)
+          type: string
+        checkurl: 
+          description: урл для получения кассового чека
+          type: string
+        volume: 
+          description: суммарный объем
+          type: number
+        weight: 
+          description: суммарный вес
+          type: number
+        discount: 
+          description: скидка от розничной цены
+          type: number

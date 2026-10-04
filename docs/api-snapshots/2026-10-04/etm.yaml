@@ -1,0 +1,1390 @@
+openapi: 3.0.1
+info:
+  title: API ЭТМ
+  description: API ЭТМ iPRO
+  version: '1.0.0'
+servers:
+  - url: '/api/v1'
+  - url: 'https://itest.etm.ru/api/v1'
+
+tags:
+  - name: user
+    description: Пользователь
+  - name: catalog
+    description: Каталог
+  - name: goods
+    description: Товар
+  - name: job
+    description: Задачи
+  - name: info
+    description: Информация
+  - name: invoice
+    description: Документы
+  - name: delivery
+    description: Доставки
+
+paths:
+
+  /user/login:
+    post:
+      summary: Авторизация    
+      tags:
+        - user
+      parameters:
+        - name: log
+          in: query
+          description: Имя пользователя
+          required: true
+          schema:
+            type: string
+        - name: pwd
+          in: query
+          description: Пароль
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Успешная авторизация'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: 'components.yaml#/components/schemas/Status'
+                  data: 
+                    type: object
+                    properties:
+                      session: 
+                        type: string
+                        description: Ключ пользователя (время жизни 2 часа)
+        '403':
+          description: 'Неверный логин или пароль'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: 'components.yaml#/components/schemas/Status'
+
+  /catalog:
+    get:
+      summary: Список товаров
+      tags:
+        - catalog
+      security:
+        - userAuth: []
+      parameters:
+        - in: query
+          name: val
+          description: Поисковый запрос
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: ['code']
+          description: >
+            по чему ищем:
+             * `code` - по коду и артикулу
+        - name: mnf
+          in: query
+          schema:
+            type: integer
+            format: int32
+          description: Код производителя
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: '#/components/schemas/Catalog'
+
+  /goods/{id}/price:
+    get:
+      summary: Цена товара
+      tags:
+        - goods
+      security:
+        - userAuth: []
+      parameters:
+        - $ref: '#/components/parameters/goods_ids'
+        - $ref: '#/components/parameters/goods_id_type'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: 'components.yaml#/components/schemas/Status'
+                  data: 
+                    type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            price: 
+                              description: цена без НДС
+                              type: number
+                            pricewnds: 
+                              description: цена с НДС
+                              type: number
+                            price_tarif: 
+                              description: цена по тарифу
+                              type: number
+                            price_retail: 
+                              description: розничная цена
+                              type: number
+                            gdscode: 
+                              description: код товара в ЭТМ
+                              type: number
+
+  /goods/{id}/remains:
+    get:
+      summary: Доступность товара
+      tags:
+        - goods
+      security:
+        - userAuth: []
+      parameters:
+        - $ref: '#/components/parameters/goods_id'
+        - $ref: '#/components/parameters/goods_id_type'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: 'components.yaml#/components/schemas/Status'
+                  data: 
+                    type: object
+                    properties: 
+                      gdscode: 
+                        description: код товара в ЭТМ
+                        type: number
+                      UnitName: 
+                        description: ед.измерения
+                        type: string                        
+                      InfoStores: 
+                        description: перечень складов
+                        type: array                        
+                        items: 
+                          type: object
+                          properties: 
+                            StoreCode: 
+                              description: код склада                            
+                              type: number
+                            StoreName: 
+                              description: имя склада
+                              type: string
+                            StoreType: 
+                              description: тип склада (rc,crs,op)
+                              type: string                              
+                            StoreQuantRem: 
+                              description: остаток                            
+                              type: string
+                      InfoSuppStores: 
+                        type: array
+                        description: информация о наличии товара на складах поставщика (если доступна)
+                        items: 
+                          type: object
+                          properties:
+                            SuppStoreName:
+                              description: наименование склада
+                              type: string
+                            SuppStoreState:
+                              description: состояние на (утро такого-то числа/прогноз на такую-то дату)
+                              type: string
+                            SuppStoreQuantRem:
+                              description: количество товара
+                              type: string
+                            SuppStoreUnitName:
+                              description: наименование единицы измерения
+                              type: string
+  /goods/{id}:
+    get:
+      summary: Характеристики товара
+      tags:
+        - goods
+      security:
+        - userAuth: []
+      parameters:
+        - $ref: '#/components/parameters/goods_id'
+        - $ref: '#/components/parameters/goods_id_type'
+        - $ref: '#/components/parameters/goods_mnf'        
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: 'goods.yaml#/components/schemas/Goods'
+
+  /goods/remains:
+    get:
+      summary: Остатки всех товаров
+      tags:
+        - goods
+      security:
+        - userAuth: []
+      parameters:
+        - name: store
+          in: query
+          description: Склад (если нужен ответ по конкретному, а не всем доступным)
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: 'components.yaml#/components/schemas/Status'
+                  data: 
+                    type: object
+                    properties:
+                      rows: 
+                        type: array
+                        items:
+                          type: object
+                          properties: 
+                            gdsCode:
+                              type: string
+                              description: код товара
+                            gdsName:
+                              type: string
+                              description: наименование товара
+                            Article: 
+                              type: string
+                              description: артикул товара
+                            RemInfo: 
+                              type: string
+                              description: остаток товара
+
+  /job/create/{procedure}:
+    post:
+      summary: Запуск формирования задачи (отчета)
+      tags:
+        - job
+      security:
+        - userAuth: []
+      parameters:
+        - in: path  
+          required: true
+          name: procedure
+          description: >
+            Номер процедуры:
+             * 40029846 - формирование списка товаров (формат - json массив c данными: id,name,brand,article,brand_code,cli_code,class)
+          schema:
+            type: string
+            enum: ["40029846"]
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  status:
+                      $ref: 'components.yaml#/components/schemas/Status'
+                  data: 
+                    type: object
+                    properties: 
+                      message: 
+                        description: сообщение об ошибке
+                        type: string
+                      uuid: 
+                        description: uuid созданной задачи на формирование
+                        type: string
+
+  /job/{uuid}:
+    get:
+      summary: Состояние задачи
+      tags:
+        - job
+      security:
+        - userAuth: []
+      parameters:
+        - in: path  
+          required: true
+          name: uuid
+          description: uuid из ответа метода /job/create/
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: 'components.yaml#/components/schemas/Status'
+                  data: 
+                    type: object
+                    properties: 
+                      rows: 
+                        type: array
+                        items: 
+                          type: object
+                          properties: 
+                            id:
+                              type: string
+                            state:
+                              type: string
+                              description: >
+                                Состояние задачи:
+                                 * 0 - создана
+                                 * 1 - успешно завершена
+                                 * 2 - завершена с ошибкой
+                                 * 3 - ждет назначенного времени запуска
+                            msg:
+                              type: string
+                              description: сообщение об ошибке
+                            name:
+                              type: string
+                              description: название задачи (отчета)
+#                            files:
+#                              type: string
+#                              description: файлы с результатом (через ";")
+                            urls:
+                              type: array
+                              description: массив ссылок на файлы с результатом
+                              items: 
+                                type: string
+                            whencre:
+                              type: string
+                              description: дата запуска
+                            timecre:
+                              type: string
+                              description: время запуска
+
+  /info/search/{type}/:
+    get:
+      summary: Справочники
+      tags:
+        - info
+      parameters:
+        - in: path
+          required: true
+          name: type
+          description: >
+            Тип справочника:
+              * r-manuf - производители
+          schema:
+            type: string
+            enum: ['r-manuf']
+        - in: query
+          name: term
+          description: >
+            контекст поиска:
+              * для type=r-manuf - код или наименование производителя              
+          schema:
+            type: string
+        - $ref: 'components.yaml#/components/parameters/page'
+        - $ref: 'components.yaml#/components/parameters/rows'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: 'components.yaml#/components/schemas/Status'
+                  data: 
+                    type: object
+                    properties: 
+                      rows: 
+                        type: array
+                        items:
+                          type: object
+                          properties: 
+                            id: 
+                              type: string
+                              description: внутренний id записи
+                            value: 
+                              type: string
+                              description: код
+                            label: 
+                                type: string                        
+                                description: наименование
+  
+  /invoice:
+    get:
+      summary: Список докуменов
+      tags:
+        - invoice
+      security:
+        - userAuth: []
+      parameters:
+        - in: query
+          name: d1
+          description: Начало периода
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: d2
+          description: Конец периода
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: usr-inv-num
+          description: Номер документа
+          schema:
+            type: string
+        - in: query
+          name: status
+          description: Статус документа
+          schema:
+            type: string
+        - in: query
+          name: cprStatus
+          description: >
+            Статус ЦПР
+             * `rejected` - Отклонен
+             * `agreed` - Согласован
+             * `wait` - Ожидает согласования
+          schema:
+            type: string
+            enum: ['rejected', 'agreed', 'wait']
+        - name: sidx
+          in: query
+          schema:
+            type: string
+            enum: ['inv-date', 'usr-inv-num', 'inv-store-sum']
+          description: >
+            Поле сортировки:
+             * `inv-date` - дата документа
+             * `usr-inv-num` - номер документа
+             * `inv-store-sum` - сумма докуемнта
+        - $ref: 'components.yaml#/components/parameters/sord'
+        - $ref: 'components.yaml#/components/parameters/page'
+        - $ref: 'components.yaml#/components/parameters/rows'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: 'components.yaml#/components/schemas/Status'
+                  data: 
+                    $ref: 'invoice.yaml#/components/schemas/list'
+
+  /invoice/{id}/body:
+    get:
+      summary: Документ (товарные строки)
+      tags:
+        - invoice
+      security:
+        - userAuth: []
+      parameters:
+        - in: path
+          required: true
+          name: id
+          description: id документа
+          schema:
+            type: string
+        - in: query
+          name: nodateotgr
+          description: не считать возможную дату отгрузки
+          schema:
+            type: string
+            enum: ['yes']
+        - in: query
+          name: nobonus
+          description: не считать возможные баллы
+          schema:
+            type: string
+            enum: ['yes']
+        - in: query
+          name: nosize
+          description: не выводить размеры товара
+          schema:
+            type: string
+            enum: ['yes']
+        - in: query
+          name: detail
+          description: Значения для вывода через запятую (seller,buyer,delivery,upd,country,price)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: 'components.yaml#/components/schemas/Status'
+                  data: 
+                    $ref: 'invoice.yaml#/components/schemas/body'
+
+  /invoice/create:
+    post:
+      summary: Создание документа
+      tags:
+        - invoice
+      security:
+        - userAuth: []
+      parameters:
+        - in: query
+          name: TypeDoc
+          description: вид документа
+          schema:
+            type: number
+            enum: [10,250,345]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+#              $ref: '#/components/schemas/Pet'
+          application/xml:
+            schema:
+#              $ref: '#/components/schemas/Pet'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  status:
+                      $ref: 'components.yaml#/components/schemas/Status'
+                  data: 
+                    type: object
+                    properties: 
+                      id:
+                        type: string
+                        description: id созданного документа
+
+  /invoice/{id}/print/{proc}:
+    post:
+      summary: Печать по документу(ам) формы печати
+      tags:
+        - invoice
+      security:
+        - userAuth: []
+      parameters:
+        - in: path
+          required: true
+          name: id
+          description: id документа
+          schema:
+            type: string
+        - in: path
+          name: proc
+          description: >
+            Вид формы печати:
+             * `bill` - счет
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: ch2
+          description: id второго документа при групповых операциях
+          schema:
+            type: string
+        - in: query
+          name: ch3
+          description: id третьего документа при групповых операциях (и так до 40)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: 'components.yaml#/components/schemas/Status'
+                  data:
+                    type: object
+        '403':
+          description: 'Ошибка'
+        '404':
+          description: 'Не найден'
+
+  /invoice/{id}/order:
+    post:
+      summary: Заказ на основе документа
+      tags:
+        - invoice
+      security:
+        - userAuth: []
+      parameters:
+        - in: path
+          required: true
+          name: id
+          description: id документа
+          schema:
+            type: string
+        - name: skl
+          in: query
+          description: код склада-получетеля (для доставки передавать 1000)
+          schema:
+            type: integer
+            format: int32
+        - name: tovzak
+          in: query
+          description: примечание
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json; charset=utf-8:
+              schema:
+                $ref: 'components.yaml#/components/schemas/Status'
+
+  /invoice/{id}/delivery:
+    post:
+      summary: Добавление документа в новую доставку
+      tags:
+        - invoice
+      security:
+        - userAuth: []
+      parameters:
+        - in: path
+          required: true
+          name: id
+          description: id документа
+          schema:
+            type: string
+        - in: query
+          required: true
+          name: adr
+          description: id точки доставки
+          schema:
+            type: string
+        - in: query
+          required: true
+          name: date
+          description: дата разгрузки
+          schema:
+            type: string
+        - in: query
+          required: true
+          name: time
+          description: время разгрузки с
+          schema:
+            type: string
+        - in: query
+          required: true
+          name: time_po
+          description: время разгрузки по
+          schema:
+            type: string
+        - in: query
+          required: true
+          name: phone
+          description: телефон
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: 'components.yaml#/components/schemas/Status'
+       
+  /invoice/{id}/ps:
+    get:
+      summary: Получение примечаний (записей в переписке) на документе 
+      tags:
+        - invoice
+      security:
+        - userAuth: []
+      parameters:
+        - in: path
+          required: true
+          name: id
+          description: id документа
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: 'components.yaml#/components/schemas/Status'
+                  data: 
+                    type: object
+                    properties: 
+                      ps: 
+                        type: string
+                        description: примечание документа
+                      invWhencre: 
+                        type: string
+                        description: дата создания документа
+                      invTimecre: 
+                        type: string
+                        description: время создания документа
+                      author: 
+                        type: string
+                        description: автор документа
+                      agreement: 
+                        type: string
+                        description: Если пользователь может согласовать/рассогласовать документ то 1, иначе 0
+                      comments: 
+                        type: array
+                        description: массив с перепиской
+                        items: 
+                          type: object
+                          properties: 
+                            candel: 
+                              type: string
+                            date: 
+                              type: string
+                            time: 
+                              type: string
+                            fio: 
+                              type: string
+                            agreed: 
+                              type: string
+                            text: 
+                              type: string
+    post:
+      summary: Добавление примечания (записи в переписке) к документу
+      tags:
+        - invoice
+      security:
+        - userAuth: []
+      parameters:
+        - in: path
+          required: true
+          name: id
+          description: id документа
+          schema:
+            type: string
+        - in: query
+          name: sg
+          description: >
+            Согласования:
+            * 1 - согласовано
+            * 2 - рассогласовано
+            * 3 - требует согласование
+          schema:
+            type: string
+            enum: ['1','2','3']
+        - in: query
+          name: text
+          description: текст
+          schema:
+            type: string
+        - in: query
+          name: docStatus
+          description: >
+            Итоговый статус согласования
+            * agreed - согласован 
+            * rejected - отклонен
+            * wait - ожидает согласования
+          schema:
+            type: string
+        - in: query
+          name: service_message
+          description: Внутреннее сообщение, не доступное для просмотра пользователями
+          schema:
+            type: string
+            enum: ['true', 'false']
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: 'components.yaml#/components/schemas/Status'
+                  data: 
+                    type: object
+                    properties: 
+                      msg: 
+                        type: string
+                      fio: 
+                        type: string
+                      date: 
+                        type: string
+                      time: 
+                        type: string
+  
+  /delivery/point/create:
+    post:
+      summary: Создание точки доставки
+      tags:
+        - delivery
+      security:
+        - userAuth: []
+      parameters:
+        - in: query
+          required: true
+          name: t-adr
+          description: Адрес
+          schema:
+            type: string
+        - in: query
+          required: true
+          name: t-gps
+          description: Координаты (через запятую)
+          schema:
+            type: string
+        - in: query
+          name: t-info
+          description: Информация для водителя
+          schema:
+            type: string
+        - in: query
+          name: t-kont
+          description: ФИО
+          schema:
+            type: string
+        - in: query
+          required: true
+          name: t-tel
+          schema:
+            type: string
+          description: Телефон
+
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: 'components.yaml#/components/schemas/Status'
+                  data: 
+                    type: object
+                    properties: 
+                      id:
+                        type: string
+                        description: id созданной точки
+
+  /delivery/point/{id}/date:
+    get:
+      summary: Даты возможной доставки в выбранную точку
+      tags:
+        - delivery
+      security:
+        - userAuth: []
+      parameters:
+        - in: path
+          required: true
+          name: id
+          description: id точки доставки
+          schema:
+            type: string
+        - in: query
+          name: month
+          description: месяц
+          schema:
+            type: number
+        - in: query
+          name: year
+          description: год
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+                properties:
+                  status:
+                    $ref: 'components.yaml#/components/schemas/Status'
+                  data: 
+                    type: object
+                    properties: 
+                      rows: 
+                        type: array
+                        items:
+                          type: object
+                          properties: 
+                            id: 
+                              type: string
+                            scheduleErr: 
+                              type: string
+                            shipmentDates: 
+                              type: array
+                              description: список доступных дат через запятую
+
+components:
+  securitySchemes:
+    userAuth:
+      $ref: 'components.yaml#/components/securitySchemes/userAuth'
+  parameters:
+    goods_id:
+      name: id
+      in: path
+      required: true
+      description: Код товара
+      schema:
+        type: string
+    goods_ids:
+      name: id
+      in: path
+      required: true
+      description: Коды товара через запятую (не более 50 шт.)
+      schema:
+        type: string
+    goods_id_type:
+      name: type
+      in: query
+      description: >
+        Тип кода товара:
+         * cli - код клиента (дефолт)
+         * etm - код ЭТМ
+         * mnf - код производителя (артикул)
+#         * bar - штрих-код товара
+      schema:
+        type: string
+        enum: ['cli','etm','mnf']
+    goods_mnf:
+      name: mnf
+      in: query
+      description: Код производителя в ЭТМ (работает как фильтр для type=mnf)
+      schema:
+        type: number
+  schemas:
+    Catalog:
+      description: Каталог товаров
+      type: object
+      properties:
+        status:
+          $ref: 'components.yaml#/components/schemas/Status'
+        data: 
+          type: object
+          properties: 
+            rows: 
+              type: array
+              items:
+                type: object
+                properties: 
+                  id:
+                    type: string
+                    description: ID (КодТовара-NetСкладскойКарточки-NumСкладскойКарточки)
+                  code: 
+                    type: string
+                    description: код товара с префиксом ETM
+                  gdscode: 
+                    type: number
+                    description: код товара
+                  image: 
+                    type: string
+                    description: путь к картинке
+                  name: 
+                    type: string
+                    description: наименование
+                  analog: 
+                    type: string
+                    description: наличие у товара аналога и взаимозаменяемого товара (КодВзЗамены;КодАналогов)
+                  art: 
+                    type: string
+                    description: артикул
+                  mnf_name: 
+                    type: string
+                    description: наименование производителя
+                  pack: 
+                    type: string
+                    description: упаковка
+                  rem_op: 
+                    type: number
+                    description: наличие в первом попавшемся ОП в регионе
+                  rem: 
+                    type: string
+                    description: остаток на ЛЦ
+                  rem_add: 
+                    type: string
+                    description: остаток на ОП
+                  rem_crs: 
+                    type: number
+                    description: остаток на ЦРС
+                  price: 
+                    type: string
+                    description: цена клиента
+                  price98: 
+                    type: string
+                    description: розничная цена
+                  price482: 
+                    type: string
+                    description: цена с максимальной скидкой в ИМ
+                  edizm: 
+                    type: string
+                    description: единица измерения
+                  can_basket: 
+                    type: string
+                    description: можно ли добавлять товар в корзину ('p','-' - нельзя; пусто и 'z' - можно)
+                  basket_cnt: 
+                    type: string
+                    description: Количество данного товара уже положенного в корзину
+                  taking: 
+                    type: string
+                    description: количество покупок клиента (избранное и мой каталог)
+                  group: 
+                    type: string
+                    description: наменование группы в режиме конструктора
+                  min_cnt: 
+                    type: string
+                    description: минимально допустимое количество к добавлению в корзину
+                  price_dec: 
+                    type: number
+                    description: числовое выражение цены клиента
+                  qual: 
+                    type: string
+                    description: качество товара (ГОСТ и т.п.)
+                  more: 
+                    type: string
+                    description: есть больше товара, если = 1
+                  crs_days: 
+                    type: number
+                    description: срок поставки на РЦ с ЦРС или экспрессом
+                  mnf_code: 
+                    type: number
+                    description: код производителя
+                  mnf_link: 
+                    type: string
+                    description: url производителя
+                  country: 
+                    type: string
+                    description: страна произвотства
+                  my: 
+                    type: string
+                    description: товар в моем каталоге (избранном)
+                  my_code: 
+                    type: string
+                    description: код товара клиента
+                  nlk: 
+                    type: string
+                    description: 1 - это безусловная акция (82 класс), 2 - неликвид, 3 - условная акция (291 класс с ApplicInCatalog=yes), приоритет от большего номера к меньшему
+                  rem_expected: 
+                    type: number
+                    description: ожидаемое к поступлению кол-во товара
+                  cnt_similar:
+                    type: number
+                    description: кол-во однотипных товаров
+                  pack_alt: 
+                    type: string
+                    description: альтернативные упаковки товара в формате ИмяУпак1$Кол-воУпак1$ТочностьУпак1|ИмяУпак2$Кол-воУпак2$ТочностьУпак2....
+                  constr:
+                    type: boolean
+                    description: наличие конструктора
+                  kpp:
+                    type: boolean
+                    description: партионный кабель
+                  new:
+                    type: boolean
+                    description: новинка
+                  can_tag:
+                    type: boolean
+                    description: доступность создания тега
+                  main_card:
+                    type: boolean
+                    description: главная карточка товара
+                  add_info_card:
+                    type: array
+                    description: массив данных карточки товара
+                    items: 
+                          type: object
+                          properties: 
+                            gdsNameCountry: 
+                              type: string
+                              description: страна
+                            description: 
+                              type: string
+                              description: описание
+                            gdsMnfUrl: 
+                              type: string
+                              description: ЧПУ производителя товара
+                            gdsSertifName: 
+                              type: string
+                              description: сертификат
+                            gdsClassTree: 
+                              type: array
+                              description: дерево классификация товара в каталоге
+                              items: 
+                                type: object
+                                properties: 
+                                  code: 
+                                    type: string
+                                    description: код класса
+                                  name: 
+                                    type: string
+                                    description: имя класса
+                                  url: 
+                                    type: string
+                                    description: ЧПУ класса
+                            gdsChars: 
+                              $ref: 'goods.yaml#/components/schemas/GdsChars'
+                            gdsImages: 
+                              type: object
+                              description: изображения товара
+                              properties: 
+                                gdsImgSrc: 
+                                  type: string
+                                  description: ссылка на картинку
+                                gdsImgRef: 
+                                  type: string
+                                  description: ссылка для перехода
+                            gdsVideos:
+                              $ref: '#/components/schemas/gdsVideos' 
+                            certificates:
+                              $ref: '#/components/schemas/certificates' 
+                            gdsTechDescInt: 
+                              type: array
+                              description: дополнительные материалы по товару
+                              items: 
+                                type: object
+                                properties: 
+                                  gdsTechIntSrc: 
+                                    type: string
+                                    description: ссылка на материал
+                                  gdsTechIntName: 
+                                    type: string
+                                    description: описание
+                                  gdsTechIntType:
+                                    type: string
+                                    description: тип файла
+                            gdsTechDescExt: 
+                              type: array
+                              description: внеешняя техническая информация по товару
+                              items:
+                                type: object
+                                properties: 
+                                  gdsTechIntSrc: 
+                                    type: string
+                                    description: ссылка
+                                  gdsTechIntName: 
+                                    type: string
+                                    description: описание
+                                  gdsTechIntType:
+                                    type: string
+                                    description: тип файла
+                            gdsInfoPacks: 
+                              type: string
+                              description: упаковки
+                            sumUsers: 
+                              type: number
+                              description: количество пользователей, оценивших товар
+                            minPack: 
+                              type: string
+                              description: минимально возможное кол-во
+                            purchased: 
+                              type: string
+                              description: пользователь покупал ранее этот товар
+                            bull_mnf: 
+                              type: string
+                              description: бонусные баллы от производителя
+                            bull_etm: 
+                              type: string
+                              description: бонусные баллы от ЭТМ
+                            sumRaiting: 
+                              type: number
+                              description: средняя оценка от всех пользователей
+                            userRaiting: 
+                              type: number
+                              description: Оценка товара пользователем
+                            gdsClasses:
+                              type: array
+                              description: вся классификация товара
+                              items:
+                                type: object
+                                properties: 
+                                  gdsTypeClass: 
+                                    type: string
+                                    description: тип класса
+                                  gdsCodeClass: 
+                                    type: string
+                                    description: код класса
+                                  gdsNameClass: 
+                                    type: string
+                                    description: наименование класса
+                            gdsPacks:
+                              type: array
+                              description: упаковки
+                              items:
+                                type: object
+                                properties: 
+                                  gdsPackCode: 
+                                    type: string
+                                    description: код упаковки
+                                  gdsPackName: 
+                                    type: string
+                                    description: наименование упаковки
+                                  gdsPackVal: 
+                                    type: string
+                                    description: количество товара в упаковке
+                                  gdsPackWeightVal: 
+                                    type: string
+                                    description: вес
+                                  gdsPackWeightDim: 
+                                    type: string
+                                    description: единица измерения веса
+                                  gdsPackLengthVal: 
+                                    type: string
+                                    description: длина
+                                  gdsPackLengthDim: 
+                                    type: string
+                                    description: единица измерения длины
+                                  gdsPackWidthVal: 
+                                    type: string
+                                    description: ширина
+                                  gdsPackWidthDim: 
+                                    type: string
+                                    description: единица измерения ширины
+                                  gdsPackHeigthVal: 
+                                    type: string
+                                    description: высота
+                                  gdsPackHeigthDim: 
+                                    type: string
+                                    description: единица измерения высоты
+                                  gdsPackVolumeVal: 
+                                    type: string
+                                    description: объем
+                                  gdsPackVolumeDim: 
+                                    type: string
+                                    description: единица измерения объема
+
+            records:
+              type: integer
+            limit:
+              type: boolean
+            timeX:
+              type: integer
+            timeY:
+              type: integer
+            str:
+              type: string
+            title: 
+              type: string
+              description: заголовок документа для отображения в заголовке окна браузера или на вкладке страницы(показывается если в фильтре присутствует класс)
+            seo_desc: 
+              type: string
+              description: мета-описание страницы(показывается если в фильтре присутствует класс)
+            seo_h1: 
+              type: string
+              description: заголовок H1 для класса(показывается если в фильтре присутствует класс)              
+            description: 
+              type: string
+              description: описание для класса(показывается если в фильтре присутствует класс)
+            result_desc:
+              type: string
+              description: текстовое описание результата
+            result_improve:
+              type: string
+              description: текстовое описание, как результат может быть улучшен
+            result_tooltip:
+              type: string
+              description: подсказка к описанию
+            result_key:
+              type: string
+              description: значение ключа improve, которое надо использовать для расширенного запроса
+            tag: 
+              type: array
+              description: теги класса(показывается если в фильтре присутствует класс)
+              items:
+                type: object
+                properties: 
+                  ctt_class81:
+                    type: string
+                    description: код класса 81 классификатора
+                  ctt_chpu:
+                    type: string
+                    description: ЧПУ
+                  ctt_link:
+                    type: string
+                    description: ссылка на страницу тега
+                  ctt_name:
+                    type: string
+                    description: наименование тега
+                  ctt_sort:
+                    type: string
+                    description: сортировка
+                  ctt_title:
+                    type: string
+                    description: заголовок тега
+                  ctt_desc:
+                    type: string
+                    description: описание тега
+                  ctt_h1:
+                    type: string
+                    description: H1 заголовок тега
+    gdsVideos:
+      type: array
+      description: массив с видео
+      items: 
+        type: object
+        properties: 
+          gdsVidSrc:
+            type: string
+            description: ссылка
+          gdsVidName:
+            type: string
+            description: наименование
+          gdsVidType:
+            type: string
+            description: тип
+    certificates:
+      type: array
+      description: массив по сертификатам
+      items: 
+        type: object
+        properties: 
+          name:
+            type: string
+            description: наименование
+          file:
+            type: string
+            description: файл
+          type:
+            type: string
+            description: тип
+          lable:
+            type: string
+            description: значение параметра lable
+

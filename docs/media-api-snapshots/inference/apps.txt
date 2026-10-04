@@ -1,0 +1,189 @@
+Manage your apps and versions via REST.
+
+For running apps (creating tasks), see Tasks. For CLI deploy workflows, see Deploying.
+
+→ Apps concept · Extending Apps
+
+Authentication
+
+Read endpoints require the apps:read scope. Write endpoints (including setting the current version) require apps:write.
+
+App refs and naming
+
+Apps are identified by namespace/name — for example myteam/image-gen. This ref is what callers pass to POST /run, the CLI (belt app run namespace/name), and agent tools.
+
+ | Rule | Detail
+
+ | Unique ref | Each namespace/name pair is unique among live apps. Creating or deploying to a taken ref returns 409 name_conflict.
+
+ | Same name, different namespace | The same name slug can exist in multiple namespaces — even under the same owner (for example arxiv/search and exa/search).
+
+ | Updates | Redeploying to an existing ref creates a new version instead of a second app — see Deploying.
+
+ | Deleted apps | Deleting an app releases its namespace/name ref for reuse.
+
+Pin a specific version with @version-id (for example myteam/image-gen@ver_abc123). Omit the version pin to use the current active version.
+
+Get App
+
+GET /apps/{id}
+
+Returns a single app by ID, including the active version in version_id and version.
+
+GET /apps/{namespace}/{name}
+
+Returns an app by namespace and name (for example myteam/my-app).
+
+Returns 404 with code not_found when no app matches; use Search for broader discovery.
+
+List Apps
+
+GET /apps or POST /apps/list
+
+Returns your apps with cursor-based pagination. Requires the apps:read scope.
+
+Request
+
+ | Field | Type | Description
+
+ | limit | number | Page size (default 50, max 100)
+
+ | cursor | string | Cursor from a previous response
+
+ | direction | string | "next" (default) or "prev"
+
+ | filters | array | { "field", "operator", "value" } — use app column names
+
+ | sort | array | { "field", "dir" } where dir is asc or desc
+
+ | search | object | { "term", "fields" } for case-insensitive substring match
+
+Supported filter and sort fields include namespace, name, category, visibility, status, created_at, and updated_at. Unknown filter or sort columns return 400 (Invalid sort or filter field). See Cursor pagination.
+
+Text search: search.term is required. Each name in search.fields must be an allowlisted column (namespace, name, description, category, agent_description, and others on the app model). Invalid or empty field names are ignored; if no valid fields remain, the search clause is skipped.
+
+Example — filter by namespace:
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/apps/list \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "limit": 20,6    "filters": [{ "field": "namespace", "operator": "eq", "value": "myteam" }]7  }'
+
+Example — search name and description:
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/apps/list \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "limit": 20,6    "search": { "term": "flux", "fields": ["name", "description"] }7  }'
+
+Response
+
+ | Field | Type | Description
+
+ | items | array | App objects
+
+ | next_cursor | string | Cursor for the next page
+
+ | prev_cursor | string | Cursor for the previous page
+
+ | has_next | boolean | More results available
+
+ | has_previous | boolean | Previous page available
+
+List Versions
+
+GET /apps/{id}/versions or POST /apps/{id}/versions/list
+
+Returns version history for an app. Each version has its own ID.
+
+Get Version
+
+GET /apps/{id}/versions/{versionId}
+
+Returns a specific app version. versionId is the version's ID (the segment after @ in refs like myteam/my-app@ver_abc123).
+
+Set Current Version
+
+PUT /apps/{id}/versions/{versionId}/current
+
+Sets which version is active for the app. The active version is what runs when callers use namespace/name without @version, and what the Grid and search index expose as the live app.
+
+Requires the apps:write scope. No request body. Idempotent: calling it again with the same version has no effect.
+
+Example
+
+bashcopy
+
+1curl -X PUT "https://api.inference.sh/apps/app_abc123/versions/ver_xyz789/current" \2  -H "Authorization: Bearer inf_your_key"
+
+Response
+
+Returns the updated app (same shape as Get App), with version_id and version pointing at the promoted version.
+
+jsoncopy
+
+1{2  "id": "app_abc123",3  "namespace": "myteam",4  "name": "my-app",5  "version_id": "ver_xyz789",6  "version": { "id": "ver_xyz789", "kernel": "python-3.11" }7}
+
+When to use this
+
+After a staged deploy (belt app deploy --stage) — promote the new version when you are ready
+
+To roll back — set an older version as current
+
+From automation — switch active versions without using the web UI
+
+By default, belt app deploy (without --stage) makes the new version current automatically. Use staged deploys plus this endpoint when you want to test a version before promoting it.
+
+Migration from POST /apps/{id}/current-version
+
+The previous endpoint accepted the version ID in the JSON body:
+
+bashcopy
+
+1# Removed — do not use2curl -X POST "https://api.inference.sh/apps/app_abc123/current-version" \3  -H "Authorization: Bearer inf_your_key" \4  -H "Content-Type: application/json" \5  -d '{"version_id": "ver_xyz789"}'
+
+Use PUT /apps/{id}/versions/{versionId}/current instead, with versionId in the path.
+
+App lifecycle status
+
+Apps have a status field separate from visibility. Visibility controls who can see the app (public, team, private). Status controls whether new runs can be created and how the app appears in discovery.
+
+App objects include:
+
+ | Field | Type | Description
+
+ | status | string | active, maintenance, deprecated, or retired (default active)
+
+ | status_message | string | Optional human-readable explanation shown to callers
+
+ | status_changed_at | string | ISO timestamp of the last status change
+
+ | Status | New runs | Discovery
+
+ | active | Allowed | Listed in store and search (when public)
+
+ | deprecated | Allowed — existing integrations keep working | Listed in store and search (when public)
+
+ | maintenance | Blocked — 503 with app_maintenance | Still visible to owners; public store/search behavior unchanged
+
+ | retired | Blocked — 410 with app_retired | Excluded from store listings and search; historical tasks remain accessible
+
+Use deprecated when you want callers to migrate but still allow runs. Use maintenance for temporary outages. Use retired when an app should no longer be discoverable or runnable while preserving run history.
+
+Update status
+
+POST /apps/{id}/status
+
+Requires the apps:write scope. The caller must have write permission on the app.
+
+ | Field | Type | Required | Description
+
+ | status | string | Yes | active, maintenance, deprecated, or retired
+
+ | message | string | No | Stored in status_message and shown when runs are blocked
+
+Returns the updated app (same shape as Get App).
+
+bashcopy
+
+1curl -X POST "https://api.inference.sh/apps/app_abc123/status" \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"status": "deprecated", "message": "Use myteam/flux-v2 instead"}'
+
+When an app is in maintenance or retired, POST /run and POST /apps/run return errors — see Tasks API — Run Task errors.

@@ -1,0 +1,607 @@
+Run apps and manage tasks.
+
+Run Task
+
+POST /run
+
+Run an app and optionally wait for completion.
+
+Request
+
+ | Field | Type | Required | Description
+
+ | app | string | Yes | App identifier (namespace/name@version)
+
+ | input | object | Yes | Input data matching app schema
+
+ | setup | object | No | Setup parameters
+
+ | infra | string | No | "cloud", "private", or "private_first" (default "cloud" when omitted)
+
+ | workers | string[] | No | Specific worker IDs
+
+ | webhook | string | No | URL to receive a POST when the task completes
+
+ | session | string | No | "new" to start a session, or existing session ID
+
+ | session_timeout | number | No | Session idle timeout in seconds (1-3600, only with session: "new")
+
+Example:
+
+jsoncopy
+
+1{2  "app": "infsh/flux",3  "input": {4    "prompt": "A sunset over mountains"5  },6  "setup": {7    "model": "schnell"8  }9}
+
+Response
+
+ | Field | Type | Description
+
+ | id | string | Task ID
+
+ | status | number | Status code
+
+ | input | object | Input data
+
+ | output | object | Output data (when complete). Internal pricing field output_meta is stripped — app authors still set it in app code; see Output metadata.
+
+ | error | string | Error message (if failed)
+
+ | session_id | string | Session ID (if using sessions)
+
+ | created_at | string | ISO timestamp
+
+Example:
+
+jsoncopy
+
+1{2  "id": "task_abc123",3  "status": 10,4  "input": { "prompt": "A sunset..." },5  "output": {6    "image": { "uri": "https://..." }7  },8  "created_at": "2024-01-15T10:30:00Z"9}
+
+Errors
+
+These apply to both POST /run and POST /apps/run (same handler).
+
+ | Status | Code | Description
+
+ | 404 | not_found | App ref does not exist
+
+ | 404 | SESSION_NOT_FOUND | Session ID does not exist (when reusing session)
+
+ | 403 | forbidden | No permission to run the app
+
+ | 402 | payment_required | Insufficient balance
+
+ | 409 | APP_MISMATCH | Session is bound to a different app
+
+ | 409 | VERSION_MISMATCH | Session is bound to a different app version
+
+ | 410 | SESSION_EXPIRED | Session timed out (when reusing an existing session ID)
+
+ | 410 | SESSION_ENDED | Session was explicitly ended
+
+ | 410 | app_retired | App has been retired — error.message includes the app's status_message
+
+ | 412 | precondition_failed | Missing setup requirements — see Credentials
+
+ | 422 | validation_error | Invalid input — for example an unknown function on a multi-function app. The data array lists field errors; unknown-function errors include available function names in the message.
+
+ | 503 | app_maintenance | App is temporarily unavailable — error.message includes the app's status_message; response includes Retry-After: 3600
+
+When the app ref is wrong, the response is not_found without suggestions; use Search or Store apps to discover apps.
+
+Get Task
+
+GET /tasks/:id
+
+Get task status and output.
+
+Response
+
+Same as Run Task response.
+
+Example:
+
+bashcopy
+
+1curl https://api.inference.sh/tasks/task_abc123 \2  -H "Authorization: Bearer inf_your_key"
+
+List Tasks
+
+POST /tasks/list
+
+List your tasks with cursor-based pagination. Requires the apps:read scope.
+
+Request
+
+ | Field | Type | Description
+
+ | limit | number | Max results per page (default 10)
+
+ | cursor | string | Pagination cursor from a previous response
+
+ | direction | string | "next" or "prev" (default "next")
+
+ | filters | array | Filter objects (field, operator, value)
+
+ | sort | array | Sort objects (field, dir)
+
+Filter by status — use an integer code or a status name from Task status codes (received, queued, dispatched, preparing, serving, setting_up, running, cancelling, uploading, completed, failed, cancelled):
+
+jsoncopy
+
+1{2  "limit": 20,3  "filters": [4    { "field": "status", "operator": "eq", "value": 10 }5  ]6}
+
+String names are accepted and converted server-side (for example "completed" is equivalent to 10):
+
+jsoncopy
+
+1{2  "limit": 20,3  "filters": [4    { "field": "status", "operator": "eq", "value": "completed" }5  ]6}
+
+For in / not_in operators, each array element may be an integer or a recognized status name. Unrecognized status strings return 400 with code invalid_filter.
+
+Filter by app:
+
+jsoncopy
+
+1{2  "limit": 20,3  "filters": [4    { "field": "app_id", "operator": "eq", "value": "app_xyz789" }5  ]6}
+
+Response
+
+ | Field | Type | Description
+
+ | items | array | Task objects (same shape as Get Task)
+
+ | next_cursor | string | Cursor for the next page
+
+ | prev_cursor | string | Cursor for the previous page
+
+ | has_next | boolean | More results available
+
+ | has_previous | boolean | Previous page available
+
+ | total_items | number | Total matching tasks
+
+Example:
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/tasks/list \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"limit": 10}'
+
+From the CLI: belt task list (alias belt task ls). See CLI setup.
+
+Queue stats
+
+GET /tasks/queue-stats
+
+Returns queue depth for your workspace: how many tasks are waiting for workers, scheduled for later, or actively running. Requires the apps:read scope. Counts are scoped to tasks you can see (same visibility rules as List Tasks).
+
+Use this to monitor backlog before scaling workers or alerting on capacity. See also Queued longer than expected?.
+
+Response
+
+ | Field | Type | Description
+
+ | total_queued | number | Tasks in Queued status
+
+ | with_run_at | number | Queued tasks with run_at in the future (scheduled)
+
+ | ready_to_run | number | Queued tasks ready to dispatch now
+
+ | in_progress | number | Tasks in active execution statuses (dispatched through uploading)
+
+ | by_app | array | Breakdown by app
+
+ | by_app_function | array | Breakdown by app, version, and function
+
+Each breakdown entry:
+
+ | Field | Type | Description
+
+ | app_id | string | App ID
+
+ | app_name | string | namespace/name when available
+
+ | version_id | string | App version ID
+
+ | function | string | Function name (when set)
+
+ | count | number | Queued tasks in this group
+
+ | with_run_at | number | Subset with future run_at
+
+ | in_progress | number | Subset actively running
+
+Example:
+
+bashcopy
+
+1curl https://api.inference.sh/tasks/queue-stats \2  -H "Authorization: Bearer inf_your_key"
+
+jsoncopy
+
+1{2  "total_queued": 12,3  "with_run_at": 2,4  "ready_to_run": 10,5  "in_progress": 4,6  "by_app": [7    {8      "app_id": "app_xyz789",9      "app_name": "myteam/image-gen",10      "count": 8,11      "with_run_at": 0,12      "in_progress": 313    }14  ],15  "by_app_function": []16}
+
+Get Task Status
+
+GET /tasks/:id/status
+
+Lightweight status poll without fetching full task input, output, or logs. Useful when you only need to know whether a task is still running.
+
+Response
+
+ | Field | Type | Description
+
+ | id | string | Task ID
+
+ | status | number | Status code
+
+ | updated_at | string | ISO timestamp of last update
+
+Example:
+
+bashcopy
+
+1curl https://api.inference.sh/tasks/task_abc123/status \2  -H "Authorization: Bearer inf_your_key"
+
+Get Task Logs
+
+GET /tasks/:id/logs
+
+Returns execution logs and status events for a task without the full task payload.
+
+Response
+
+ | Field | Type | Description
+
+ | task_id | string | Task ID
+
+ | status | number | Current status code
+
+ | events | array | Status transition events
+
+ | logs | array | Log entries (log_type, content)
+
+Log types
+
+ | log_type | Name | Typical content
+
+ | 0 | build | Container image build output
+
+ | 1 | run | App runtime stdout/stderr
+
+ | 2 | serve | Model serving logs
+
+ | 3 | setup | Setup-phase initialization
+
+ | 4 | task | Task-level messages
+
+Example:
+
+bashcopy
+
+1curl https://api.inference.sh/tasks/task_abc123/logs \2  -H "Authorization: Bearer inf_your_key"
+
+From the CLI: belt task get <id> -f streams status until complete; belt task logs <id> -f tails live logs (filter with --type setup). See CLI setup.
+
+JavaScript SDK: client.tasks.getLogs('task_abc123')
+
+Get Task Timings
+
+GET /tasks/:id/timings
+
+Returns a timing breakdown derived from status events — total duration, phase groups, and per-transition timings.
+
+Response
+
+ | Field | Type | Description
+
+ | task_id | string | Task ID
+
+ | status | number | Current status code
+
+ | total_duration | string | Human-readable total duration
+
+ | total_duration_ms | number | Total duration in milliseconds
+
+ | groups | array | High-level phases (label, start_at, end_at, duration, duration_ms)
+
+ | events | array | Per-status transitions with durations
+
+Example:
+
+bashcopy
+
+1curl https://api.inference.sh/tasks/task_abc123/timings \2  -H "Authorization: Bearer inf_your_key"
+
+From the CLI: belt task timings <id>. See CLI setup.
+
+JavaScript SDK: client.tasks.getTimings('task_abc123')
+
+Get Task Telemetry
+
+GET /tasks/:id/telemetry
+
+Returns time-series resource samples collected while the task ran on a worker (CPU, RAM, GPU, and volume usage). Samples are recorded by the engine during execution and stored in TimescaleDB.
+
+Requires the same access as Get Task (apps:read scope). Long runs may return up to 100 downsampled points so responses stay bounded.
+
+Response
+
+Array of telemetry records under data:
+
+ | Field | Type | Description
+
+ | id | string | Sample record ID
+
+ | timestamp | string | ISO timestamp when the sample was taken
+
+ | task_id | string | Task ID
+
+ | task_seq | number | Monotonic sequence within the task
+
+ | app_id | string | App that ran
+
+ | app_version_id | string | App version
+
+ | engine_id | string | Engine that hosted the worker
+
+ | worker_id | string | Worker that executed the task
+
+ | system_info | object | Worker CPU, RAM, GPU, and volume metrics at this sample
+
+ | engine_resources | object | Engine-level CPU, RAM, GPU, and volume metrics at this sample
+
+Each system_info / engine_resources object includes:
+
+ | Nested field | Description
+
+ | cpus | Per-CPU usage (usage, normalized_usage, core metadata)
+
+ | ram | Memory totals and usage percentages
+
+ | gpus | GPU memory, temperature, and driver metadata (when present)
+
+ | volumes | Disk volume size and usage
+
+Example:
+
+bashcopy
+
+1curl https://api.inference.sh/tasks/task_abc123/telemetry \2  -H "Authorization: Bearer inf_your_key"
+
+JavaScript SDK:
+
+typescriptcopy
+
+1const samples = await client.tasks.getTelemetry('task_abc123');
+
+Telemetry is most useful for debugging resource-heavy apps (large models, GPU runs, or disk-heavy pipelines). For phase durations without resource metrics, use Get Task Timings.
+
+→ Observability · SDK overview — inspect and observability
+
+Cancel Task
+
+POST /tasks/:id/cancel
+
+Cancel a running task. By default the platform requests a graceful stop (apps with an on_cancel hook can clean up first).
+
+Request body (optional)
+
+ | Field | Type | Description
+
+ | force | boolean | If true, skip the graceful stop and end the run immediately
+
+ | timeout | number | Milliseconds the app gets to stop on its own before the run is ended for it (default 10000)
+
+Either way the worker is free for the next task when the call returns. An app that stops on its own keeps its loaded state; one that is ended for it is restarted, so the next task on that worker runs setup() again. See Graceful cancellation.
+
+Example (graceful):
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/tasks/task_abc123/cancel \2  -H "Authorization: Bearer inf_your_key"
+
+Example (force kill):
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/tasks/task_abc123/cancel \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"force": true}'
+
+Response
+
+jsoncopy
+
+1{2  "id": "task_abc123",3  "status": 12,4  "cancelled": true5}
+
+Infrastructure routing
+
+The infra field controls which workers the scheduler considers:
+
+ | Value | Behavior
+
+ | cloud | Cloud workers only (default when infra is omitted on POST /run)
+
+ | private | Your workspace's private workers only
+
+ | private_first | Try private workers first; fall back to cloud if none are available
+
+private_first is useful when you prefer your own hardware but still want runs to succeed when private capacity is offline or busy. The scheduler ranks private workers ahead of cloud workers for matching tasks.
+
+Apps may restrict which infra types they allow (for example cloud-only store apps). If the chosen infra is not permitted, the task fails immediately. If no worker is available yet, the task stays Queued until capacity appears or the queue expires.
+
+→ Workers · Using private workers
+
+Stream Task Updates
+
+GET /tasks/:id/stream
+
+Receive task status, logs, and output over Server-Sent Events (SSE) instead of polling GET /tasks/:id.
+
+→ Streaming API
+
+Use polling (GET /tasks/:id in a loop) when your environment cannot hold long-lived connections. The Python and JavaScript SDKs also support stream: false — see SDK polling.
+
+Get Task Cost
+
+GET /usage/tasks/:id/cost
+
+Get the cost breakdown for a completed task.
+
+Response
+
+ | Field | Type | Description
+
+ | total | number | Total cost in microcents (1 microcent = $0.000001)
+
+ | discount | number | Total discount applied in microcents (omitted if zero)
+
+ | charged | number | Amount actually charged in microcents
+
+ | refunded | number | Amount refunded in microcents (omitted if zero)
+
+Example:
+
+bashcopy
+
+1curl https://api.inference.sh/usage/tasks/task_abc123/cost \2  -H "Authorization: Bearer inf_your_key"
+
+Response:
+
+jsoncopy
+
+1{2  "total": 50000,3  "charged": 500004}
+
+See REST overview — response format.
+
+Note: All values are in microcents. To convert to dollars: dollars = microcents / 100000000. For example, 50000 microcents = $0.0005.
+
+Errors
+
+ | Status | Code | Description
+
+ | 403 | forbidden | You don't have permission to access this task
+
+ | 404 | not_found | Cost not found for this task
+
+Task Status Codes
+
+ | Status | Code | Description
+
+ | Received | 1 | Task received
+
+ | Queued | 2 | Waiting for worker
+
+ | Dispatched | 3 | Assigned to worker
+
+ | Preparing | 4 | Setting up environment
+
+ | Serving | 5 | Loading model
+
+ | Setting Up | 6 | Task initialization
+
+ | Running | 7 | Executing
+
+ | Cancelling | 8 | Cancel requested; worker shutting down
+
+ | Uploading | 9 | Uploading results
+
+ | Completed | 10 | Done
+
+ | Failed | 11 | Error occurred
+
+ | Cancelled | 12 | Cancelled
+
+Task failure messages
+
+When status is 11 (Failed), the error string describes the failure. App errors pass through from your code unchanged. Platform failures return short, retry-friendly messages without internal scheduler or worker details.
+
+ | error value | Meaning
+
+ | task interrupted, please retry | Transient infrastructure issue (worker disconnect, engine reconnect, orphaned task)
+
+ | task could not be dispatched, please retry | Could not assign a worker when the task was submitted
+
+ | task could not be processed after multiple attempts, please retry | Exceeded dispatch retry limit while stuck in Dispatched
+
+ | task expired while waiting for available capacity, please retry | Queued ~24 hours with no available worker
+
+ | no active workers with matching resources | No worker matches GPU/VRAM/infra (~10 minutes)
+
+ | no available workers — capacity reserved for higher-priority apps | Matching cloud workers exist but are reserved by another app's min_concurrency floor (~10 minutes)
+
+ | failed to prepare secrets for this app, please check your secret configuration | Missing or invalid workspace secret
+
+ | session worker busy too long | Session worker busy for ~30 seconds
+
+ | session worker offline | Session's worker is no longer available
+
+ | session expired or not found | Invalid session ID or idle timeout
+
+→ Failed tasks and error messages · Troubleshooting
+
+cURL Examples
+
+Run and wait
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/run \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "app": "infsh/flux",6    "input": {"prompt": "A sunset"}7  }'
+
+Run without waiting
+
+bashcopy
+
+1curl -X POST "https://api.inference.sh/run?wait=false" \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "app": "infsh/flux",6    "input": {"prompt": "A sunset"}7  }'
+
+Run with session
+
+bashcopy
+
+1# Start a new session2curl -X POST https://api.inference.sh/run \3  -H "Authorization: Bearer inf_your_key" \4  -H "Content-Type: application/json" \5  -d '{6    "app": "my-app",7    "input": {"action": "init"},8    "session": "new"9  }'10# Response includes session_id: "sess_abc123"1112# Continue session13curl -X POST https://api.inference.sh/run \14  -H "Authorization: Bearer inf_your_key" \15  -H "Content-Type: application/json" \16  -d '{17    "app": "my-app",18    "input": {"action": "process"},19    "session": "sess_abc123"20  }'
+
+Run with custom session timeout
+
+bashcopy
+
+1# Start session with 5-minute idle timeout2curl -X POST https://api.inference.sh/run \3  -H "Authorization: Bearer inf_your_key" \4  -H "Content-Type: application/json" \5  -d '{6    "app": "my-app",7    "input": {"action": "init"},8    "session": "new",9    "session_timeout": 30010  }'
+
+See Sessions Developer Guide for full documentation.
+
+Session errors on run
+
+When you pass an existing session ID to POST /run or POST /apps/run and the session has timed out, the API returns 410 Gone with code SESSION_EXPIRED. Start a new session with "session": "new".
+
+Other session errors on run (SESSION_NOT_FOUND, SESSION_ENDED, APP_MISMATCH, VERSION_MISMATCH) are listed in Run Task errors above. WORKER_LEASED and other session-management errors are documented on the Sessions API. See also Sessions developer guide — Error handling.
+
+Webhooks
+
+Get notified when a task completes by providing a webhook URL. When the task reaches a terminal state, a POST request is sent to your URL.
+
+Run with webhook
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/run \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "app": "infsh/flux",6    "input": {"prompt": "A sunset"},7    "webhook": "https://your-server.com/webhook"8  }'
+
+Webhook payload
+
+Your endpoint receives a JSON POST with the task result:
+
+jsoncopy
+
+1{2  "id": "task_abc123",3  "status": 10,4  "output": { "image": { "uri": "https://..." } },5  "error": "",6  "session_id": null,7  "created_at": "2024-01-15T10:30:00Z",8  "updated_at": "2024-01-15T10:30:05Z"9}
+
+ | Field | Type | Description
+
+ | id | string | Task ID
+
+ | status | number | Terminal status code (10=completed, 11=failed, 12=cancelled)
+
+ | output | object | Task output (when completed)
+
+ | error | string | Error message (when failed)
+
+ | session_id | string | Session ID (if using sessions)
+
+ | created_at | string | ISO timestamp
+
+ | updated_at | string | ISO timestamp

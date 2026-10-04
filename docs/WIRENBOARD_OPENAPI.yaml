@@ -1,0 +1,3730 @@
+openapi: 3.0.3
+info:
+  title: WBC API
+  version: 0.0.0 (v1)
+  description: REST API for Wiren Board Cloud.
+paths:
+  /api/v1/auth/logout/:
+    post:
+      operationId: authLogoutCreate
+      description: Invalidate the current refresh token and clear authentication cookies.
+      summary: Log out
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotRequiredTokenBlacklistRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NotRequiredTokenBlacklistRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NotRequiredTokenBlacklistRequest'
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/password/change/:
+    put:
+      operationId: authPasswordChangeUpdate
+      description: Change the password for the current authenticated user. All other
+        sessions are automatically terminated.
+      summary: Change password
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/password/reset/:
+    post:
+      operationId: authPasswordResetCreate
+      description: Send a password reset email for the specified account.
+      summary: Request password reset
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmailRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmailRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestResetPasswordResponse'
+          description: ''
+  /api/v1/auth/password/reset/confirm/:
+    post:
+      operationId: authPasswordResetConfirmCreate
+      description: Set a new password using a valid password reset token.
+      summary: Confirm password reset
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordConfirmRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordConfirmRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordConfirmRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetPasswordConfirmResponse'
+          description: ''
+  /api/v1/auth/sessions/:
+    get:
+      operationId: authSessionsList
+      description: Return all active sessions for the current user with device information.
+      summary: List active sessions
+      tags:
+      - Authentication
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserSession'
+          description: ''
+  /api/v1/auth/sessions/terminate/:
+    post:
+      operationId: authSessionsTerminateCreate
+      description: Terminate specific sessions by their IDs. The current session cannot
+        be terminated through this endpoint.
+      summary: Terminate sessions
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TerminateSessionsRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TerminateSessionsRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TerminateSessionsRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminateSessionsResponse'
+          description: ''
+  /api/v1/auth/token/:
+    post:
+      operationId: authTokenCreate
+      description: Authenticate a user and issue access and refresh tokens.
+      summary: Sign in
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairWithProperMessageRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairWithProperMessageRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairWithProperMessageRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPairWithProperMessage'
+          description: ''
+  /api/v1/auth/token/refresh/:
+    post:
+      operationId: authTokenRefreshCreate
+      description: Issue a new access token from a valid refresh token.
+      summary: Refresh access token
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DelayBlacklistTokenRefreshRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DelayBlacklistTokenRefreshRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DelayBlacklistTokenRefreshRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DelayBlacklistTokenRefresh'
+          description: ''
+  /api/v1/auth/totp/activate/:
+    post:
+      operationId: authTotpActivateCreate
+      description: Complete TOTP activation and issue recovery codes. All other sessions
+        are automatically terminated.
+      summary: Activate TOTP
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TOTPCodeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TOTPCodeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TOTPCodeRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: TOTP is activated.
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: TOTP set up is not completed.
+          description: ''
+  /api/v1/auth/totp/disable/:
+    post:
+      operationId: authTotpDisableCreate
+      description: Disable TOTP for the current user after recent confirmation.
+      summary: Disable TOTP
+      tags:
+      - Authentication
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: TOTP is disabled.
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: TOTP is already disabled.
+          description: ''
+  /api/v1/auth/totp/setup/:
+    post:
+      operationId: authTotpSetupCreate
+      description: Generate the TOTP secret, otpauth URI and QR code for the current
+        user.
+      summary: Start TOTP setup
+      tags:
+      - Authentication
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetupTOTPResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: TOTP is already enabled.
+          description: ''
+  /api/v1/auth/totp/verify/:
+    post:
+      operationId: authTotpVerifyCreate
+      description: Verify a TOTP or recovery code for a protected action scope. Provide
+        either `code` or `recoveryCode`.
+      summary: Verify TOTP or recovery code
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyTOTPOrRecoveryCodeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyTOTPOrRecoveryCodeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyTOTPOrRecoveryCodeRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: TOTP code is verified.
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: TOTP is not enabled.
+          description: ''
+  /api/v1/controllers/:
+    get:
+      operationId: controllersList
+      description: Return controllers available to the current user.
+      summary: List controllers
+      parameters:
+      - in: query
+        name: description
+        schema:
+          type: string
+        description: Description contains
+      - in: query
+        name: firmware_version
+        schema:
+          type: string
+        description: Firmware version contains
+      - in: query
+        name: group_ids
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+        description: Comma-separated list of group IDs. Includes nested subgroups.
+        explode: false
+        style: form
+      - in: query
+        name: group_name
+        schema:
+          type: string
+        description: Group name contains
+      - in: query
+        name: latitude_max
+        schema:
+          type: number
+          format: double
+        description: Maximum latitude in decimal degrees.
+      - in: query
+        name: latitude_min
+        schema:
+          type: number
+          format: double
+        description: Minimum latitude in decimal degrees.
+      - in: query
+        name: longitude_max
+        schema:
+          type: number
+          format: double
+        description: Maximum longitude in decimal degrees.
+      - in: query
+        name: longitude_min
+        schema:
+          type: number
+          format: double
+        description: Minimum longitude in decimal degrees.
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - in: query
+        name: organization_id
+        schema:
+          type: string
+          format: uuid
+        description: Filter controllers by organization ID.
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Search across controller description, serial number, firmware
+          version and group name.
+      - in: query
+        name: serial_number
+        schema:
+          type: string
+        description: Serial number contains
+      tags:
+      - Controllers
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedControllerList'
+          description: ''
+  /api/v1/controllers-activation/activate/:
+    post:
+      operationId: activateController
+      description: Attach a controller to an organization using an activation token.
+      summary: Activate controller
+      tags:
+      - Controllers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControllerActivationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ControllerActivationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ControllerActivationRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Controller'
+          description: ''
+  /api/v1/controllers-activation/validate/:
+    post:
+      operationId: validateControllerActivationToken
+      description: Validate a controller activation token before activation.
+      summary: Validate controller activation token
+      tags:
+      - Controllers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControllerValidationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ControllerValidationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ControllerValidationRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControllerValidatedToken'
+          description: ''
+  /api/v1/controllers-count/:
+    get:
+      operationId: getControllerCounters
+      description: Return total controller count and agent health counters for the
+        current filters.
+      summary: Get controller counters
+      tags:
+      - Controllers
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControllerCount'
+          description: ''
+  /api/v1/controllers-transfer-request/accept/:
+    post:
+      operationId: acceptControllerTransferRequest
+      description: Accept a pending controller transfer request into the selected
+        organization.
+      summary: Accept controller transfer request
+      tags:
+      - Controller Transfers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControllerTransferAcceptRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ControllerTransferAcceptRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ControllerTransferAcceptRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Controller'
+          description: ''
+  /api/v1/controllers-transfer-request/validate/:
+    post:
+      operationId: validateControllerTransferRequest
+      description: Validate that a controller transfer request token is valid for
+        the current user.
+      summary: Validate controller transfer request
+      tags:
+      - Controller Transfers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControllerTransferValidationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ControllerTransferValidationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ControllerTransferValidationRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationControllerTransferResponse'
+          description: ''
+  /api/v1/controllers/{serialNumber}/:
+    get:
+      operationId: controllersRetrieve
+      description: Return details for the selected controller.
+      summary: Retrieve controller
+      parameters:
+      - in: path
+        name: serialNumber
+        schema:
+          type: string
+        required: true
+      tags:
+      - Controllers
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Controller'
+          description: ''
+    put:
+      operationId: controllersUpdate
+      description: Replace editable fields of the selected controller.
+      summary: Update controller
+      parameters:
+      - in: path
+        name: serialNumber
+        schema:
+          type: string
+        required: true
+      tags:
+      - Controllers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateControllerRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateControllerRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UpdateControllerRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateController'
+          description: ''
+    patch:
+      operationId: controllersPartialUpdate
+      description: Update one or more editable fields of the selected controller.
+      summary: Partially update controller
+      parameters:
+      - in: path
+        name: serialNumber
+        schema:
+          type: string
+        required: true
+      tags:
+      - Controllers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateControllerRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateControllerRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateControllerRequest'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateController'
+          description: ''
+    delete:
+      operationId: controllersDestroy
+      description: Delete the selected controller.
+      summary: Delete controller
+      parameters:
+      - in: path
+        name: serialNumber
+        schema:
+          type: string
+        required: true
+      tags:
+      - Controllers
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/controllers/{serialNumber}/diagnostic/:
+    get:
+      operationId: getControllerDiagnostic
+      description: Return the latest diagnostic file for the selected controller.
+      summary: Get controller diagnostic file
+      parameters:
+      - in: path
+        name: serialNumber
+        schema:
+          type: string
+        required: true
+      tags:
+      - Controllers
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControllerDiagnostic'
+          description: ''
+  /api/v1/controllers/{serialNumber}/last-metrics-time/:
+    get:
+      operationId: getControllerLastMetricsTime
+      description: Return the time of the newest metric point stored for the selected
+        controller.
+      summary: Get controller last metrics time
+      parameters:
+      - in: path
+        name: serialNumber
+        schema:
+          type: string
+        required: true
+      tags:
+      - Controllers
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControllerLastMetricsTime'
+          description: ''
+  /api/v1/controllers/{serialNumber}/request-diagnostic/:
+    post:
+      operationId: requestControllerDiagnostics
+      description: Trigger diagnostic data collection for the selected controller.
+      summary: Request controller diagnostics
+      parameters:
+      - in: path
+        name: serialNumber
+        schema:
+          type: string
+        required: true
+      tags:
+      - Controllers
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/controllers/{serialNumber}/service-catalog/:
+    get:
+      operationId: listServiceCatalog
+      description: Return predefined services with default ports for tunneling.
+      summary: List service catalog
+      parameters:
+      - in: path
+        name: serialNumber
+        schema:
+          type: string
+        required: true
+      tags:
+      - Controllers
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceCatalogEntry'
+          description: ''
+  /api/v1/controllers/{serialNumber}/services/:
+    get:
+      operationId: listControllerServices
+      description: Default ViewSet but without create and delete.
+      summary: List controller services
+      parameters:
+      - in: path
+        name: serialNumber
+        schema:
+          type: string
+        required: true
+      tags:
+      - Controllers
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ControllerService'
+          description: ''
+    post:
+      operationId: addControllerService
+      description: Default ViewSet but without create and delete.
+      summary: Add a controller service
+      parameters:
+      - in: path
+        name: serialNumber
+        schema:
+          type: string
+        required: true
+      tags:
+      - Controllers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControllerServiceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ControllerServiceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ControllerServiceRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControllerService'
+          description: ''
+  /api/v1/controllers/{serialNumber}/services/{port}/:
+    patch:
+      operationId: updateControllerService
+      description: Default ViewSet but without create and delete.
+      summary: Update a controller service
+      parameters:
+      - in: path
+        name: port
+        schema:
+          type: string
+          pattern: '[0-9]{1,5}'
+        description: Local port of the configured service.
+        required: true
+      - in: path
+        name: serialNumber
+        schema:
+          type: string
+        required: true
+      tags:
+      - Controllers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedControllerServiceRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedControllerServiceRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedControllerServiceRequest'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControllerService'
+          description: ''
+    delete:
+      operationId: deleteControllerService
+      description: Default ViewSet but without create and delete.
+      summary: Delete a controller service
+      parameters:
+      - in: path
+        name: port
+        schema:
+          type: string
+          pattern: '[0-9]{1,5}'
+        description: Local port of the configured service.
+        required: true
+      - in: path
+        name: serialNumber
+        schema:
+          type: string
+        required: true
+      tags:
+      - Controllers
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/controllers/{serialNumber}/system-metrics/:
+    post:
+      operationId: queryControllerSystemMetrics
+      description: Return time-series system metrics for the selected controller.
+      summary: Query controller system metrics
+      parameters:
+      - in: path
+        name: serialNumber
+        schema:
+          type: string
+        required: true
+      tags:
+      - Controllers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControllerSystemMetricsRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ControllerSystemMetricsRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ControllerSystemMetricsRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ControllerSystemMetricsValues'
+          description: ''
+  /api/v1/controllers/{serialNumber}/tcp-tunnels/{identifier}/:
+    post:
+      operationId: createControllerTunnel
+      description: 'Create or reuse a TCP tunnel to the selected controller service:
+        built-in SSH/HomeUI or a user-configured service identified by its port.'
+      summary: Create controller tunnel
+      parameters:
+      - in: path
+        name: identifier
+        schema:
+          type: string
+        description: Built-in `ssh`/`http` or the local port of a configured service.
+        required: true
+      - in: path
+        name: serialNumber
+        schema:
+          type: string
+        required: true
+      tags:
+      - Controllers
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControllerTunnelAccess'
+          description: ''
+  /api/v1/email-unsubscribe/:
+    get:
+      operationId: emailUnsubscribeRetrieve
+      description: Redirect to the unsubscribe page for mail clients without one-click
+        support.
+      summary: Open the unsubscribe page
+      tags:
+      - Users
+      security:
+      - {}
+      responses:
+        '302':
+          description: No response body
+    post:
+      operationId: emailUnsubscribeCreate
+      description: Stop sending broadcasts to the address the token was issued for.
+      summary: Unsubscribe from broadcasts
+      tags:
+      - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailUnsubscribeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EmailUnsubscribeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EmailUnsubscribeRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/environments/:
+    get:
+      operationId: environmentsRetrieve
+      description: Return public runtime settings required by frontend clients.
+      summary: Get client environment settings
+      tags:
+      - Environment
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Environment'
+          description: ''
+  /api/v1/grafana-session-start/:
+    post:
+      operationId: grafanaSessionStartCreate
+      description: Create a short-lived nonce that can be exchanged for a Grafana
+        session.
+      summary: Start Grafana session
+      tags:
+      - Grafana
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GrafanaSessionStartRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GrafanaSessionStartRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GrafanaSessionStartRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrafanaSessionStart'
+          description: ''
+  /api/v1/groups/:
+    get:
+      operationId: groupsList
+      description: Return top-level controller groups available to the current user.
+      summary: List groups
+      parameters:
+      - in: query
+        name: organization_id
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Groups
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HierarchyGroup'
+          description: ''
+    post:
+      operationId: groupsCreate
+      description: Create a new controller group.
+      summary: Create group
+      tags:
+      - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGroupRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateGroupRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateGroupRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateGroup'
+          description: ''
+  /api/v1/groups-detach-from-controllers/:
+    post:
+      operationId: groupsDetachFromControllersCreate
+      description: Remove the specified controllers from their current groups.
+      summary: Detach controllers from groups
+      tags:
+      - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControllerGroupSetterRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ControllerGroupSetterRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ControllerGroupSetterRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/groups/{id}/:
+    get:
+      operationId: groupsRetrieve
+      description: Return details for the selected controller group.
+      summary: Retrieve group
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Group ID.
+        required: true
+      tags:
+      - Groups
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HierarchyGroup'
+          description: ''
+    put:
+      operationId: groupsUpdate
+      description: Replace editable fields of the selected controller group.
+      summary: Update group
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Group ID.
+        required: true
+      tags:
+      - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGroupRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateGroupRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UpdateGroupRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateGroup'
+          description: ''
+    patch:
+      operationId: groupsPartialUpdate
+      description: Update one or more editable fields of the selected controller group.
+      summary: Partially update group
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Group ID.
+        required: true
+      tags:
+      - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateGroupRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateGroupRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateGroupRequest'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateGroup'
+          description: ''
+    delete:
+      operationId: groupsDestroy
+      description: Delete the selected controller group.
+      summary: Delete group
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Group ID.
+        required: true
+      tags:
+      - Groups
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/groups/{id}/attach-controllers/:
+    post:
+      operationId: groupsAttachControllersCreate
+      description: Assign the specified controllers to the selected group.
+      summary: Attach controllers to group
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Group ID.
+        required: true
+      tags:
+      - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControllerGroupSetterRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ControllerGroupSetterRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ControllerGroupSetterRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HierarchyGroup'
+          description: ''
+  /api/v1/organizations/:
+    get:
+      operationId: organizationsList
+      description: Return organizations available to the current user.
+      summary: List organizations
+      tags:
+      - Organizations
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrganizationWithUserRole'
+          description: ''
+    post:
+      operationId: organizationsCreate
+      description: Create a new organization.
+      summary: Create organization
+      tags:
+      - Organizations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationWithUserRoleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrganizationWithUserRoleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrganizationWithUserRoleRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationWithUserRole'
+          description: ''
+  /api/v1/organizations-invite/accept/:
+    post:
+      operationId: organizationsInviteAcceptCreate
+      description: Accept an organization invitation and sign in the invited user.
+      summary: Accept organization invitation
+      tags:
+      - Organizations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptInviteRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AcceptInviteRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AcceptInviteRequestRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/organizations-invite/self-enroll/:
+    post:
+      operationId: organizationsInviteSelfEnrollCreate
+      description: Join an organization using a valid invitation token.
+      summary: Join organization by invitation
+      tags:
+      - Organizations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationInviteTokenRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrganizationInviteTokenRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrganizationInviteTokenRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organization'
+          description: ''
+  /api/v1/organizations-invite/validate/:
+    post:
+      operationId: organizationsInviteValidateCreate
+      description: Validate an organization invitation token and return invitation
+        details.
+      summary: Validate organization invitation
+      tags:
+      - Organizations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationInviteTokenRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrganizationInviteTokenRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrganizationInviteTokenRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationInviteValidatedToken'
+          description: ''
+  /api/v1/organizations/{id}/:
+    get:
+      operationId: organizationsRetrieve
+      description: Return details for the selected organization.
+      summary: Retrieve organization
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Organization ID.
+        required: true
+      tags:
+      - Organizations
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationWithUserRole'
+          description: ''
+    put:
+      operationId: organizationsUpdate
+      description: Replace editable fields of the selected organization.
+      summary: Update organization
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Organization ID.
+        required: true
+      tags:
+      - Organizations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationWithUserRoleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrganizationWithUserRoleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrganizationWithUserRoleRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationWithUserRole'
+          description: ''
+    patch:
+      operationId: organizationsPartialUpdate
+      description: Update one or more editable fields of the selected organization.
+      summary: Partially update organization
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Organization ID.
+        required: true
+      tags:
+      - Organizations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOrganizationWithUserRoleRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOrganizationWithUserRoleRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOrganizationWithUserRoleRequest'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationWithUserRole'
+          description: ''
+    delete:
+      operationId: organizationsDestroy
+      description: Delete the selected organization if it has no controllers and only
+        the owner remains.
+      summary: Delete organization
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Organization ID.
+        required: true
+      tags:
+      - Organizations
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/organizations/{organizationId}/controllers-transfer/:
+    post:
+      operationId: organizationsControllersTransferCreate
+      description: Move controllers between organizations that the current user can
+        manage.
+      summary: Move controllers between organizations
+      parameters:
+      - in: path
+        name: organizationId
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Controller Transfers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationControllerTransferRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrganizationControllerTransferRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrganizationControllerTransferRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/organizations/{organizationId}/controllers-transfer-requests/:
+    get:
+      operationId: organizationsControllersTransferRequestsList
+      description: Return active external controller transfer requests to transfer
+        controllers to another user.
+      summary: List controller transfer requests
+      parameters:
+      - in: path
+        name: organizationId
+        schema:
+          type: string
+        required: true
+      tags:
+      - Controller Transfers
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrganizationControllerTransferResponse'
+          description: ''
+    post:
+      operationId: organizationsControllersTransferRequestsCreate
+      description: Create an external controller transfer request to transfer controllers
+        to another user. Up to 20 controllers can be included.
+      summary: Create controller transfer request
+      parameters:
+      - in: path
+        name: organizationId
+        schema:
+          type: string
+        required: true
+      tags:
+      - Controller Transfers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationControllerTransferRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrganizationControllerTransferRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrganizationControllerTransferRequestRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationControllerTransferResponse'
+          description: ''
+  /api/v1/organizations/{organizationId}/controllers-transfer-requests/{transferRequestId}/:
+    get:
+      operationId: organizationsControllersTransferRequestsRetrieve
+      description: Return details for the selected external controller transfer request.
+      summary: Retrieve controller transfer request
+      parameters:
+      - in: path
+        name: organizationId
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: transferRequestId
+        schema:
+          type: string
+          format: uuid
+        description: Controller transfer request ID.
+        required: true
+      tags:
+      - Controller Transfers
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationControllerTransferResponse'
+          description: ''
+    delete:
+      operationId: organizationsControllersTransferRequestsDestroy
+      description: Cancel a pending external controller transfer request.
+      summary: Cancel controller transfer request
+      parameters:
+      - in: path
+        name: organizationId
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: transferRequestId
+        schema:
+          type: string
+          format: uuid
+        description: Controller transfer request ID.
+        required: true
+      tags:
+      - Controller Transfers
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/organizations/{organizationId}/grafana-access/:
+    get:
+      operationId: organizationsGrafanaAccessRetrieve
+      description: Return whether Grafana access is available for the selected organization.
+      summary: Get organization Grafana access
+      parameters:
+      - in: path
+        name: organizationId
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Organizations
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationGrafanaAccess'
+          description: ''
+  /api/v1/organizations/{organizationId}/invite-user/:
+    post:
+      operationId: organizationsInviteUserCreate
+      description: Create an invitation for a user to join the selected organization.
+      summary: Invite user to organization
+      parameters:
+      - in: path
+        name: organizationId
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Organizations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationInviteCreationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrganizationInviteCreationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrganizationInviteCreationRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationInviteCreationResponse'
+          description: ''
+  /api/v1/organizations/{organizationId}/leave/:
+    post:
+      operationId: organizationsLeaveCreate
+      description: Remove the current user from the selected organization.
+      summary: Leave organization
+      parameters:
+      - in: path
+        name: organizationId
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Organizations
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/organizations/{organizationId}/members/:
+    get:
+      operationId: organizationsMembersList
+      description: Return members of the selected organization.
+      summary: List organization members
+      parameters:
+      - in: path
+        name: organizationId
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Organizations
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrganizationMember'
+          description: ''
+  /api/v1/organizations/{organizationId}/members/{userId}/:
+    get:
+      operationId: organizationsMembersRetrieve
+      description: Return details for the selected organization member.
+      summary: Retrieve organization member
+      parameters:
+      - in: path
+        name: organizationId
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: userId
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Organizations
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationMember'
+          description: ''
+    put:
+      operationId: organizationsMembersUpdate
+      description: Replace editable fields of the selected organization member.
+      summary: Update organization member
+      parameters:
+      - in: path
+        name: organizationId
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: userId
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Organizations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrganizationMemberUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrganizationMemberUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrganizationMemberUpdateRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationMemberUpdate'
+          description: ''
+    patch:
+      operationId: organizationsMembersPartialUpdate
+      description: Update one or more editable fields of the selected organization
+        member.
+      summary: Partially update organization member
+      parameters:
+      - in: path
+        name: organizationId
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: userId
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Organizations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOrganizationMemberUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOrganizationMemberUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOrganizationMemberUpdateRequest'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationMemberUpdate'
+          description: ''
+    delete:
+      operationId: organizationsMembersDestroy
+      description: Remove the selected member from the organization.
+      summary: Remove organization member
+      parameters:
+      - in: path
+        name: organizationId
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: userId
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Organizations
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/organizations/{organizationId}/tariffs/:
+    get:
+      operationId: organizationsTariffsRetrieve
+      description: Return tariff options and controller counts for license cost calculation.
+      summary: Get organization tariffs
+      parameters:
+      - in: path
+        name: organizationId
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Organizations
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TariffListResponse'
+          description: ''
+  /api/v1/users/emails/:
+    post:
+      operationId: usersEmailsCreate
+      description: Create an email verification request for changing the current user's
+        email.
+      summary: Request email change verification
+      tags:
+      - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserChangeEmailRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserChangeEmailRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserChangeEmailRequestRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          description: No response body
+  /api/v1/users/emails/verification/:
+    patch:
+      operationId: usersEmailsVerificationPartialUpdate
+      description: Confirm an email change using a verification request identifier.
+      summary: Confirm email change
+      tags:
+      - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserChangeEmailConfirmationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserChangeEmailConfirmationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserChangeEmailConfirmationRequest'
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/v1/users/me/:
+    get:
+      operationId: usersMeRetrieve
+      description: Return the profile of the current authenticated user.
+      summary: Get current user
+      tags:
+      - Users
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/v1/users/registrations/:
+    post:
+      operationId: usersRegistrationsCreate
+      description: Create a self-service registration request for a new user.
+      summary: Start registration
+      tags:
+      - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '201':
+          description: No response body
+    patch:
+      operationId: usersRegistrationsPartialUpdate
+      description: Complete registration using a previously created registration request.
+      summary: Confirm registration
+      tags:
+      - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRegistrationConfirmationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRegistrationConfirmationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRegistrationConfirmationRequest'
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+components:
+  schemas:
+    AcceptInviteRequestRequest:
+      type: object
+      properties:
+        password:
+          type: string
+          minLength: 8
+          description: Password for the invited user account.
+          maxLength: 70
+        token:
+          type: string
+          nullable: true
+          minLength: 1
+          description: Invitation token from the email link.
+          maxLength: 70
+      required:
+      - password
+    BlankEnum:
+      enum:
+      - ''
+    ChangePasswordRequest:
+      type: object
+      properties:
+        oldPassword:
+          type: string
+          minLength: 1
+        newPassword:
+          type: string
+          minLength: 1
+      required:
+      - newPassword
+      - oldPassword
+    Controller:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        serialNumber:
+          type: string
+          description: Unique controller serial number.
+          maxLength: 36
+        lastAgentStartupAt:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: Last time the controller agent started.
+        firmwareVersion:
+          type: string
+          nullable: true
+          description: Current firmware version reported by the controller.
+          maxLength: 36
+        agentVersion:
+          type: string
+          nullable: true
+          maxLength: 255
+        frpcVersion:
+          type: string
+          nullable: true
+          maxLength: 255
+        pythonVersion:
+          type: string
+          nullable: true
+          title: Python runtime version
+          maxLength: 64
+        mqttrpcVersion:
+          type: string
+          nullable: true
+          title: Python3-mqttrpc package version
+          maxLength: 255
+        pahoMqttVersion:
+          type: string
+          nullable: true
+          title: Python3-paho-mqtt package version
+          maxLength: 255
+        wbMqttDbVersion:
+          type: string
+          nullable: true
+          title: Wb-mqtt-db package version
+          maxLength: 255
+        isAgentOk:
+          type: boolean
+          readOnly: true
+          description: Whether the controller agent is currently considered healthy.
+        lastAgentPingAt:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: Last successful agent ping time.
+        lastMetricsAt:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: Last time metrics were received from the controller.
+        metricsEnabled:
+          type: boolean
+          title: Metrics collection enabled
+        metricsSendIntervalSeconds:
+          type: integer
+          maximum: 240
+          minimum: 60
+          title: Metrics send interval, seconds
+          description: How often the controller sends collected metrics to the cloud.
+            In seconds, 60 to 240, 120 by default.
+        showMetricsUpdateBanner:
+          type: boolean
+          readOnly: true
+          description: Whether UI should show a warning that the agent must be updated
+            for metrics.
+        description:
+          type: string
+          nullable: true
+          description: Optional human-readable controller description.
+          maxLength: 255
+        latitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,7})?$
+          nullable: true
+          description: Latitude in decimal degrees.
+        longitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,7})?$
+          nullable: true
+          description: Longitude in decimal degrees.
+        organization:
+          allOf:
+          - $ref: '#/components/schemas/SimpleOrganization'
+          readOnly: true
+          description: Organization that owns the controller.
+        group:
+          allOf:
+          - $ref: '#/components/schemas/Group'
+          readOnly: true
+          description: Group assigned to the controller.
+        userDefinedData:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDefinedData'
+          nullable: true
+          title: Custom metadata
+          description: Optional user-defined key-value metadata for the controller.
+        previewUrl:
+          type: string
+          format: uri
+          readOnly: true
+          nullable: true
+          description: Preview image URL for the controller model.
+        activeTransferRequestId:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+          description: Identifier of the active transfer request, if one exists.
+      required:
+      - activeTransferRequestId
+      - group
+      - id
+      - isAgentOk
+      - lastAgentPingAt
+      - lastAgentStartupAt
+      - lastMetricsAt
+      - organization
+      - previewUrl
+      - serialNumber
+      - showMetricsUpdateBanner
+      - userDefinedData
+    ControllerActivationRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          minLength: 1
+          description: Controller activation token.
+        organization:
+          type: string
+          format: uuid
+          description: Organization that the controller should be activated into.
+      required:
+      - organization
+      - token
+    ControllerConnection:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        lastPingAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Last time the tunnel connection sent a keepalive ping.
+      required:
+      - id
+    ControllerCount:
+      type: object
+      properties:
+        count:
+          type: integer
+          title: Controller count
+          description: Total number of matching controllers.
+        countAgentNotOk:
+          type: integer
+          title: Controllers with stale agent
+          description: Number of matching controllers whose agent is not currently
+            healthy.
+      required:
+      - count
+      - countAgentNotOk
+    ControllerDiagnostic:
+      type: object
+      properties:
+        status:
+          type: string
+          readOnly: true
+          default: not_requested
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - created
+      - id
+      - status
+    ControllerGroupSetterRequest:
+      type: object
+      properties:
+        controllers:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          description: List of controller serial numbers to update.
+      required:
+      - controllers
+    ControllerLastMetricsTime:
+      type: object
+      properties:
+        lastMetricsAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Time of the newest metric point stored for the controller.
+      required:
+      - lastMetricsAt
+    ControllerService:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        port:
+          type: integer
+          description: Service port on the controller; identifies the service.
+        name:
+          type: string
+          description: Button label override; defaults to the port.
+          maxLength: 64
+        displayName:
+          type: string
+          readOnly: true
+          description: Button label (override or the port number).
+      required:
+      - displayName
+      - id
+      - port
+    ControllerServiceRequest:
+      type: object
+      properties:
+        port:
+          type: integer
+          description: Service port on the controller; identifies the service.
+        name:
+          type: string
+          description: Button label override; defaults to the port.
+          maxLength: 64
+      required:
+      - port
+    ControllerSystemMetricsRequest:
+      type: object
+      properties:
+        start:
+          type: string
+          format: date-time
+          title: Start time
+          description: Start of the metrics time range.
+        stop:
+          type: string
+          format: date-time
+          title: End time
+          description: End of the metrics time range.
+        name:
+          allOf:
+          - $ref: '#/components/schemas/NameEnum'
+          description: |-
+            Logical name of the system metric.
+
+            * `disk_free_data` - disk_free_data
+            * `disk_free_root` - disk_free_root
+            * `load15` - load15
+            * `mem_available` - mem_available
+      required:
+      - name
+      - start
+      - stop
+    ControllerSystemMetricsValues:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        value:
+          type: string
+          nullable: true
+          description: Represent metric value compactly for frontend graph widgets.
+          readOnly: true
+      required:
+      - timestamp
+      - value
+    ControllerTcpTunnel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        connection:
+          allOf:
+          - $ref: '#/components/schemas/ControllerConnection'
+          description: Tunnel connection details.
+        connectedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Time when the TCP tunnel was established.
+        protocol:
+          nullable: true
+          description: |-
+            Built-in tunnel type (ssh/http); empty for user services.
+
+            * `ssh` - ssh
+            * `http` - http
+          oneOf:
+          - $ref: '#/components/schemas/ProtocolEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        localPort:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          default: 80
+          description: Service port on the controller.
+      required:
+      - connection
+      - id
+    ControllerTransferAcceptRequest:
+      type: object
+      properties:
+        targetOrganizationId:
+          type: string
+          format: uuid
+          description: Organization that will receive the controllers.
+        token:
+          type: string
+          minLength: 1
+          description: Controller transfer request token.
+      required:
+      - targetOrganizationId
+      - token
+    ControllerTransferValidationRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          minLength: 1
+          description: Controller transfer request token.
+      required:
+      - token
+    ControllerTunnelAccess:
+      type: object
+      properties:
+        tunnel:
+          allOf:
+          - $ref: '#/components/schemas/ControllerTcpTunnel'
+          description: Created or reused TCP tunnel.
+        tunnelKey:
+          type: string
+          nullable: true
+          description: Tunnel access key, if required by the selected protocol.
+        tunnelRedirectUrl:
+          type: string
+          nullable: true
+          description: Direct URL for opening the tunnel in a browser, when applicable.
+      required:
+      - tunnel
+      - tunnelKey
+      - tunnelRedirectUrl
+    ControllerValidatedToken:
+      type: object
+      properties:
+        controllerSerialNumber:
+          type: string
+          description: Serial number extracted from the validated activation token.
+      required:
+      - controllerSerialNumber
+    ControllerValidationRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          minLength: 1
+          description: Controller activation token.
+      required:
+      - token
+    CreateGroup:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        organization:
+          type: string
+          format: uuid
+        parent:
+          type: string
+          format: uuid
+          nullable: true
+          description: Parent group. Leave empty to create a top-level group.
+      required:
+      - name
+      - organization
+    CreateGroupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        organization:
+          type: string
+          format: uuid
+        parent:
+          type: string
+          format: uuid
+          nullable: true
+          description: Parent group. Leave empty to create a top-level group.
+      required:
+      - name
+      - organization
+    DelayBlacklistTokenRefresh:
+      type: object
+      properties:
+        refresh:
+          type: string
+          description: Refresh token used to issue a new access token. Returned again
+            when rotation is enabled.
+        access:
+          type: string
+          readOnly: true
+          description: New JWT access token.
+      required:
+      - access
+      - refresh
+    DelayBlacklistTokenRefreshRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          minLength: 1
+          description: Refresh token used to issue a new access token. Returned again
+            when rotation is enabled.
+      required:
+      - refresh
+    EmailRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+      required:
+      - email
+    EmailUnsubscribeRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          minLength: 1
+      required:
+      - token
+    Environment:
+      type: object
+      properties:
+        TOTP_AUTH_ENABLED:
+          type: boolean
+        IS_ON_PREMISE:
+          type: boolean
+        ON_PREMISE_VERSION:
+          type: string
+        MAX_ACTIVATED_CONTROLLERS:
+          type: integer
+        FEATURE_BADGES:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/FeatureBadge'
+          description: Active badges keyed by their frontend anchor.
+        LANGUAGES:
+          type: array
+          items:
+            $ref: '#/components/schemas/InterfaceLanguage'
+          description: Languages the frontend offers, in the order they are shown.
+        DEFAULT_LANGUAGE:
+          type: string
+        SERVICE_NAME:
+          type: string
+        PRIMARY_COLOR:
+          type: string
+        SERVICE_STATUS_URL:
+          type: string
+          description: 'Also passed to the frontend as an env var: the error page
+            that shows this link appears when this endpoint is unreachable.'
+        SERVICE_DOCS_URL:
+          type: string
+        SERVICE_DOCS_URL_EN:
+          type: string
+        FOOTER_SITE_URL:
+          type: string
+        FOOTER_SITE_LABEL_RU:
+          type: string
+        FOOTER_SITE_LABEL_EN:
+          type: string
+      required:
+      - DEFAULT_LANGUAGE
+      - FEATURE_BADGES
+      - FOOTER_SITE_LABEL_EN
+      - FOOTER_SITE_LABEL_RU
+      - FOOTER_SITE_URL
+      - IS_ON_PREMISE
+      - LANGUAGES
+      - MAX_ACTIVATED_CONTROLLERS
+      - ON_PREMISE_VERSION
+      - PRIMARY_COLOR
+      - SERVICE_DOCS_URL
+      - SERVICE_DOCS_URL_EN
+      - SERVICE_NAME
+      - SERVICE_STATUS_URL
+      - TOTP_AUTH_ENABLED
+    FeatureBadge:
+      type: object
+      properties:
+        label:
+          $ref: '#/components/schemas/FeatureBadgeLabel'
+        description:
+          allOf:
+          - $ref: '#/components/schemas/FeatureBadgeDescription'
+          nullable: true
+        color:
+          $ref: '#/components/schemas/FeatureBadgeColorEnum'
+        until:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - color
+      - description
+      - label
+      - until
+    FeatureBadgeColorEnum:
+      enum:
+      - violet
+      - blue
+      - green
+      - orange
+      - red
+      - inherit
+      type: string
+      description: |-
+        * `violet` - Violet
+        * `blue` - Blue
+        * `green` - Green
+        * `orange` - Orange
+        * `red` - Red
+        * `inherit` - Inherit surrounding color
+    FeatureBadgeDescription:
+      type: object
+      properties:
+        ru:
+          type: string
+        en:
+          type: string
+      required:
+      - en
+      - ru
+    FeatureBadgeLabel:
+      type: object
+      properties:
+        ru:
+          type: string
+        en:
+          type: string
+      required:
+      - en
+      - ru
+    GrafanaSessionStart:
+      type: object
+      properties:
+        orgId:
+          type: string
+          format: uuid
+          title: Organization ID
+          description: Organization for which the Grafana session should be created.
+      required:
+      - orgId
+    GrafanaSessionStartRequest:
+      type: object
+      properties:
+        orgId:
+          type: string
+          format: uuid
+          title: Organization ID
+          description: Organization for which the Grafana session should be created.
+      required:
+      - orgId
+    Group:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        level:
+          type: integer
+          readOnly: true
+      required:
+      - id
+      - level
+      - name
+    HierarchyGroup:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        organization:
+          allOf:
+          - $ref: '#/components/schemas/SimpleOrganization'
+          readOnly: true
+          description: Organization that owns the group.
+        level:
+          type: integer
+          readOnly: true
+          description: Depth level of the group in the hierarchy.
+        subgroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/HierarchyGroup'
+          readOnly: true
+      required:
+      - id
+      - level
+      - name
+      - organization
+      - subgroups
+    InterfaceLanguage:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+      required:
+      - code
+      - name
+    NameEnum:
+      enum:
+      - disk_free_data
+      - disk_free_root
+      - load15
+      - mem_available
+      type: string
+      description: |-
+        * `disk_free_data` - disk_free_data
+        * `disk_free_root` - disk_free_root
+        * `load15` - load15
+        * `mem_available` - mem_available
+    NotRequiredTokenBlacklistRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          writeOnly: true
+          minLength: 1
+          description: Refresh token to blacklist.
+    NullEnum:
+      enum:
+      - null
+    Organization:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          description: Organization name shown to users.
+          maxLength: 255
+      required:
+      - id
+      - name
+    OrganizationControllerTransferRequest:
+      type: object
+      properties:
+        controllers:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          description: List of controller serial numbers to transfer.
+          maxItems: 20
+        targetOrganizationId:
+          type: string
+          format: uuid
+          description: Target organization that will receive the controllers.
+        clearControllersInfo:
+          type: boolean
+          default: false
+          description: Whether controller metadata should be cleared during transfer.
+      required:
+      - controllers
+      - targetOrganizationId
+    OrganizationControllerTransferRequestRequest:
+      type: object
+      properties:
+        controllers:
+          type: array
+          items:
+            type: string
+            minLength: 1
+          description: List of controller serial numbers to transfer.
+          maxItems: 20
+        targetEmail:
+          type: string
+          format: email
+          minLength: 1
+          description: Email address of the destination user.
+        clearControllersInfo:
+          type: boolean
+          default: false
+          description: Whether controller metadata should be cleared during transfer.
+      required:
+      - controllers
+      - targetEmail
+    OrganizationControllerTransferResponse:
+      type: object
+      properties:
+        transferRequestId:
+          type: string
+          format: uuid
+          readOnly: true
+        targetEmail:
+          type: string
+          format: email
+          description: Email address of the destination user.
+          maxLength: 254
+        controllers:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransferRequestController'
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        expiresAt:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - controllers
+      - createdAt
+      - expiresAt
+      - targetEmail
+      - transferRequestId
+    OrganizationGrafanaAccess:
+      type: object
+      properties:
+        isGrafanaReady:
+          type: boolean
+          title: Grafana access available
+          description: Whether Grafana access is configured and available for the
+            organization.
+      required:
+      - isGrafanaReady
+    OrganizationInviteCreationRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          minLength: 1
+          title: Invitee email
+          description: Email address of the user to invite.
+      required:
+      - email
+    OrganizationInviteCreationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+      - id
+    OrganizationInviteTokenRequest:
+      type: object
+      properties:
+        organizationInviteToken:
+          type: string
+          minLength: 1
+          description: Token from the organization invitation link.
+      required:
+      - organizationInviteToken
+    OrganizationInviteValidatedToken:
+      type: object
+      properties:
+        userExists:
+          type: boolean
+          description: Whether an account with the invited email already exists.
+        invitedUserEmail:
+          type: string
+          title: Invitee email
+        organizationToJoin:
+          allOf:
+          - $ref: '#/components/schemas/Organization'
+          description: Organization that can be joined with this token.
+      required:
+      - invitedUserEmail
+      - organizationToJoin
+      - userExists
+    OrganizationMember:
+      type: object
+      properties:
+        user:
+          allOf:
+          - $ref: '#/components/schemas/SimpleUser'
+          readOnly: true
+        role:
+          $ref: '#/components/schemas/OrganizationMemberRoleEnum'
+      required:
+      - user
+    OrganizationMemberRoleEnum:
+      enum:
+      - owner
+      - admin
+      - member
+      - demo
+      type: string
+      description: |-
+        * `owner` - Owner
+        * `admin` - Admin
+        * `member` - Member
+        * `demo` - Demo
+    OrganizationMemberUpdate:
+      type: object
+      properties:
+        role:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationMemberUpdateRoleEnum'
+          description: |-
+            New role for the organization member.
+
+            * `member` - member
+            * `admin` - admin
+      required:
+      - role
+    OrganizationMemberUpdateRequest:
+      type: object
+      properties:
+        role:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationMemberUpdateRoleEnum'
+          description: |-
+            New role for the organization member.
+
+            * `member` - member
+            * `admin` - admin
+      required:
+      - role
+    OrganizationMemberUpdateRoleEnum:
+      enum:
+      - member
+      - admin
+      type: string
+      description: |-
+        * `member` - member
+        * `admin` - admin
+    OrganizationWithUserRole:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          description: Organization name shown to users.
+          maxLength: 255
+        userRole:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationMemberRoleEnum'
+          readOnly: true
+          description: |-
+            Current user's role in the organization.
+
+            * `owner` - Owner
+            * `admin` - Admin
+            * `member` - Member
+            * `demo` - Demo
+        totpRequired:
+          type: boolean
+          title: OTP Code required
+          description: Whether TOTP confirmation is required for organization members.
+      required:
+      - id
+      - name
+      - userRole
+    OrganizationWithUserRoleRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          description: Organization name shown to users.
+          maxLength: 255
+        totpRequired:
+          type: boolean
+          title: OTP Code required
+          description: Whether TOTP confirmation is required for organization members.
+      required:
+      - name
+    PaginatedControllerList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Controller'
+    PatchedControllerServiceRequest:
+      type: object
+      properties:
+        port:
+          type: integer
+          description: Service port on the controller; identifies the service.
+        name:
+          type: string
+          description: Button label override; defaults to the port.
+          maxLength: 64
+    PatchedOrganizationMemberUpdateRequest:
+      type: object
+      properties:
+        role:
+          allOf:
+          - $ref: '#/components/schemas/OrganizationMemberUpdateRoleEnum'
+          description: |-
+            New role for the organization member.
+
+            * `member` - member
+            * `admin` - admin
+    PatchedOrganizationWithUserRoleRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          description: Organization name shown to users.
+          maxLength: 255
+        totpRequired:
+          type: boolean
+          title: OTP Code required
+          description: Whether TOTP confirmation is required for organization members.
+    PatchedUpdateControllerRequest:
+      type: object
+      properties:
+        description:
+          type: string
+          nullable: true
+          description: Optional human-readable controller description.
+          maxLength: 255
+        group:
+          type: string
+          format: uuid
+          nullable: true
+          description: Group assigned to the controller.
+        latitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,7})?$
+          nullable: true
+          description: Latitude in decimal degrees.
+        longitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,7})?$
+          nullable: true
+          description: Longitude in decimal degrees.
+        userDefinedData:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDefinedDataRequest'
+          nullable: true
+          title: Custom metadata
+          description: Optional user-defined key-value metadata for the controller.
+          maxItems: 100
+        metricsEnabled:
+          type: boolean
+          title: Metrics collection enabled
+        metricsSendIntervalSeconds:
+          type: integer
+          maximum: 240
+          minimum: 60
+          title: Metrics send interval, seconds
+          description: How often the controller sends collected metrics to the cloud.
+            In seconds, 60 to 240, 120 by default.
+    PatchedUpdateGroupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        parent:
+          type: string
+          format: uuid
+          nullable: true
+          description: Parent group. Leave empty to create a top-level group.
+    PatchedUserChangeEmailConfirmationRequest:
+      type: object
+      properties:
+        verificationRequestId:
+          type: string
+          format: uuid
+          description: Identifier of the email verification request to confirm.
+    PatchedUserRegistrationConfirmationRequest:
+      type: object
+      properties:
+        registrationRequestId:
+          type: string
+          format: uuid
+          description: Identifier of the registration request to confirm.
+    ProtocolEnum:
+      enum:
+      - ssh
+      - http
+      type: string
+      description: |-
+        * `ssh` - ssh
+        * `http` - http
+    RequestResetPasswordResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+      - detail
+    ResetPasswordConfirmRequest:
+      type: object
+      properties:
+        uid:
+          type: string
+          minLength: 1
+          description: UID of the user.
+        token:
+          type: string
+          minLength: 1
+          title: Reset token
+          description: Password reset token from the email link.
+        newPassword:
+          type: string
+          minLength: 1
+      required:
+      - newPassword
+      - token
+      - uid
+    ResetPasswordConfirmResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+      - detail
+    ScopeEnum:
+      enum:
+      - transfer_controller
+      - delete_controller
+      - delete_organization
+      - change_password
+      - disable_user_totp
+      - change_org_totp
+      - verify_email_totp
+      type: string
+      description: |-
+        * `transfer_controller` - Transfer controller to another organization
+        * `delete_controller` - Delete controller from organization
+        * `delete_organization` - Delete organization
+        * `change_password` - Change user password
+        * `disable_user_totp` - Disable TOTP Auth for user
+        * `change_org_totp` - Change TOTP Required in organization
+        * `verify_email_totp` - Verify email set or change for user
+    ServiceCatalogEntry:
+      type: object
+      properties:
+        port:
+          type: integer
+          description: Default port of the catalog service.
+        name:
+          type: string
+          description: Default button label.
+      required:
+      - name
+      - port
+    SetupTOTPResponse:
+      type: object
+      properties:
+        secret:
+          type: string
+          title: Shared secret
+          description: Base32-encoded secret for the authenticator.
+        uri:
+          type: string
+          title: otpauth URI
+          description: URI that can be imported into an authenticator app.
+        qrCode:
+          type: string
+          description: QR code image encoded as a string.
+      required:
+      - qrCode
+      - secret
+      - uri
+    SimpleOrganization:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        totpRequired:
+          type: boolean
+          title: OTP Code required
+      required:
+      - id
+    SimpleUser:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          description: Email address must be unique and match username
+          maxLength: 254
+        firstName:
+          type: string
+          maxLength: 150
+        lastName:
+          type: string
+          maxLength: 150
+        totpEnabled:
+          type: boolean
+          readOnly: true
+          description: Whether TOTP is enabled for the user.
+        hasRecoveryCodes:
+          type: boolean
+          readOnly: true
+          description: Whether the user has active recovery codes.
+      required:
+      - email
+      - hasRecoveryCodes
+      - id
+      - totpEnabled
+      - username
+    StatusEnum:
+      enum:
+      - pending
+      - accepted
+      - cancelled
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `accepted` - Accepted
+        * `cancelled` - Cancelled
+    TOTPCodeRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 6
+          title: TOTP code
+          description: One-time code from the authenticator app.
+          maxLength: 6
+      required:
+      - code
+    Tariff:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          title: Tariff ID
+          description: Unique tariff identifier.
+        name:
+          type: string
+          title: Tariff name
+          description: Human-readable tariff name.
+        retentionDays:
+          type: integer
+          description: Metrics retention period included in the tariff, in days.
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          title: Price per controller
+          description: Monthly price per controller.
+        currencyCode:
+          type: string
+          description: ISO 4217 currency code.
+          maxLength: 3
+      required:
+      - currencyCode
+      - id
+      - name
+      - price
+      - retentionDays
+    TariffListResponse:
+      type: object
+      properties:
+        controllersCount:
+          type: integer
+          title: Current controller count
+          description: Current number of controllers in the organization.
+        tariffs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tariff'
+          title: Available tariffs
+          description: Tariff options available for the organization.
+      required:
+      - controllersCount
+      - tariffs
+    TerminateSessionsRequest:
+      type: object
+      properties:
+        sessionIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: List of session UUIDs to terminate.
+          minItems: 1
+      required:
+      - sessionIds
+    TerminateSessionsResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+        terminatedCount:
+          type: integer
+      required:
+      - detail
+      - terminatedCount
+    TokenObtainPairWithProperMessage:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+          description: JWT access token.
+        refresh:
+          type: string
+          readOnly: true
+          description: JWT refresh token.
+        totpCode:
+          type: string
+          description: One-time code from the authenticator app.
+          maxLength: 6
+          minLength: 6
+        recoveryCode:
+          type: string
+          description: Recovery code used when TOTP is unavailable.
+          maxLength: 25
+          minLength: 25
+      required:
+      - access
+      - refresh
+    TokenObtainPairWithProperMessageRequest:
+      type: object
+      properties:
+        totpCode:
+          type: string
+          description: One-time code from the authenticator app.
+          maxLength: 6
+          minLength: 6
+        recoveryCode:
+          type: string
+          description: Recovery code used when TOTP is unavailable.
+          maxLength: 25
+          minLength: 25
+        email:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - email
+      - password
+    TransferRequestController:
+      type: object
+      description: Lightweight controller serializer for transfer request responses
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        serialNumber:
+          type: string
+          maxLength: 36
+      required:
+      - id
+      - serialNumber
+    UpdateController:
+      type: object
+      properties:
+        description:
+          type: string
+          nullable: true
+          description: Optional human-readable controller description.
+          maxLength: 255
+        group:
+          type: string
+          format: uuid
+          nullable: true
+          description: Group assigned to the controller.
+        latitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,7})?$
+          nullable: true
+          description: Latitude in decimal degrees.
+        longitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,7})?$
+          nullable: true
+          description: Longitude in decimal degrees.
+        userDefinedData:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDefinedData'
+          nullable: true
+          title: Custom metadata
+          description: Optional user-defined key-value metadata for the controller.
+          maxItems: 100
+        metricsEnabled:
+          type: boolean
+          title: Metrics collection enabled
+        metricsSendIntervalSeconds:
+          type: integer
+          maximum: 240
+          minimum: 60
+          title: Metrics send interval, seconds
+          description: How often the controller sends collected metrics to the cloud.
+            In seconds, 60 to 240, 120 by default.
+      required:
+      - userDefinedData
+    UpdateControllerRequest:
+      type: object
+      properties:
+        description:
+          type: string
+          nullable: true
+          description: Optional human-readable controller description.
+          maxLength: 255
+        group:
+          type: string
+          format: uuid
+          nullable: true
+          description: Group assigned to the controller.
+        latitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,7})?$
+          nullable: true
+          description: Latitude in decimal degrees.
+        longitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,7})?$
+          nullable: true
+          description: Longitude in decimal degrees.
+        userDefinedData:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDefinedDataRequest'
+          nullable: true
+          title: Custom metadata
+          description: Optional user-defined key-value metadata for the controller.
+          maxItems: 100
+        metricsEnabled:
+          type: boolean
+          title: Metrics collection enabled
+        metricsSendIntervalSeconds:
+          type: integer
+          maximum: 240
+          minimum: 60
+          title: Metrics send interval, seconds
+          description: How often the controller sends collected metrics to the cloud.
+            In seconds, 60 to 240, 120 by default.
+      required:
+      - userDefinedData
+    UpdateGroup:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        parent:
+          type: string
+          format: uuid
+          nullable: true
+          description: Parent group. Leave empty to create a top-level group.
+      required:
+      - name
+    UpdateGroupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        parent:
+          type: string
+          format: uuid
+          nullable: true
+          description: Parent group. Leave empty to create a top-level group.
+      required:
+      - name
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        firstName:
+          type: string
+          maxLength: 150
+        lastName:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          description: Email address must be unique and match username
+          maxLength: 254
+        remoteAddr:
+          type: string
+          readOnly: true
+          description: IP address of the current request.
+        totpEnabled:
+          type: boolean
+          readOnly: true
+          description: Whether TOTP is enabled for the user.
+        hasRecoveryCodes:
+          type: boolean
+          readOnly: true
+          description: Whether the user has active recovery codes.
+        hasTotpRequiredOrg:
+          type: boolean
+          readOnly: true
+          description: Whether the user belongs to any organization that requires
+            TOTP.
+        isDemo:
+          type: boolean
+          readOnly: true
+          description: Whether the user is a demo user in any organization.
+      required:
+      - email
+      - hasRecoveryCodes
+      - hasTotpRequiredOrg
+      - id
+      - isDemo
+      - remoteAddr
+      - totpEnabled
+      - username
+    UserChangeEmailRequestRequest:
+      type: object
+      properties:
+        newUserEmail:
+          type: string
+          format: email
+          minLength: 1
+          description: New email address to verify and attach to the account.
+          maxLength: 254
+        isPrimary:
+          type: boolean
+          description: Whether the new email should become the primary email address.
+      required:
+      - isPrimary
+      - newUserEmail
+    UserDefinedData:
+      type: object
+      description: Became a JSON
+      properties:
+        label:
+          type: string
+          description: Metadata key shown to users.
+          maxLength: 255
+        value:
+          type: string
+          description: Metadata value shown to users.
+          maxLength: 1024
+      required:
+      - label
+      - value
+    UserDefinedDataRequest:
+      type: object
+      description: Became a JSON
+      properties:
+        label:
+          type: string
+          minLength: 1
+          description: Metadata key shown to users.
+          maxLength: 255
+        value:
+          type: string
+          minLength: 1
+          description: Metadata value shown to users.
+          maxLength: 1024
+      required:
+      - label
+      - value
+    UserRegistrationRequest:
+      type: object
+      properties:
+        userEmail:
+          type: string
+          format: email
+          minLength: 1
+          description: Email address and username for the new account.
+        userPassword:
+          type: string
+          minLength: 8
+          maxLength: 70
+      required:
+      - userEmail
+      - userPassword
+    UserSession:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        ipAddress:
+          type: string
+          readOnly: true
+          nullable: true
+        userAgent:
+          type: string
+          readOnly: true
+        country:
+          type: string
+          readOnly: true
+        city:
+          type: string
+          readOnly: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        lastActivity:
+          type: string
+          format: date-time
+          readOnly: true
+        isCurrent:
+          type: boolean
+          readOnly: true
+      required:
+      - city
+      - country
+      - created
+      - id
+      - ipAddress
+      - isCurrent
+      - lastActivity
+      - userAgent
+    VerifyTOTPOrRecoveryCodeRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          title: TOTP code
+          description: One-time code from the authenticator app.
+          maxLength: 6
+          minLength: 6
+        recoveryCode:
+          type: string
+          description: Recovery code used instead of a TOTP code.
+          maxLength: 25
+          minLength: 25
+        scope:
+          allOf:
+          - $ref: '#/components/schemas/ScopeEnum'
+          description: |-
+            Scope of the protected action.
+
+            * `transfer_controller` - Transfer controller to another organization
+            * `delete_controller` - Delete controller from organization
+            * `delete_organization` - Delete organization
+            * `change_password` - Change user password
+            * `disable_user_totp` - Disable TOTP Auth for user
+            * `change_org_totp` - Change TOTP Required in organization
+            * `verify_email_totp` - Verify email set or change for user
+      required:
+      - scope
+  securitySchemes:
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
+tags:
+- name: Authentication
+  description: Sign-in, session tokens, password reset and TOTP verification.
+- name: Users
+  description: Current user profile, registration requests and email verification.
+- name: Organizations
+  description: Organizations, members, invites and organization-level settings.
+- name: Groups
+  description: Controller groups, hierarchy and controller assignment.
+- name: Controllers
+  description: Controller inventory, activation, diagnostics, tunnels and system metrics.
+- name: Controller Transfers
+  description: Transfer controllers between organizations, including request validation
+    and acceptance.
+- name: Grafana
+  description: Grafana access and session bootstrap.
+- name: Environment
+  description: Public environment metadata for client applications.

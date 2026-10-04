@@ -1,0 +1,9 @@
+name: automation-speech-source
+version: 0.4.1
+description: Preserve full speech preparation and deliver ordered voice messages up to five minutes
+provides_hooks:
+  - pre_llm_call
+  - transform_llm_output
+  - pre_tool_call
+  - pre_gateway_dispatch
+  - agent_loop_stopped

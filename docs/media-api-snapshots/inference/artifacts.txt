@@ -1,0 +1,493 @@
+Publish self-contained HTML or Markdown pages to a shareable URL. Artifacts are versioned and permissioned, and update in place when you publish again.
+
+This page is the REST reference. For the concepts and the CLI, see Artifacts, Publishing, Capabilities, and Sharing.
+
+Responses use the standard envelope. See REST overview — response format.
+
+Scopes
+
+ | Scope | Access
+
+ | artifacts:read | Post comments
+
+ | artifacts:write | Create, publish versions, update metadata, delete, change visibility, share, transfer, upload and delete assets, activate and resolve comment threads
+
+Read routes (list, get, content, render, frame, versions, comments, assets, viewer, page store) need no scope. They apply the artifact's visibility instead: public and unlisted artifacts are readable without authentication, and everything else requires a caller who is allowed to see it.
+
+Both scopes are in the standard preset. See API keys — Permission scopes.
+
+Endpoints
+
+ | Method | Path | Scope | Purpose
+
+ | GET | /artifacts | — | List artifacts
+
+ | POST | /artifacts/list | — | List artifacts (JSON body)
+
+ | GET | /artifacts/{id} | — | Get an artifact
+
+ | GET | /artifacts/{namespace}/{name} | — | Get an artifact by name
+
+ | POST | /artifacts | artifacts:write | Create an artifact, or publish a version when the name exists
+
+ | POST | /artifacts/{id} | artifacts:write | Update metadata
+
+ | POST | /artifacts/{id}/versions | artifacts:write | Publish a version
+
+ | DELETE | /artifacts/{id} | artifacts:write | Delete
+
+ | GET | /artifacts/{id}/versions | — | List versions
+
+ | POST | /artifacts/{id}/versions/list | — | List versions (JSON body)
+
+ | GET | /artifacts/{id}/versions/{versionId} | — | Get one version
+
+ | GET | /artifacts/{id}/content | — | Page source of the version viewers see
+
+ | GET | /artifacts/{id}/versions/{versionId}/content | — | Page source of one version
+
+ | GET | /artifacts/{id}/render | — | Wrapped HTML document
+
+ | GET | /artifacts/{id}/frame | — | Embed URLs for an iframe
+
+ | GET | /artifacts/{id}/stream | — | Server-sent events for updates
+
+ | GET | /artifacts/guidance | — | Authoring guidance as Markdown
+
+ | POST | /artifacts/{id}/visibility | artifacts:write | Change visibility
+
+ | GET | /artifacts/{id}/shares | artifacts:write | List per-user shares
+
+ | POST | /artifacts/{id}/share | artifacts:write | Share with a user
+
+ | DELETE | /artifacts/{id}/share/{userId} | artifacts:write | Revoke a share
+
+ | POST | /artifacts/{id}/transfer | artifacts:write | Transfer to another workspace
+
+ | GET | /artifacts/{id}/comments | — | List comment threads
+
+ | POST | /artifacts/{id}/comments | artifacts:read | Post a comment
+
+ | POST | /artifacts/{id}/comments/{commentId}/activate | artifacts:write | Send a thread to agents
+
+ | POST | /artifacts/{id}/comments/{commentId}/resolve | artifacts:write | Resolve or reopen a thread
+
+ | GET | /artifacts/{id}/viewer | — | Who is viewing (user capability)
+
+ | POST | /artifacts/{id}/data/get list set update delete | — | Page store (db capability)
+
+ | GET | /artifacts/{id}/assets | — | List assets
+
+ | GET | /artifacts/{id}/assets/{assetId} | — | Download an asset
+
+ | POST | /artifacts/{id}/assets | artifacts:write | Upload an asset
+
+ | DELETE | /artifacts/{id}/assets/{assetId} | artifacts:write | Delete an asset
+
+Artifact object
+
+ | Field | Type | Description
+
+ | id | string | Artifact ID
+
+ | namespace | string | Owning workspace's username. Immutable.
+
+ | name | string | Slug within the namespace. Immutable.
+
+ | title | string | Display title
+
+ | description | string | One-line summary
+
+ | favicon | string | One or two emoji for the rendered page's browser tab
+
+ | images | object | Cover images: card, thumbnail, banner (URL strings)
+
+ | type | string | html (default) or markdown
+
+ | version_id | string | Latest published version ID
+
+ | version | object | Latest version metadata
+
+ | shared_version_id | string | Pinned version viewers see. Empty means latest.
+
+ | capabilities | object | Runtime capabilities the latest version declared
+
+ | visibility | string | private, team, org, unlisted, or public
+
+ | views | integer | View count
+
+ | url | string | Canonical viewer URL
+
+ | created_at, updated_at | string | RFC 3339 timestamps
+
+New artifacts are created private.
+
+Version object
+
+ | Field | Type | Description
+
+ | id | string | Version ID
+
+ | artifact_id | string | Parent artifact ID
+
+ | number | integer | 1-based publish sequence
+
+ | content | object | Stored file reference (uri, hash, size). The source itself comes from the content endpoints. uri is empty when the version is stored in the private artifacts bucket — use the content endpoints instead of treating a bare storage key as a public URL.
+
+ | content_hash | string | SHA-256 of the UTF-8 source
+
+ | md5 | string | Lowercase hex MD5 of the UTF-8 source
+
+ | size_bytes | integer | Source byte length
+
+ | label, notes | string | Optional version label and notes
+
+ | origin | string | Provenance, for example belt, chat:<id>, api
+
+ | generated_by | string | Who produced the version, for example agent:<id>, human:<email>
+
+ | capabilities | object | Runtime capabilities this version declared
+
+ | created_by_user_id | string | Publishing user
+
+Publishing identical content is a no-op. No duplicate version is created.
+
+Create or publish
+
+POST /artifacts creates an artifact and its first version. When an artifact with the same name already exists in your namespace, it publishes a new version instead.
+
+POST /artifacts/{id}/versions appends a version to an existing artifact.
+
+Both accept multipart/form-data or JSON. Multipart is the recommended way to send page source.
+
+Multipart
+
+ | Part | Description
+
+ | file | Page source (HTML or Markdown). Omit to update metadata without creating a version.
+
+ | title, description, favicon, type | Entry metadata
+
+ | name | Slug on create. Derived from title when omitted.
+
+ | label, notes, origin, generated_by | Version metadata
+
+ | image | Cover URL. Sets card, thumbnail, and banner to the same value.
+
+ | capability or capabilities | Repeat the field or comma-separate: db, user, assets
+
+ | base_version_id, force | See Version conflicts
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/artifacts \2  -H "Authorization: Bearer inf_your_key" \3  -F "[email protected]" \4  -F "title=Sales dashboard" \5  -F "type=html" \6  -F "capability=db"
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/artifacts/art_abc123/versions \2  -H "Authorization: Bearer inf_your_key" \3  -F "[email protected]" \4  -F "label=v2"
+
+JSON
+
+ | Field | Type | Required | Description
+
+ | title | string | On create | Display title
+
+ | content | string | Yes | Page source (HTML or Markdown)
+
+ | content_encoding | string | No | "base64" when content is base64-encoded UTF-8
+
+ | name | string | No | Slug on create. Derived from title when omitted.
+
+ | description, favicon | string | No | Entry metadata
+
+ | images | object | No | Cover image URLs (card, thumbnail, banner)
+
+ | type | string | No | html (default) or markdown. Create only.
+
+ | label, notes, origin, generated_by | string | No | Version metadata
+
+ | capabilities | object | No | For example {"db": true, "user": true}. An unknown name is refused.
+
+ | base_version_id | string | No | Version the content was built on
+
+ | force | boolean | No | Publish over a newer version and discard it
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/artifacts \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "title": "Release notes",6    "type": "markdown",7    "content": "# v2.0\n\n- Faster renders"8  }'
+
+Version conflicts
+
+Pass base_version_id with the version_id you read before editing. When the artifact has moved past that version, the publish is refused with 409 and code version_conflict. The detail names the current version. Re-read it, merge, and publish again.
+
+ | Request | Result
+
+ | base_version_id omitted | Unconditional publish
+
+ | base_version_id equals the current version_id | Publish proceeds
+
+ | base_version_id is stale | 409 version_conflict
+
+ | force: true | Publishes anyway and discards what landed in between
+
+Update metadata
+
+POST /artifacts/{id}
+
+Updates title, description, favicon, images, or shared_version_id. Content changes go through a publish.
+
+jsoncopy
+
+1{2  "title": "Updated title",3  "shared_version_id": "VERSION_ID"4}
+
+shared_version_id pins the version viewers see. Pass "" to show the latest version again. See Sharing — Versions.
+
+List and get
+
+GET /artifacts or POST /artifacts/list returns artifacts you own or that were shared with you, with cursor pagination.
+
+GET /artifacts/{id} returns one artifact by ID.
+
+GET /artifacts/{namespace}/{name} resolves by name. Append @shortVersionId to the name to get that version attached instead of the latest (for example myteam/report@a1b2c3d4).
+
+GET /artifacts/{id}/versions or POST /artifacts/{id}/versions/list lists version metadata with cursor pagination. GET /artifacts/{id}/versions/{versionId} returns one version.
+
+DELETE /artifacts/{id} deletes the artifact.
+
+Content
+
+GET /artifacts/{id}/content returns the source of the version viewers see (latest, or the pinned version).
+
+GET /artifacts/{id}/versions/{versionId}/content returns one version. versionId is a full ID or the short ID.
+
+ | Request | Response
+
+ | Default | JSON: artifact_id, version_id, number, type, title, content, content_hash, md5, size_bytes
+
+ | Accept: text/* or ?raw=1 | Raw source body
+
+Render
+
+GET /artifacts/{id}/render
+
+Returns the page wrapped in a full HTML document, as belt artifact get --render prints it.
+
+ | Query | Description
+
+ | version | Version ID or short ID. Default: the version viewers see.
+
+ | theme | dark or light
+
+The response Content-Type is text/plain, so a browser shows the source instead of running it on the API origin. Browsers display published pages through Frame.
+
+Frame
+
+GET /artifacts/{id}/frame
+
+Returns the URLs a client loads to show a published page. Both point at the user-content domain, never the API host. See Artifacts — Where a page runs. Accepts the same version and theme query parameters as Render, and runs the same read check as GET /artifacts/{id}.
+
+ | Field | Type | Description
+
+ | artifact_id | string | Artifact ID
+
+ | version_id | string | Resolved version ID
+
+ | version_short_id | string | Version short ID
+
+ | embed_url | string | URL for an <iframe>
+
+ | top_url | string | The same page opened in its own tab
+
+ | exchange | boolean | true when the URLs carry a short-lived access token. false for a public artifact, which needs none.
+
+ | expires_at | string | When the URL token expires. Omitted when exchange is false.
+
+URL tokens are valid for about 10 minutes. Once a URL has been opened, the page stays accessible in that browser for about 55 minutes. Request a new frame after that.
+
+bashcopy
+
+1curl "https://api.inference.sh/artifacts/art_abc123/frame?theme=dark" \2  -H "Authorization: Bearer inf_your_key"
+
+Authoring guidance
+
+GET /artifacts/guidance
+
+Returns the page contract with the design, capability, and diagram guidance. It is the text belt artifact guidance prints. No authentication required. The response body is text/markdown, not JSON.
+
+ | Query | Description
+
+ | topics | Comma-separated: design, capabilities, diagrams. Omit for all.
+
+Live updates
+
+GET /artifacts/{id}/stream
+
+Server-sent events for artifact updates such as new versions and metadata changes. See Streaming.
+
+Visibility, sharing, transfer
+
+POST /artifacts/{id}/visibility
+
+jsoncopy
+
+1{ "visibility": "unlisted" }
+
+ | Value | Who can view
+
+ | private | The author (default on create)
+
+ | team | Workspace members
+
+ | org | Organization members
+
+ | unlisted | Anyone with the link
+
+ | public | Anyone
+
+POST /artifacts/{id}/share shares with one user:
+
+jsoncopy
+
+1{ "user_id": "USER_ID", "permission": "read" }
+
+permission is read (viewer) or write (can publish versions). GET /artifacts/{id}/shares lists shares. DELETE /artifacts/{id}/share/{userId} revokes one.
+
+POST /artifacts/{id}/transfer moves the artifact to another workspace:
+
+jsoncopy
+
+1{ "team_id": "TEAM_ID" }
+
+→ Sharing
+
+Comments
+
+GET /artifacts/{id}/comments returns an array of threads. Each thread is a root comment with its replies in chronological order. Anyone who can read the artifact can list its threads.
+
+POST /artifacts/{id}/comments requires artifacts:read.
+
+ | Field | Description
+
+ | content | Comment body (required)
+
+ | parent_comment_id | Thread root to reply to. Omit to start a thread.
+
+ | send_to_agent | Activate the thread for agents in the same request
+
+Comments are disabled on public artifacts. The request returns 409 with code comments_unavailable.
+
+POST /artifacts/{id}/comments/{commentId}/activate sets agent_activated on a thread root. Agents can read every thread but can only reply to or resolve activated threads.
+
+POST /artifacts/{id}/comments/{commentId}/resolve resolves a thread. Send {"resolved": false} to reopen it.
+
+Runtime capabilities
+
+A page declares capabilities at publish time and gets only what its published version declared. Capabilities covers the window.inferencesh JavaScript API. The routes below are what the viewer calls on the page's behalf. Each is refused unless the artifact declared the matching capability.
+
+Page store (db)
+
+POST /artifacts/{id}/data/get, /data/list, /data/set, /data/update, /data/delete
+
+ | Field | Type | Required | Description
+
+ | collection | string | Yes | Collection path, for example poll or data/users/me/prefs
+
+ | doc_id | string | For get, set, update, delete | Document ID within the collection
+
+ | data | object | For set, update | JSON document body
+
+ | limit | integer | No | Max documents on list. Clamped to 200.
+
+set replaces a document and creates it when missing. update merges fields. Reads follow the artifact's visibility. Writes require a signed-in caller. Documents under data/users/me are private to the caller who wrote them.
+
+A document response has collection, doc_id, data, updated_at, and owner_user_id (set for per-viewer documents). A list response has collection, documents, and count.
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/artifacts/art_abc123/data/get \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"collection": "poll", "doc_id": "totals"}'
+
+data/get returns 404 not_found with document not found when the artifact is readable but the document does not exist. data/list returns an empty documents array for an empty collection.
+
+Viewer identity (user)
+
+GET /artifacts/{id}/viewer
+
+ | Field | Type | Description
+
+ | signed_in | boolean | false for someone opening a public link without an account
+
+ | user_id | string | Present when signed in
+
+ | name | string | Display name
+
+ | avatar_url | string | Profile image URL
+
+ | can_edit | boolean | Whether this viewer may publish new versions
+
+No email or credential is included.
+
+Assets (assets)
+
+Files stored beside an artifact. Page sources and assets are written to a dedicated private object store (not the shared bucket behind public task file URLs). Anyone who can view the artifact can read its assets through the API; upload and delete require artifacts:write. Uploading identical bytes twice returns the existing asset.
+
+POST /artifacts/{id}/assets takes multipart form data with a file part and an optional content_type field.
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/artifacts/art_abc123/assets \2  -H "Authorization: Bearer inf_your_key" \3  -F "[email protected]"
+
+ | Field | Type | Description
+
+ | asset_id | string | Asset ID
+
+ | filename | string | Original filename
+
+ | content_type | string | MIME type
+
+ | size_bytes | integer | File size
+
+ | url | string | Address to use in page markup, exactly as returned
+
+ | created_at | string | RFC 3339 timestamp
+
+ | uploaded_by_user_id | string | Uploading user
+
+GET /artifacts/{id}/assets returns assets, count, total_bytes, and budget_bytes.
+
+GET /artifacts/{id}/assets/{assetId} checks that the caller may view the artifact, then redirects (302) to a storage URL valid for 15 minutes, or streams the bytes.
+
+DELETE /artifacts/{id}/assets/{assetId} removes the asset and its stored bytes.
+
+Limits
+
+ | Limit | Value
+
+ | Page source per publish | 16 MiB
+
+ | Asset file | 25 MiB
+
+ | Assets per artifact | 250 MiB and 500 files
+
+ | Asset upload through the MCP artifact_asset_upload tool | 8 MiB per file
+
+ | Page store document | 128 KiB of stored JSON
+
+ | Page store per artifact | 16 MiB and 10,000 documents
+
+ | Page store list | 200 documents per call
+
+ | Collection path / document ID length | 512 / 200 characters
+
+A page store write over a limit returns 400 with code validation_error. Replacing an existing document is measured against the new payload only.
+
+Related
+
+Artifacts — what a page is and where it runs
+
+Publishing — belt artifact publish, flags, updating in place
+
+Capabilities — db, user, assets from inside a page
+
+Sharing — visibility, pinned versions, comments
+
+API keys — artifacts:read and artifacts:write scopes

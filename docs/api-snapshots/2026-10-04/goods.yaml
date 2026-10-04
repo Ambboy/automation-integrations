@@ -1,0 +1,457 @@
+openapi: 3.0.1
+info:
+  title: компоненты api goods
+  version: '1'
+
+components:
+
+  schemas:
+
+    Goods: 
+      type: object
+      properties:    
+        status:
+          $ref: 'components.yaml#/components/schemas/Status'
+        data:
+          type: object
+          properties:
+            gdsCode:
+              type: string
+              description: код товара
+            gdsNameTitle:
+              type: string
+              description: полное наименование товара
+            rem_op:
+              type: string
+              description: Суммарное количество товара во всех ОП
+            rem:
+              type: string
+              description: Количество товара в ЛЦ
+            gdsNameInMnf: 
+              type: string
+              description: наименование в прайсе производителя
+            gdsInfoClass81: 
+              type: string
+              description: классификация товара в каталоге
+            gdsNameCountry: 
+              type: string
+              description: страна
+            gdsMnfName: 
+              type: string
+              description: имя производителя товара
+            gdsMnfCode: 
+              type: string
+              description: код производителя товара
+            gdsMnfUrl: 
+              type: string
+              description: ЧПУ производителя товара
+            gdsArt: 
+              type: string
+              description: артикул
+            gdsExtArt: 
+              type: string
+              description: артикул расширенный
+            gdsUnitName: 
+              type: string
+              description: ед.измерения
+            gdsInfoPacks: 
+              type: string
+              description: упаковки
+            gdsSertifName: 
+              type: string
+              description: сертификат
+            gdsClassTree: 
+              type: array
+              description: дерево классификация товара в каталоге
+              items: 
+                type: object
+                properties: 
+                  code: 
+                    type: string
+                    description: код класса
+                  name: 
+                    type: string
+                    description: имя класса
+                  url: 
+                    type: string
+                    description: ЧПУ класса
+            gdsChars: 
+              $ref: '#/components/schemas/GdsChars'
+            description: 
+              type: string
+              description: описание
+            slang: 
+              type: string
+              description: сленг
+            gdsPacks:
+              type: array
+              description: упаковки
+              items:
+                type: object
+                properties: 
+                  gdsPackCode: 
+                    type: string
+                    description: код упаковки
+                  gdsPackName: 
+                    type: string
+                    description: наименование упаковки
+                  gdsPackVal: 
+                    type: string
+                    description: количество товара в упаковке
+                  gdsPackWeightVal: 
+                    type: string
+                    description: вес
+                  gdsPackWeightDim: 
+                    type: string
+                    description: единица измерения веса
+                  gdsPackLengthVal: 
+                    type: string
+                    description: длина
+                  gdsPackLengthDim: 
+                    type: string
+                    description: единица измерения длины
+                  gdsPackWidthVal: 
+                    type: string
+                    description: ширина
+                  gdsPackWidthDim: 
+                    type: string
+                    description: единица измерения ширины
+                  gdsPackHeigthVal: 
+                    type: string
+                    description: высота
+                  gdsPackHeigthDim: 
+                    type: string
+                    description: единица измерения высоты
+                  gdsPackVolumeVal: 
+                    type: string
+                    description: объем
+                  gdsPackVolumeDim: 
+                    type: string
+                    description: единица измерения объема
+            gdsClasses:
+              type: array
+              description: вся классификация товара
+              items:
+                type: object
+            gdsPrice1: 
+              type: string
+              description: цена продажи
+            gdsPrice2: 
+              type: string
+              description: розничная цена
+            gdsPrice3: 
+              type: string
+              description: доп. справочная цена
+            gdsImages: 
+              type: object
+              description: изображения товара
+              properties: 
+                gdsImgSrc: 
+                  type: string
+                  description: ссылка на картинку
+                gdsImgRef: 
+                  type: string
+                  description: ссылка для перехода
+            gdsVz_an: 
+              type: string
+              description: коды взаимозаменяемых и аналогов
+            gdsConstr: 
+              type: string
+              description: если = 1, то у товара есть конструктор
+            qual82_img: 
+              type: string
+              description: ссылка на картику качества
+            qual82_title: 
+              type: string
+              description: текст к качеству товара
+            gdsRemSt: 
+              type: string
+              description: остаток товара на ЛЦ
+            gdsAvail: 
+              type: string
+              description: доступность
+            gdsRemCRS: 
+              type: string
+              description: остаток на ЦРС
+            timeX: 
+              type: string
+              description: очень приблизительное время с ЛЦ до ОП
+            timeY: 
+              type: string
+              description: очень приблизительное время с ЦРС до ОП
+            can_basket:
+              type: string
+              description: можно добавлять в корзину (пусто - да, "-" - нельзя, "z" - заказной)
+            gdsRemAddSt: 
+              type: string
+              description: остаток в ОП
+            dif_price:
+              type: boolean
+              description: есть этот же товар по другой цене
+            not_produced:
+              type: boolean
+              description: товар не производится
+            gdsSertFiles:
+              type: array
+              description: сертификаты на товар
+              items:
+                type: string
+            minPack: 
+              type: string
+              description: минимально возможное кол-во
+            myCatalog: 
+              type: string
+              description: если = 1, то товар в избранном клиента
+            relatedProducts: 
+              type: array
+              description: похожие товары
+              items: 
+                type: object
+                properties: 
+                  gdsCode: 
+                    type: string
+                    description: код товара
+                  gdsName: 
+                    type: string
+                    description: наименование товара
+                  sale: 
+                    type: string
+                    description: распродажа
+                  saleText: 
+                    type: string
+                    description: текст к распродаже
+                  gdsPrice1: 
+                    type: string
+                    description: цена продажи
+                  gdsPrice2: 
+                    type: string
+                    description: розничная цена
+                  gdsPrice3: 
+                    type: string
+                    description: доп. справочная цена
+                  gdsUnitName: 
+                    type: string
+                    description: ед.измерения
+                  minPack: 
+                    type: string
+                    description: минимально возможное кол-во
+                  type: 
+                    type: string
+                    description: степень похожести (analog или class)
+                  mnfName: 
+                    type: string
+                    description: имя производителя товара
+                  mnfSer: 
+                    type: string
+                    description: серия производителя
+                  pack3: 
+                    type: string
+                    description: заводская упаковка
+                  can_basket:
+                    type: string
+                    description: можно добавлять в корзину (пусто - да, "-" - нельзя, "z" - заказной)
+                  basket_cnt: 
+                    type: string
+                    description: Количество данного товара уже положенного в корзину
+                  avail: 
+                    type: string
+                    description: доступность
+                  rem_op:
+                    type: string
+                    description: Количество товара во всех ОП
+                  rem:
+                    type: string
+                    description: Количество товара в ЛЦ
+                  rem_crs:
+                    type: string
+                    description: Количество товаров на других складах (КДК)
+                  op_lc_days:
+                    type: string
+                    description: Количество дней поставки товара с ЛЦ до ОП
+                  crs_days:
+                    type: string
+                    description: Количество дней поставки товара по КДК до ОП
+                  gdsImgSrc: 
+                    type: string
+                    description: ссылка на картинку товара
+                  sumUsers: 
+                    type: number
+                    description: количество пользователей, оценивших товар
+                  sumRaiting: 
+                    type: number
+                    description: средняя оценка от всех пользователей
+                  userRaiting: 
+                    type: number
+                    description: Оценка товара пользователем
+                  purchased: 
+                    type: string
+                    description: Пользователь покупал ранее этот товар
+            barcodes:
+              type: array
+              description: штрихкоды
+              items:
+                type: object
+                properties:
+                  val:
+                    type: string
+                    description: штрихкод
+                  pack:
+                    type: string
+                    description: упаковка
+            gdsTechDescInt: 
+              type: array
+              description: дополнительные материалы по товару
+              items: 
+                type: object
+                properties: 
+                  gdsTechIntSrc: 
+                    type: string
+                    description: ссылка на материал
+                  gdsTechIntName: 
+                    type: string
+                    description: описание
+                  gdsTechIntType:
+                    type: string
+                    description: тип файла
+            gdsTechDescExt: 
+              type: array
+              description: внеешняя техническая информация по товару
+              items:
+                type: object
+                properties: 
+                  gdsTechIntSrc: 
+                    type: string
+                    description: ссылка
+                  gdsTechIntName: 
+                    type: string
+                    description: описание
+                  gdsTechIntType:
+                    type: string
+                    description: тип файла
+            similar: 
+              type: object
+              description: однотипные товары
+              properties: 
+                property1: 
+                  type: object
+                  description: первая отличительная характеристика
+                  properties: 
+                    name: 
+                      type: string
+                      description: название характеристики
+                    code: 
+                      type: string
+                      description: код характеристики
+                    columns:
+                      type: string
+                      description: список колонок через '|'
+                    values: 
+                      type: array
+                      description: возможные значения
+                      items: 
+                        type: object
+                        properties: 
+                          val: 
+                            type: string
+                            description: значение
+                          name: 
+                            type: string
+                            description: наименование значения
+                          selected: 
+                            type: boolean
+                            description: соответствие текущему товару                            
+                          gdsName: 
+                            type: string
+                            description: наименование однотипного товара
+                          gdsArt: 
+                            type: string
+                            description: артикул
+                          mnfName: 
+                            type: string
+                            description: производитель
+                          mnfSer: 
+                            type: string
+                            description: серия
+                          pack3: 
+                            type: string
+                            description: упаковка
+                          gdsAvail: 
+                            type: string
+                            description: наличие
+                          sale: 
+                            type: string
+                            description: распродажа
+                          gdsPrice1: 
+                            type: string
+                            description: цена продажи
+                          gdsPrice2: 
+                            type: string
+                            description: розничная цена
+                          gdsPrice3: 
+                            type: string
+                            description: доп. справочная цена
+                          can_basket: 
+                            type: string
+                            description: можно добавлять в корзину (пусто - да, "-" - нельзя, "z" - заказной)                            
+                          minPack: 
+                            type: string
+                            description: минимально возможное кол-во
+                          basket_cnt: 
+                            type: number
+                            description: Количество данного товара уже положенного в корзину
+                          gdsCode: 
+                            type: number
+                            description: код однотипного товара
+                property2: 
+                  type: object
+                  description: вторая отличительная характеристика
+                  properties: 
+                    name: 
+                      type: string
+                      description: название характеристики
+                    code: 
+                      type: string
+                      description: код характеристики
+                    values: 
+                      type: array
+                      description: возможные значения
+                      items: 
+                        type: object
+                        properties: 
+                          val: 
+                            type: string
+                            description: значение
+                          name: 
+                            type: string
+                            description: наименование значения
+                          selected: 
+                            type: boolean
+                            description: соответствие текущему товару                            
+                          gdsCode: 
+                            type: number
+                            description: код однотипного товара
+
+    GdsChars:
+      type: array
+      description: характеристики товара
+      items: 
+        type: object
+        properties: 
+          gdsCharName:
+            type: string
+            description: наименование характеристики
+          gdsCharVal:
+            type: string
+            description: значение характеристики
+          ConfigCharCode:
+            type: string
+            description: код характеристики
+          ConfigCharIdVal:
+            type: string
+            description: код значения характеристики
+          gdsCharSeoValid:
+            type: boolean
+            description: валидность ссылки в SEO-инструменте
+          gdsCharSeoURL:
+            type: string
+            description: ЧПУ

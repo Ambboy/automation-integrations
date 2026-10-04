@@ -1,0 +1,203 @@
+Real-time updates via Server-Sent Events (SSE).
+
+SSE event payloads are bare DTOs, not wrapped in the response envelope.
+
+Stream Task Updates
+
+GET /tasks/:id/stream
+
+Stream task status updates in real-time.
+
+Headers
+
+codecopy
+
+1Accept: text/event-stream
+
+Event Format
+
+codecopy
+
+1event: update2data: {"id":"task_abc","status":7,"logs":"Processing..."}34event: update5data: {"id":"task_abc","status":10,"output":{...}}67event: done8data: {}
+
+Event Types
+
+ | Event | Description
+
+ | update | Task state changed
+
+ | done | Stream complete
+
+ | error | Error occurred
+
+cURL Example
+
+bashcopy
+
+1curl -N https://api.inference.sh/tasks/task_abc123/stream \2  -H "Authorization: Bearer inf_your_key" \3  -H "Accept: text/event-stream"
+
+Stream workspace events
+
+GET /events
+
+Real-time updates for resources in your workspace. The inference shell app uses this stream to refresh user profile, billing transactions, and engine state without polling.
+
+Requires authentication with teams:read scope.
+
+Format negotiation
+
+ | Accept header | Format
+
+ | application/x-ndjson or application/jsonl | Newline-delimited JSON (preferred by the web app)
+
+ | text/event-stream (default) | Server-Sent Events
+
+NDJSON messages
+
+Each line is a JSON object. Heartbeats use {"type":"heartbeat"} (every 10 seconds).
+
+Typed updates include an event field set to the resource table name:
+
+jsoncopy
+
+1{"event":"engines","data":{"id":"eng_abc","status":"running",...}}2{"event":"transactions","data":{"id":"txn_xyz","amount":500,...}}3{"event":"users","data":{"id":"usr_123","balance":10000,...}}
+
+Subscribe to the event names you care about (engines, transactions, users). Partial field updates may include a fields array alongside data. The id field is always included in partial payloads so clients can correlate updates with existing records, even when fields omits it.
+
+SSE format
+
+codecopy
+
+1event: engines2data: {"id":"eng_abc","status":"running",...}34: heartbeat
+
+The event name matches the resource type (same table names as NDJSON).
+
+cURL example
+
+bashcopy
+
+1curl -N https://api.inference.sh/events \2  -H "Authorization: Bearer inf_your_key" \3  -H "Accept: application/x-ndjson"
+
+When to use this vs other streams
+
+ | Endpoint | Use for
+
+ | GET /events | Workspace-wide updates (engines, balance transactions, user profile)
+
+ | GET /tasks/:id/stream | A single task's status and output
+
+ | GET /chats/:id/stream | Agent chat state, messages, and runs
+
+ | GET /engines/:id/stream | Live updates for one engine
+
+There is no last_event_id resume on /events — open a new connection after disconnects.
+
+Stream engine updates
+
+GET /engines/{id}/stream
+
+Stream status changes for a single private engine. Requires engines:read scope.
+
+Send Accept: text/event-stream. Events use the same SSE pattern as task streaming: update events with engine DTO payloads, done when the stream closes, and heartbeat comments every 10 seconds.
+
+bashcopy
+
+1curl -N https://api.inference.sh/engines/eng_abc123/stream \2  -H "Authorization: Bearer inf_your_key" \3  -H "Accept: text/event-stream"
+
+In the JavaScript SDK: client.engines.stream(engineId).
+
+Stream chat updates
+
+GET /chats/:id/stream
+
+Unified real-time stream for agent chat state, messages, and runs. Used by belt chat watch, the JavaScript SDK (client.chats.stream(chatId)), and client.agent().sendMessage() when streaming.
+
+Requires conversations:read scope. Send Accept: text/event-stream (default) or application/x-ndjson.
+
+Initial snapshot
+
+On connect (including reconnect), the server sends one chats event with the current chat status (busy, idle, awaiting_input, …) derived from the active run. Message history is omitted from the snapshot to keep payloads small — call List chat messages to load the transcript, including queued messages.
+
+Event types
+
+ | Event (SSE) / event (NDJSON) | Payload | When
+
+ | chats | Chat DTO | Initial snapshot and chat-level updates
+
+ | chat_messages | ChatMessage DTO | Message created or updated (content, status, tool_invocations)
+
+ | agent_runs | AgentRun DTO | Run started, completed, or cancelled
+
+Tool invocation progress arrives as chat_messages updates — the server republishes the parent message when an invocation status changes.
+
+Queued messages emit chat_messages with status: "queued", then status: "ready" when the agent consumes them on its next turn. When a run completes and a new run starts for queued messages, you receive agent_runs events for both.
+
+Partial updates
+
+Some chat_messages events are partial updates — for example when status changes from queued to ready and the server assigns a final transcript order. These use a {data, fields} envelope (same pattern as task partial updates):
+
+jsoncopy
+
+1{"event":"chat_messages","data":{"id":"msg_1","chat_id":"chat_abc","status":"ready","order":15},"fields":["id","status","chat_id","order"]}
+
+The id field is always present in data, even when fields omits it. Merge partial updates into your local message state instead of replacing the full object. The JavaScript SDK handles this via onPartialData on chat streams; Python iterators unwrap the envelope automatically.
+
+Full-object chat_messages events (message created, content streaming) omit the fields wrapper.
+
+Heartbeats are sent every 10 seconds (: heartbeat in SSE, {"type":"heartbeat"} in NDJSON).
+
+SSE example
+
+codecopy
+
+1event: chats2data: {"id":"chat_abc","status":"busy",...}34event: chat_messages5data: {"id":"msg_1","role":"user","status":"queued",...}67: heartbeat89event: chat_messages10data: {"data":{"id":"msg_1","chat_id":"chat_abc","status":"ready"},"fields":["id","status","chat_id"]}1112event: agent_runs13data: {"id":"run_1","state":"completed",...}
+
+cURL example
+
+bashcopy
+
+1curl -N https://api.inference.sh/chats/chat_abc123/stream \2  -H "Authorization: Bearer inf_your_key" \3  -H "Accept: application/x-ndjson"
+
+Reconnection
+
+Open a new connection to /chats/:id/stream. The initial snapshot reflects the current chat state — not the state from when you last disconnected. Fetch List chat messages for any messages you missed while offline.
+
+Unlike task streams, chat streams stay open across multiple agent turns. They do not emit a done event when a single turn completes. Fetch structured results (if any) with GET /chats/:id — see Get Chat.
+
+Related endpoints
+
+ | Endpoint | Use for
+
+ | GET /chats/:id/stream | Live chat updates (recommended)
+
+ | POST /agents/run with stream: true | Start or continue a chat and stream message updates in the same response
+
+ | GET /chats/messages/:id/stream | Updates for a single message only
+
+ | GET /agent-runs/:id/stream | Updates for a single agent run
+
+ | GET /chats/:id/messages | Message history and tool invocations (paginated snapshot)
+
+ | GET /chats/:id | Chat metadata only (status, output, context, channel_context, active_run)
+
+ | GET /chats/:id/status | Status-only polling
+
+Connection Parameters
+
+ | Query Param | Description
+
+ | last_event_id | Resume from event ID
+
+Handling Reconnection
+
+SSE supports automatic reconnection. Use the Last-Event-ID header:
+
+bashcopy
+
+1curl -N https://api.inference.sh/tasks/task_abc123/stream \2  -H "Authorization: Bearer inf_your_key" \3  -H "Accept: text/event-stream" \4  -H "Last-Event-ID: evt_xyz"
+
+JavaScript Example
+
+javascriptcopy
+
+1const eventSource = new EventSource(2  'https://api.inference.sh/tasks/task_abc123/stream',3  {4    headers: {5      'Authorization': 'Bearer inf_your_key'6    }7  }8);910eventSource.addEventListener('update', (event) => {11  const data = JSON.parse(event.data);12  console.log('Status:', data.status);13});1415eventSource.addEventListener('done', () => {16  eventSource.close();17});

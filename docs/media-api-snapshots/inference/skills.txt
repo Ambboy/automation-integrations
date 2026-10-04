@@ -1,0 +1,341 @@
+Manage and access skills via REST.
+
+Skills are indexed in the skills search collection. Discover public skills via GET /suggest or filter with GET /search?collection=skills. Browse approved registry listings with GET /store/skills — see Store API.
+
+List responses use cursor pagination. See REST overview — response format.
+
+Write endpoints (create, update, delete, supersede, transfer, visibility, GitHub import) require the knowledge:write scope. General knowledge entries (observations, references, preferences) use apps:write instead. See Knowledge API.
+
+→ Store API · Search concept · Search API · Skill registry
+
+List Skills
+
+GET /skills or POST /skills/list
+
+Returns skills with cursor-based pagination.
+
+Query Parameters
+
+ | Field | Type | Description
+
+ | cursor | string | Pagination cursor
+
+ | limit | integer | Max results (default 50, max 100)
+
+Response
+
+ | Field | Type | Description
+
+ | items | array | Skill objects
+
+ | next_cursor | string | Cursor for the next page
+
+ | prev_cursor | string | Cursor for the previous page
+
+ | has_next | boolean | More results available
+
+ | has_previous | boolean | Previous page available
+
+ | items_per_page | number | Items returned in this page
+
+ | total_items | number | Total matching skills
+
+Responses may include RFC 8288 Link headers (rel="next", rel="prev") with the same cursors.
+
+Example:
+
+jsoncopy
+
+1{2  "items": [3    {4      "id": "skill_abc123",5      "namespace": "myteam",6      "name": "code-review",7      "description": "Guidelines for reviewing pull requests",8      "version_id": "ver_xyz789",9      "version": {10        "id": "ver_xyz789",11        "instructions": { "path": "SKILL.md", "uri": "https://..." },12        "files": [{ "path": "references/checklist.md", "uri": "https://..." }],13        "content_hash": "a3f5c9e2b1d4...",14        "tags": ["development"],15        "license": "MIT"16      },17      "visibility": "public",18      "created_at": "2026-01-15T10:30:00Z"19    }20  ],21  "next_cursor": "abc123",22  "has_next": true,23  "has_previous": false,24  "items_per_page": 50,25  "total_items": 12026}
+
+The paginated object is returned under data. See REST overview — response format.
+
+Get Skill
+
+GET /skills/{id}
+
+Returns a single skill by ID.
+
+Version content_hash
+
+Each version includes content_hash — a hash over the SKILL.md instructions and supporting files. Use it to detect when a skill changed without comparing full content.
+
+GET /knowledge/{namespace}/{name} and related knowledge ref routes set ETag from this hash and support If-None-Match (304 Not Modified). See Knowledge API — Content hash and conditional GET.
+
+Get References
+
+GET /skills/{id}/references
+
+Returns the same ReferencesResponse as Get References on knowledge entries — outgoing and incoming content reference edges for the skill. Requires read access to the skill.
+
+bashcopy
+
+1curl https://api.inference.sh/skills/skill_abc123/references \2  -H "Authorization: Bearer inf_your_key"
+
+Content reference edges use graph edge type references (namespace/name mentions in markdown). See Get References for the response shape.
+
+Get Lineage
+
+GET /skills/{id}/lineage
+
+Returns the same SkillLineageResponse as Get Lineage on knowledge entries — parents, siblings, forks, duplicates, and fork_depth.
+
+bashcopy
+
+1curl https://api.inference.sh/skills/skill_abc123/lineage \2  -H "Authorization: Bearer inf_your_key"
+
+Get Skill by Ref
+
+GET /skills/{namespace}/{name}
+
+Returns a skill by namespace and name.
+
+bashcopy
+
+1curl https://api.inference.sh/skills/myteam/code-review \2  -H "Authorization: Bearer inf_your_key"
+
+Get Skill Content
+
+GET /skills/{namespace}/{name}/content
+
+Returns the raw SKILL.md content as text/markdown.
+
+bashcopy
+
+1curl https://api.inference.sh/skills/myteam/code-review/content
+
+No authentication required for public skills.
+
+Get Skill File
+
+GET /skills/{namespace}/{name}/files/{path}
+
+Returns a supporting file (redirects to CDN).
+
+bashcopy
+
+1curl -L https://api.inference.sh/skills/myteam/code-review/files/references/checklist.md
+
+Resolve Skill
+
+GET /skills/resolve?ref={ref}
+
+Resolves a skill from the registry or GitHub. Falls back to GitHub if not found in the store. Skills fetched from GitHub are auto-imported to the store so later resolves are fast store hits.
+
+ | Parameter | Description
+
+ | ref | Skill reference (e.g. myteam/code-review, github.com/org/repo, or org/repo with GitHub fallback)
+
+ | skill | Optional skill name within a repo
+
+Response
+
+jsoncopy
+
+1{2  "source": "store",3  "namespace": "myteam",4  "name": "code-review",5  "content": "# Code Review Guidelines\n...",6  "files": [{ "path": "references/checklist.md", "uri": "https://..." }]7}
+
+ | Field | Description
+
+ | source | "store" when served from the registry, "github" when fetched live from GitHub
+
+GitHub auto-refresh (stale-while-revalidate)
+
+When a skill is already in the store and linked to GitHub (repo_url or version source_url contains github.com), resolve checks whether the current version is older than 24 hours. If it is stale:
+
+The API returns the cached store content immediately (this request is not blocked).
+
+A background re-import from GitHub runs in the background (concurrent requests for the same skill are deduped).
+
+If upstream content changed, a new version is published; identical content is skipped (no duplicate version).
+
+The next resolve returns the updated content.
+
+This applies to skills imported via Import from GitHub and to skills auto-imported on first resolve from a GitHub URL. You do not need to manually re-publish when the upstream repo changes — call resolve again after the background refresh completes.
+
+CLI: belt skill use <ref> calls this endpoint (including GitHub refs like github.com/org/repo or org/repo:skill-name).
+
+Note: GET /skills/{namespace}/{name}/content always serves the latest stored version but does not trigger GitHub re-sync. Use resolve (or belt skill use) when you want upstream changes pulled into the store.
+
+Create Skill
+
+POST /skills
+
+Requires knowledge:write scope. Creates a new skill or new version of an existing skill.
+
+Accepts application/json (web UI) or multipart/form-data (belt skill upload). Multipart fields mirror the JSON body; upload files as files with relative paths as filenames (for example SKILL.md, references/checklist.md).
+
+Request
+
+jsoncopy
+
+1{2  "namespace": "belt-sh",3  "name": "code-review",4  "description": "Guidelines for reviewing pull requests",5  "instructions": "# Code Review Guidelines\n\nWhen reviewing...",6  "files": [7    { "path": "references/checklist.md", "content": "## Checklist\n..." }8  ],9  "license": "MIT",10  "allowed_tools": "Read Grep",11  "compatibility": "Claude Code",12  "repo_url": "https://github.com/myteam/skills"13}
+
+ | Field | Required | Description
+
+ | namespace | no | Target namespace (admin accounts only; regular users publish under their workspace username)
+
+ | name | yes | Kebab-case, immutable after creation
+
+ | description | yes | What the skill does
+
+ | instructions | yes | Markdown content (SKILL.md body)
+
+ | files | no | Supporting files with path and content
+
+ | license | no | License identifier (MIT, Apache-2.0)
+
+ | allowed_tools | no | Space-separated pre-approved tools
+
+ | compatibility | no | Environment requirements
+
+ | repo_url | no | Source repository URL
+
+Multipart form fields: namespace, name, description, license, allowed_tools, compatibility, disable_model_invocation, user_invocable, context, plus files uploads. The CLI reads namespace from SKILL.md frontmatter when present.
+
+Response
+
+Returns the created SkillDTO.
+
+Update Skill
+
+POST /skills/{id}
+
+Creates a new version of an existing skill. Same request body as create.
+
+Delete Skill
+
+DELETE /skills/{id}
+
+Soft-deletes a skill. The entry is removed from the skills search collection, so it no longer appears in /suggest or other discovery results.
+
+Requires knowledge:write scope.
+
+CLI: belt skill delete <id or namespace/name> — resolves refs, then deletes via the knowledge delete API (same behavior as removing a skill-type entry with belt know delete). Destructive: prompts unless --yes / -y. To point users at a replacement instead of removing the old skill, use Supersede Skill (belt skill supersede).
+
+Supersede Skill
+
+POST /skills/{id}/supersede
+
+Mark an older skill as replaced by the skill at {id}. Creates a graph edge of type supersedes from the replacement skill to the outdated one. The superseded skill is excluded from suggest and other discovery results; the replacement skill is unchanged.
+
+Requires knowledge:write scope.
+
+jsoncopy
+
+1{2  "superseded_id": "skill_old123"3}
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/skills/skill_new456/supersede \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"superseded_id": "skill_old123"}'
+
+Response:
+
+jsoncopy
+
+1{"status": "ok"}
+
+Use this when you publish a replacement under a new name instead of versioning in place. The CLI equivalent is belt skill supersede <old> <new> — see Skills (CLI). Python SDK: GraphEdgeType.SUPERSEDES in inferencesh.types matches the edge type string.
+
+Import from GitHub
+
+Discover Skills
+
+POST /skills/import/github/discover
+
+Scan a GitHub repository for SKILL.md files.
+
+jsoncopy
+
+1{2  "url": "https://github.com/myteam/skills-repo"3}
+
+Response
+
+jsoncopy
+
+1{2  "namespace": "myteam",3  "repo_url": "https://github.com/myteam/skills-repo",4  "skills": [5    {6      "path": "code-review",7      "name": "code-review",8      "description": "Guidelines for reviewing pull requests",9      "file_count": 3,10      "exists": false11    }12  ]13}
+
+Import Skills
+
+POST /skills/import/github
+
+Import discovered skills from a GitHub repository. Requires knowledge:write scope.
+
+Request body:
+
+ | Field | Type | Required | Description
+
+ | url | string | yes | GitHub repository URL
+
+ | paths | string[] | no | Skill directory paths to import (from discover). Omit to import all discovered skills
+
+jsoncopy
+
+1{2  "url": "https://github.com/myteam/skills-repo",3  "paths": ["code-review", "api-docs"]4}
+
+Response:
+
+jsoncopy
+
+1{2  "results": [3    {4      "path": "code-review",5      "name": "code-review",6      "namespace": "myteam",7      "skill_id": "skill_abc123",8      "version_id": "ver_xyz789",9      "created": true,10      "index": 1,11      "total": 212    },13    {14      "path": "api-docs",15      "name": "api-docs",16      "namespace": "myteam",17      "error": "SKILL.md not found",18      "index": 2,19      "total": 220    }21  ]22}
+
+ | Field | Description
+
+ | created | true when a new skill or version was created; false when content was unchanged
+
+ | error | Per-skill failure message (other skills in the batch may still succeed)
+
+ | index / total | Progress position within the batch
+
+Errors: 404 (repository or path not found), 429 (GitHub API rate limit), 400 (invalid request).
+
+Import Skills (streaming)
+
+POST /skills/import/github/stream
+
+Same request body and scope as the batch import. Instead of waiting for the full batch, the API streams one JSON object per line (NDJSON) as each skill finishes importing.
+
+Response: Content-Type: application/x-ndjson
+
+Each line is a SkillGitHubImportEntry with the same fields as a single item in the batch results array above.
+
+codecopy
+
+1{"path":"code-review","name":"code-review","namespace":"myteam","skill_id":"skill_abc123","version_id":"ver_xyz789","created":true,"index":1,"total":2}2{"path":"api-docs","name":"api-docs","namespace":"myteam","skill_id":"skill_def456","version_id":"ver_ghi789","created":true,"index":2,"total":2}
+
+Use the streaming endpoint when importing many skills from CI pipelines or when building a UI with per-skill progress bars. For small batches, the non-streaming import is simpler.
+
+Example (process each line as it arrives):
+
+bashcopy
+
+1curl -N -X POST https://api.inference.sh/skills/import/github/stream \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"url": "https://github.com/myteam/skills-repo"}' \5  | while IFS= read -r line; do echo "$line" | jq .; done
+
+Imported skills keep their GitHub repo_url. After import, resolve automatically re-fetches from GitHub when a stored version is older than 24 hours — you do not need to re-run import when the upstream repo changes.
+
+Visibility
+
+POST /skills/{id}/visibility
+
+jsoncopy
+
+1{2  "visibility": "public"3}
+
+ | Value | Description
+
+ | public | Listed in the skill registry
+
+ | private | Only visible to your workspace
+
+JavaScript SDK
+
+typescriptcopy
+
+1import { inference } from '@inferencesh/sdk';23const client = inference({ apiKey: 'inf_your_key' });45const { items } = await client.skills.list({ limit: 50 });6const skill = await client.skills.getByName('myteam', 'code-review');7const content = await client.skills.getContent('myteam', 'code-review');89await client.skills.create({10  name: 'my-skill',11  description: 'My custom skill',12  instructions: '# Instructions\n\nDo the thing.',13});1415const { items: storeSkills } = await client.skills.listStore({ limit: 20 });
+
+→ JavaScript SDK · SDK overview
+
+cURL Examples
+
+bashcopy
+
+1# List public skills2curl https://api.inference.sh/skills34# Get skill content5curl https://api.inference.sh/skills/myteam/code-review/content67# Create a skill8curl -X POST https://api.inference.sh/skills \9  -H "Authorization: Bearer inf_your_key" \10  -H "Content-Type: application/json" \11  -d '{12    "name": "my-skill",13    "description": "My custom skill",14    "instructions": "# Instructions\n\nDo the thing."15  }'1617# Import from GitHub (batch)18curl -X POST https://api.inference.sh/skills/import/github \19  -H "Authorization: Bearer inf_your_key" \20  -H "Content-Type: application/json" \21  -d '{"url": "https://github.com/myteam/skills-repo"}'2223# Import from GitHub (streaming NDJSON)24curl -N -X POST https://api.inference.sh/skills/import/github/stream \25  -H "Authorization: Bearer inf_your_key" \26  -H "Content-Type: application/json" \27  -d '{"url": "https://github.com/myteam/skills-repo", "paths": ["code-review"]}'

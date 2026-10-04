@@ -1,0 +1,217 @@
+Group workspace credentials and secrets into named vaults.
+
+→ Credentials API: connect OAuth, service accounts, and MCP servers
+→ Secrets API: workspace environment variables
+→ The vault page in the web app: manage credentials and secrets in the UI
+
+Requires API key scopes credentials:read (list, get, list members) and credentials:write (create, update, delete, membership changes).
+
+Web app
+
+/vaults lists the workspace's vaults. The credential and secret counts on each row come from credential_count and secret_count on the VaultDTO. A vault opens at /vaults/{id} with credentials and secrets tabs.
+
+Provider detail pages (connect, reconnect, disconnect) are at /credentials/{slug}, for example /credentials/google.
+
+→ The vault page in the web app · Credential scope
+
+Vault object fields
+
+Each vault (VaultDTO) includes:
+
+ | Field | Type | Description
+
+ | id | string | Vault ID
+
+ | name | string | Display name
+
+ | description | string | Optional description
+
+ | is_default | boolean | Whether this is the workspace's default vault
+
+ | credential_count | integer | Number of non-deleted credentials linked to this vault (set on list and get)
+
+ | secret_count | integer | Number of non-deleted secrets linked to this vault (set on list and get)
+
+ | created_at | string | ISO timestamp
+
+ | updated_at | string | ISO timestamp
+
+List vaults
+
+GET /vaults or POST /vaults/list
+
+Cursor-paginated list of vaults for your workspace. Each item includes credential_count and secret_count. Uses the same cursor pagination parameters as other list endpoints.
+
+bashcopy
+
+1curl https://api.inference.sh/vaults \2  -H "Authorization: Bearer inf_your_key"
+
+Get or create default vault
+
+GET /vaults/default
+
+Returns the workspace's default vault and creates it if it does not exist yet (name: "default", is_default: true). The caller must have a workspace. Without one the API returns validation_error (400).
+
+Workspace- and user-scoped credentials are linked to the default vault when they are created. Workspace-scoped secrets are linked when created via POST /secrets. Platform- and org-scoped credentials are not vault members. Workspaces reach those through scope inheritance. Custom vaults only include credentials and secrets you add explicitly.
+
+bashcopy
+
+1curl https://api.inference.sh/vaults/default \2  -H "Authorization: Bearer inf_your_key"
+
+jsoncopy
+
+1{2  "id": "vault_abc123",3  "name": "default",4  "is_default": true,5  "credential_count": 12,6  "secret_count": 5,7  "created_at": "2026-09-09T10:00:00Z",8  "updated_at": "2026-09-09T10:00:00Z"9}
+
+Get vault
+
+GET /vaults/{id}
+
+Requires credentials:read. Returns one vault with member counts.
+
+Create vault
+
+POST /vaults
+
+Requires credentials:write.
+
+Request body
+
+ | Field | Type | Description
+
+ | name | string | Display name
+
+ | description | string | Optional description
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/vaults \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"name": "production", "description": "Production credentials and secrets"}'
+
+Returns the created VaultDTO.
+
+Update vault
+
+PUT /vaults/{id}
+
+Requires credentials:write. The body is a full vault object. The update writes name, description, and is_default, so a field you omit is reset to its zero value. Send the object from GET /vaults/{id} with your changes applied.
+
+Delete vault
+
+DELETE /vaults/{id}
+
+Requires credentials:write. Deletes a custom vault and its membership links. The credentials and secrets themselves are kept. The default vault (is_default: true) cannot be deleted. The API returns validation_error (400).
+
+Disconnecting a credential or deleting a secret also removes its vault membership links.
+
+List credentials in vault
+
+GET /vaults/{id}/credentials
+
+Requires credentials:read. Returns an array of credential objects linked to this vault. Only credentials owned by the caller's workspace are returned. Raw tokens are never included.
+
+bashcopy
+
+1curl https://api.inference.sh/vaults/vault_abc123/credentials \2  -H "Authorization: Bearer inf_your_key"
+
+jsoncopy
+
+1[2  {3    "id": "cred_xyz789",4    "provider": "google",5    "type": "oauth",6    "scope": "team",7    "status": "connected",8    "display_name": "Google Account",9    "scopes": ["https://www.googleapis.com/auth/spreadsheets"],10    "is_primary": true,11    "created_at": "2026-09-01T08:00:00Z",12    "updated_at": "2026-09-01T08:00:00Z"13  }14]
+
+Add credential to vault
+
+POST /vaults/{id}/credentials
+
+Requires credentials:write.
+
+Request body
+
+ | Field | Type | Required | Description
+
+ | credential_id | string | Yes | ID of an existing workspace credential
+
+The credential must be a connection (grant: "token") owned by your workspace. OAuth app rows (grant: "credentials") cannot be added to a vault; manage app keys on the provider instead.
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/vaults/vault_abc123/credentials \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"credential_id": "cred_xyz789"}'
+
+jsoncopy
+
+1{2  "success": true3}
+
+The credential must already exist for your workspace. Adding the same credential twice has no further effect. If credential_id belongs to another workspace, the API returns validation_error (400).
+
+Remove credential from vault
+
+DELETE /vaults/{id}/credentials
+
+Requires credentials:write. The request body must include credential_id. Removes the link only. The credential is not deleted.
+
+bashcopy
+
+1curl -X DELETE https://api.inference.sh/vaults/vault_abc123/credentials \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"credential_id": "cred_xyz789"}'
+
+List secrets in vault
+
+GET /vaults/{id}/secrets
+
+Requires credentials:read. Returns an array of SecretDTO objects linked to this vault. Only secrets owned by the caller's workspace are returned. Values are masked. Use GET /secrets/reveal/{key} for the plaintext value (audit-logged, workspace admin only).
+
+bashcopy
+
+1curl https://api.inference.sh/vaults/vault_abc123/secrets \2  -H "Authorization: Bearer inf_your_key"
+
+jsoncopy
+
+1[2  {3    "id": "sec_abc123",4    "key": "OPENAI_API_KEY",5    "masked_value": "sk-…xxxx",6    "description": "OpenAI API key",7    "scope": "team",8    "created_at": "2026-01-15T10:30:00Z"9  }10]
+
+Add secret to vault
+
+POST /vaults/{id}/secrets
+
+Requires credentials:write.
+
+Request body
+
+ | Field | Type | Required | Description
+
+ | secret_id | string | Yes | ID of an existing workspace secret
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/vaults/vault_abc123/secrets \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"secret_id": "sec_abc123"}'
+
+The secret must already exist for your workspace. Adding the same secret twice has no further effect. If secret_id belongs to another workspace, the API returns validation_error (400).
+
+Remove secret from vault
+
+DELETE /vaults/{id}/secrets
+
+Requires credentials:write. The request body must include secret_id. Removes the link only. The secret is not deleted.
+
+bashcopy
+
+1curl -X DELETE https://api.inference.sh/vaults/vault_abc123/secrets \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"secret_id": "sec_abc123"}'
+
+Errors
+
+The default-vault and membership endpoints return these errors:
+
+ | Code | HTTP | When
+
+ | not_found | 404 | Vault ID does not exist
+
+ | permission_denied | 403 | Caller cannot access the vault
+
+ | validation_error | 400 | Foreign credential_id/secret_id, or GET /vaults/default without a workspace
+
+ | invalid_request | 400 | Missing credential_id or secret_id in a membership request
+
+Related
+
+Credentials API: connect and manage credentials
+
+Secrets API: create and manage workspace secrets
+
+Credentials overview: the vault page in the web app and provider setup
+
+REST overview: authentication and response format

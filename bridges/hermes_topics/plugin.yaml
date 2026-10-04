@@ -1,0 +1,5 @@
+name: automation-topic-style
+version: 0.1.0
+description: Model-selected Telegram topic titles and icons with distinct-neighbor checks
+provides_hooks:
+  - pre_llm_call

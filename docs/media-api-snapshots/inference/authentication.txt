@@ -1,0 +1,124 @@
+How to authenticate with the API.
+
+Get an API Key
+
+Go to settings → workspace → api keys
+
+Click Create API Key. Workspace owners and admins choose whether it acts as them (personal) or as the workspace (workspace, for CI and servers). See API keys.
+
+Copy the key (starts with inf_)
+
+Keys can be scoped to least privilege — for example apps:execute without secrets:write. See API Keys API for the scope catalog (GET /scopes), preset bundles, and programmatic create/list/revoke.
+
+Keep it Secret
+
+Don't commit to git
+
+Don't share publicly
+
+Use environment variables
+
+bashcopy
+
+1export INFERENCE_API_KEY="inf_your_key"
+
+Browser apps? Never expose API keys in client-side code. Use a Server Proxy to keep credentials safe.
+
+Using the Key
+
+With SDKs
+
+PythonTypescriptSwift
+
+1from inferencesh import inference2import os34# Direct5client = inference(api_key="inf_your_key")67# From environment variable8client = inference(api_key=os.environ["INFERENCE_API_KEY"])
+
+With REST API
+
+bashcopy
+
+1curl https://api.inference.sh/apps/run \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"app": "infsh/echo", "input": {"message": "Hello!"}}'
+
+See REST overview — response format for response and error formats.
+
+Workspace context
+
+Most API resources are scoped to a workspace (a team in the API). Which workspace a request uses depends on how the API key was created:
+
+ | Key source | Workspace context
+
+ | settings → workspace → api keys (manually created) | Fixed to the workspace selected when the key was created. A personal key acts as you there and stops working if you leave; a workspace key acts as the workspace and is the one to use for CI and automation.
+
+ | Device authorization (belt login, CLI) | Acts as you. Can switch workspaces with X-Team-ID or belt auth switch.
+
+ | belt auth token (temporary key for scripts) | Fixed to the workspace active when it was minted, like a manually created key. Expires in 15 minutes by default, 24 hours at most. See temporary keys.
+
+To act as another workspace you belong to with a device-auth key, send its ID:
+
+bashcopy
+
+1curl https://api.inference.sh/apps/my \2  -H "Authorization: Bearer inf_your_key" \3  -H "X-Team-ID: team_abc123"
+
+You must be a member of that workspace. If the header names a workspace you cannot access, it is ignored and the key's current workspace is used.
+
+Manually created keys and temporary keys ignore X-Team-ID. A leaked CI or automation key cannot be pointed at your other workspaces via a header. Create separate keys per workspace, or use device authorization for interactive tooling that needs to switch workspaces.
+
+In the CLI, use belt auth switch instead of setting the header manually.
+
+Sign-in APIs
+
+API keys are for programmatic access. To sign users into the web app (browser session) or CLI, use the dedicated auth endpoints:
+
+ | Flow | Use case | Guide
+
+ | Magic link + login code | Email passwordless sign-in for the web app | Magic link API
+
+ | Device authorization | CLI, IDE, and headless login (belt login) | Device authorization API
+
+ | Standard OAuth device grant | Off-the-shelf OAuth 2.0 client libraries | Device authorization — RFC endpoints
+
+Magic link sign-in returns a session cookie. Device authorization returns a session token (recommended; token_kind: "session") or a legacy API key on the first successful poll after browser approval (one-shot delivery). Session tokens are sent as Authorization: Bearer … and behave like web sessions, including switching workspaces with X-Team-ID and revocation from settings → personal → sessions or via POST /oauth/revoke (RFC 7009).
+
+New signups cannot use disposable or temporary email domains. The rule applies to magic link, OAuth, and SAML sign-up. See REST overview: Signup email restrictions.
+
+Authenticator app (TOTP)
+
+Any signed-in user can enroll an authenticator app (Google Authenticator, 1Password, and similar) as a second factor. Admin accounts require 2FA at every sign-in: a code from the app when TOTP is enrolled (otp_method: "totp"), an emailed code otherwise. Non-admin accounts require 2FA at sign-in only after they enroll TOTP.
+
+All four routes require an authenticated request.
+
+ | Endpoint | Method | Description
+
+ | /auth/totp/status | GET | { "enabled": true | false } for the current user
+
+ | /auth/totp/enroll | POST | Generate a new secret. Returns { "secret": "…", "url": "otpauth://…" } for QR scanning. TOTP is not active until confirmed.
+
+ | /auth/totp/confirm | POST | Body: { "code": "123456" }. Verifies a code from the app and activates TOTP.
+
+ | /auth/totp/disable | POST | Body: { "code": "123456" }. Removes TOTP after verifying a current code.
+
+bashcopy
+
+1# 1. Enroll2curl -X POST https://api.inference.sh/auth/totp/enroll -b cookies.txt34# 2. Scan the otpauth:// URL or enter the secret in your authenticator app56# 3. Confirm with a 6-digit code from the app7curl -X POST https://api.inference.sh/auth/totp/confirm \8  -H "Content-Type: application/json" \9  -b cookies.txt \10  -d '{"code": "123456"}'
+
+On the next sign-in, the auth response includes otp_method: "totp". Submit a code from the authenticator app to POST /auth/otp/verify. Resend is not available for TOTP (totp_no_resend). See Magic link: Admin OTP.
+
+ | Error code | HTTP | When
+
+ | totp_already_enabled | 409 | Enroll or confirm when TOTP is already active
+
+ | no_enrollment | 400 | Confirm before calling enroll
+
+ | invalid_code | 400 | Wrong TOTP code at confirm or disable
+
+ | totp_not_enabled | 400 | Disable when TOTP is not active
+
+Install SDKs
+
+PythonTypescriptSwift
+
+1pip install inferencesh23# With async support4pip install inferencesh[async]
+
+Next
+
+→ SDK Overview — Running apps, streaming, files
+→ Server Proxy — Protect API keys in browser apps

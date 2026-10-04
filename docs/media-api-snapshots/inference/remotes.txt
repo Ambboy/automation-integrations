@@ -1,0 +1,735 @@
+Register machines that connect as remotes, inspect their status, and dispatch command executions with streamed output.
+
+Requires API key scopes remotes:read (list, get, read exec output) and remotes:write (register, update, delete, heartbeat, WebSocket connect, dispatch execs, signal runs). Launching a harness chat also needs agents:execute.
+
+→ Remotes guide · CLI setup
+
+Concepts
+
+ | Resource | Description
+
+ | Remote | A machine running belt remote start. It hosts agent harness profiles and optional shell or harness-session execution.
+
+ | Profile | One harness slot on a remote (for example Claude Code). Profiles are created from daemon registration. There is no REST endpoint that creates them.
+
+ | Exec run | One command executed on a remote, with sequenced stdout/stderr output stored for replay
+
+The daemon registers with POST /remotes, then keeps an outbound WebSocket open at wss://api.inference.sh/ws/remotes/{id} (or your configured API host). The API treats that connection as the source of truth for status; heartbeats only update heartbeat_at. Command output arrives over that socket as remote_exec_output frames and is stored per run.
+
+Exec opt-in. exec_enabled on the remote reflects whether the daemon was started with belt remote start --exec. The API refuses dispatch when it is false, and the daemon refuses the command frame as well.
+
+Agent sessions opt-in. Registration may include agents_enabled: true when the daemon was started with belt remote start --agents. The daemon enforces this flag: without it, harness session frames are refused on the host even if the API sends them.
+
+Connecting a machine only registers harness profiles on the remote — it does not create workspace agents. The first time you launch a harness chat for a profile, the API creates one agent for that profile (for example title Claude Code · work-laptop) and reuses it on later launches. Run behavior is documented under Remote harness runs.
+
+Register remote
+
+POST /remotes
+
+Called by belt remote start on startup. Registration keys on the daemon's public_key for your user and active team (from the API key or X-Team-ID). A machine that registers again with the same key in the same team reuses its existing remote and does not create a duplicate. Registering after a team switch creates a new remote for that team; older team rows age out through the heartbeat staleness sweep (disconnected, then stopped). Each registration also reconciles the harnesses probe results into profiles (one per harness kind) and returns the remote with profiles populated.
+
+Request
+
+ | Field | Type | Description
+
+ | name | string | Display name. belt remote start sends the hostname unless --name is set.
+
+ | public_key | string | Base64 ed25519 public key that identifies the machine
+
+ | remote_version | string | belt version string
+
+ | system_info | object | Host metadata (see below)
+
+ | exec_enabled | boolean | Whether this daemon accepts command execution (belt remote start --exec)
+
+ | agents_enabled | boolean | Whether this daemon hosts harness sessions (belt remote start --agents)
+
+ | harnesses | array | Harnesses discovered on the host (see below)
+
+The handler does not validate any of these fields as required.
+
+system_info
+
+belt remote sends a subset of the API's SystemInfo object (same JSON shape engines use for host telemetry). Remotes omit engine-only fields such as gpus, docker, engine_version, and hf_cache. Omitted fields default to zero values server-side.
+
+ | Field | Type | Description
+
+ | hostname | string | Machine hostname
+
+ | os | string | OS label, for example Ubuntu 24.04 LTS or macOS
+
+ | cpus | array | One aggregate entry with name, cores, optional frequency, and usage (0–100, all cores)
+
+ | ram | object | total and used in bytes; usage is used memory as a percentage (0–100)
+
+ | volumes | array | Optional. Today one entry: the filesystem that holds the user's home directory (name is the home path; size, used, free, and usage in bytes / percent)
+
+jsoncopy
+
+1{2  "hostname": "work-laptop",3  "os": "macOS",4  "cpus": [{ "name": "Apple M3 Pro", "cores": 12, "usage": 14.2 }],5  "ram": { "total": 38654705664, "used": 19327352832, "usage": 50.0 },6  "volumes": [7    { "name": "/Users/you", "size": 994662584320, "used": 512000000000, "free": 482662584320, "usage": 51.5 }8  ]9}
+
+Registration includes a full snapshot with the usage fields above. While the daemon stays connected, it attaches a fresh snapshot to every third WebSocket remote_heartbeat frame (~15 seconds at the default 5 second heartbeat interval). The first heartbeat after connect omits system_info because registration already sent one; CPU usage on later snapshots reflects load since the previous collection. The API stores each heartbeat payload on the remote row, so GET /remotes/{id} can show live utilization without re-registering.
+
+The HTTP POST /remotes/{id}/heartbeat endpoint records liveness only; it does not accept system_info.
+
+harnesses entries
+
+Each object describes one agent harness binary found on PATH:
+
+ | Field | Type | Description
+
+ | kind | string | Harness registry id (for example claude, codex, gemini, cursor)
+
+ | command | string | Resolved path to the harness binary
+
+ | version | string | Harness version from discovery. Optional, best effort.
+
+ | logged_in | boolean | true when the harness looks configured on the host. The daemon never reads credential files.
+
+ | capabilities | object | Session capabilities from the daemon's session driver for this harness (see Profile). Omitted when the harness cannot be driven from inference.
+
+A harness kind that is missing from the array is not installed, or has no resolvable binary on PATH.
+
+Profile reconciliation
+
+On each registration the API reconciles harnesses into the remote's profiles:
+
+ | Registration input | Profile effect
+
+ | New kind | Creates a profile with harness_kind, command, and status
+
+ | Existing kind | Updates command, status, and capabilities in place (same profile id)
+
+ | logged_in: true | status becomes idle
+
+ | logged_in: false | status becomes unavailable
+
+ | Harness no longer reported | The profile is marked unavailable. It is not deleted.
+
+ | capabilities omitted | Keeps the profile's previous capabilities (older daemons)
+
+The API never receives harness credentials.
+
+Response
+
+RemoteDTO:
+
+ | Field | Type | Description
+
+ | id | string | Remote ID
+
+ | name | string | Display name
+
+ | status | string | Lifecycle status (see below)
+
+ | heartbeat_at | string | null | Time of the last heartbeat
+
+ | system_info | object | null | Host metadata from the daemon (registration and optional WebSocket heartbeat updates)
+
+ | remote_version | string | belt version the daemon reported
+
+ | exec_enabled | boolean | Whether the host opted in to command execution
+
+ | agents_enabled | boolean | Whether the host opted in to harness agent sessions
+
+ | profiles | array | Harness profiles (see below)
+
+public_key is not part of the response.
+
+Profile
+
+Each ProfileDTO in profiles:
+
+ | Field | Type | Description
+
+ | remote_id | string | Owning remote
+
+ | harness_kind | string | Harness registry id (claude, codex, ...)
+
+ | display_name | string | Product name from the harness registry (for example Claude Code)
+
+ | vendor | string | Vendor name from the registry
+
+ | name | string | User label for this slot on the remote
+
+ | command | string | Harness binary path on the remote
+
+ | args | string[] | Extra launch arguments
+
+ | status | string | idle, busy, or unavailable
+
+ | max_concurrent | integer | Concurrency cap for this profile
+
+ | capabilities | object | What hosted sessions can do (steer, approvals, interrupt, resume, tools). Omitted when not reported yet; treat as all false.
+
+ | Profile status | Meaning
+
+ | idle | Ready to take a run
+
+ | busy | At its concurrency limit
+
+ | unavailable | Logged out, removed from the host, rate-limited, or disabled
+
+Remote lifecycle status:
+
+ | status | Meaning
+
+ | pending | Registered, not yet connected
+
+ | running | The daemon holds an open WebSocket to the API
+
+ | disconnected | The WebSocket closed. Reversible when the daemon reconnects.
+
+ | stopped | Finalized after staying disconnected for about 30 seconds
+
+Connection vs heartbeat. status follows the daemon's WebSocket connection, not heartbeat age. Opening the socket moves the remote to running from pending, disconnected, or stopped. Closing it (or losing the connection without a clean close) moves a running remote to disconnected. The API reconciles connection leases about every 10 seconds as a safety net: a remote that drops off presence for two rounds is marked disconnected; one that is present but not running is revived.
+
+heartbeat_at is last seen only. WebSocket and HTTP heartbeats stamp it; they do not change status. Use it for display ("last seen") and for live system_info updates on the WebSocket path.
+
+While disconnected, dispatch and harness launch return 409 remote_offline because the daemon is not connected. Exec runs and harness sessions already running on the host keep going through a brief disconnect (for example Wi‑Fi blip). They fail only when the remote reaches stopped — after the disconnect grace — or when you cancel them.
+
+Harness version support
+
+Each profile's support object describes how the installed version compares to versions inference has tested for that harness. The API computes it from the registry when serializing profiles — it does not run the harness binary.
+
+ | support.level | Meaning
+
+ | supported | Inside the tested range
+
+ | newer-than-tested | Newer than anything tested. Sessions still run; the UI may warn.
+
+ | older-than-tested | Older than the tested range but above the driver's minimum. Sessions still run; the UI may warn.
+
+ | older-than-supported | Below a floor the session driver needs (for example a missing RPC or app-server API). Launch and new turns are refused until you upgrade on the host.
+
+ | unknown | Version could not be parsed, the harness is not in the registry, or inference has not published a tested range yet. Sessions may still run; treat as a warning.
+
+ | Field | Description
+
+ | reason | Human-readable sentence explaining the verdict
+
+ | version | Parsed dotted version from the daemon's --version output
+
+ | tested_min, tested_max | Oldest and newest versions inference has tested for this harness
+
+ | requires | Minimum version the driver depends on, when defined
+
+ | upgrade_cmd | Shell command to install the latest release over the one on the machine (from the registry)
+
+The workspace Remotes machine page maps support onto each launcher card: version beside the vendor; yellow warnings for newer-than-tested, older-than-tested, and unknown on ready cards (sessions still start); a too old pill with reason and a copyable upgrade_cmd when level is older-than-supported (no launch until you upgrade on the host). API clients should mirror that split — warn on untested builds, block launch when below the driver floor. When level is older-than-supported, expect 409 harness_too_old from Launch harness session and 409 conflict from Send chat message on harness-backed chats — both include reason and how to upgrade. The remote daemon applies the same floor before opening a session: it re-reads the installed version at launch (so upgrades since registration count) and refuses with reason and upgrade_cmd when the CLI is still below requires (for example Pi < 0.80.4, Codex < 0.56.0).
+
+List remotes
+
+GET /remotes or POST /remotes/list
+
+Cursor-paginated list of remotes. Requires remotes:read.
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/remotes/list \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"limit": 20}'
+
+Get remote
+
+GET /remotes/{id}
+
+Returns a RemoteDTO with profiles included. Requires remotes:read. Use the id that belt remote start prints when it connects, or one from the list endpoint.
+
+List harness sessions
+
+GET /remotes/{id}/sessions
+
+Asks the connected daemon which harness sessions exist on the machine — ones inference started and ones a person started locally — and whether a process holds each session right now. Requires remotes:read.
+
+The handler forwards remote_sessions_list over the remote WebSocket and waits for remote_sessions_listed (up to 10 seconds). The remote must be running and registered with agents_enabled: true (belt remote start --agents).
+
+Query
+
+ | Parameter | Description
+
+ | cwd | Optional. When set, only sessions whose working directory matches are returned (same filter as the WebSocket cwd field).
+
+bashcopy
+
+1curl "https://api.inference.sh/remotes/remote_abc123/sessions" \2  -H "Authorization: Bearer inf_your_key"
+
+Response
+
+Same shape as the WebSocket remote_sessions_listed frame:
+
+ | Field | Type | Description
+
+ | request_id | string | Correlates with the daemon request
+
+ | sessions | array | Harness sessions on disk (metadata only; no transcript bodies). At most 500 entries, newest first.
+
+ | errors | array | Optional per-harness store read failures
+
+Each sessions[] entry:
+
+ | Field | Type | Description
+
+ | harness | string | Harness id (for example claude, codex)
+
+ | id | string | Harness session id on disk
+
+ | cwd | string | Working directory, when known
+
+ | title | string | Display title from the harness store, when known
+
+ | updated | string | Last metadata update (RFC 3339)
+
+ | live | object | Whether a process holds the session now (see below)
+
+live (SessionLiveness):
+
+ | Field | Type | Description
+
+ | state | string | active, idle, or unknown
+
+ | evidence | string | What decided liveness — for example lock-file, no-process, process-in-cwd, recent-write, or none
+
+ | heuristic | boolean | true when liveness is inferred rather than proven (for example from process cwd or recent writes)
+
+ | pid | integer | OS process id, when known
+
+ | detail | string | Extra context from the harness transcript layer
+
+Errors
+
+ | HTTP | Code | Cause
+
+ | 409 | agents_disabled | The daemon was not started with --agents
+
+ | 409 | remote_offline | The remote is not connected
+
+ | 504 | remote_timeout | The daemon did not answer within 10 seconds
+
+Launch harness chat
+
+POST /remotes/{id}/sessions
+
+Opens a new chat with a harness on a connected remote: pick a profile, set the working directory on that machine, and optionally resume a session the harness already has (from List harness sessions). Requires remotes:write and agents:execute.
+
+The remote must be running with agents_enabled: true (belt remote start --agents). The profile must belong to that remote and report non-null capabilities (the daemon can drive the harness).
+
+Request
+
+ | Field | Type | Required | Description
+
+ | profile_id | string | Yes | Profile id from GET /remotes/{id} → profiles[].id
+
+ | work_dir | string | No | Folder on the remote where the harness session runs. Leading and trailing whitespace is trimmed. Empty uses the daemon default. Stored on the chat as work_dir (folder-bound sessions; see Get chat).
+
+ | resume_session_id | string | No | Harness session id from a list entry's id field — continues that session instead of starting fresh. Sets harness_session_id on the new chat.
+
+bashcopy
+
+1curl -X POST "https://api.inference.sh/remotes/remote_abc123/sessions" \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "profile_id": "prof_xyz789",6    "work_dir": "/home/you/projects/api",7    "resume_session_id": "sess_abc"8  }'
+
+Response
+
+Returns a ChatDTO (same shape as Get chat) with agent_id set to the profile's harness agent, work_dir from the request, and harness_session_id when resume_session_id was sent. Send the first user message with POST /agents/run, POST /chats/{id}/messages, or open the chat in the workspace.
+
+The API creates the backing agent on first launch for that profile (harness set to the profile's registry id, profile_id and remote_id bound to the machine). Reconnecting the daemon does not duplicate agents.
+
+Errors
+
+ | HTTP | Code | Cause
+
+ | 400 | invalid_request | Missing profile_id or invalid JSON body
+
+ | 404 | profile_not_found | profile_id is not on this remote
+
+ | 409 | agents_disabled | The daemon was not started with --agents
+
+ | 409 | harness_not_drivable | The profile has no session capabilities (harness not driveable from inference)
+
+List harness catalog
+
+GET /harnesses
+
+Returns every agent harness inference can drive on a remote, from the agentprotocol harness registry. The list includes only registry entries that have a session driver (for example Claude Code, Codex, Pi, and ACP-backed CLIs). Registry entries with no driver — IDE-only agents and backends that only describe a harness — are omitted.
+
+Use this to build launch UIs: show the full set of driveable harness kinds, then match each entry's id to GET /remotes/{id} → profiles[].harness_kind to show which ones that machine installed and whether each profile is idle.
+
+Requires remotes:read.
+
+bashcopy
+
+1curl https://api.inference.sh/harnesses \2  -H "Authorization: Bearer inf_your_key"
+
+Response
+
+An array of catalog entries:
+
+ | Field | Type | Description
+
+ | id | string | Harness registry id (claude, codex, gemini, …)
+
+ | display_name | string | Product name from the registry
+
+ | vendor | string | Vendor name
+
+ | driver | string | How the daemon drives sessions: claude-code, codex, pi, or acp
+
+ | capabilities | object | Driver defaults for this harness kind: steer, approvals, interrupt, resume, tools
+
+capabilities here come from the driver implementation, not from a specific machine. Per-host behavior and login state still come from daemon registration and each profile's capabilities and status.
+
+Update remote
+
+POST /remotes/{id}
+
+Updates a remote you own and returns the updated RemoteDTO. Requires remotes:write.
+
+The body is a full remote object. The update writes every mutable field, so a field you omit is reset to its zero value. Send the object from GET /remotes/{id} with your changes applied.
+
+public_key is one of those fields and no response returns it. An update that omits it clears the key, and the next belt remote start on that machine registers a new remote.
+
+belt remote start overwrites name, status, system_info, remote_version, exec_enabled, and agents_enabled on its next registration.
+
+Delete remote
+
+DELETE /remotes/{id}
+
+Deletes a remote you own. Requires remotes:write. From the CLI, belt remote rm <id> sends the same request (confirmation prompt unless --yes).
+
+bashcopy
+
+1belt remote rm remote_abc1232curl -X DELETE https://api.inference.sh/remotes/remote_abc123 \3  -H "Authorization: Bearer inf_your_key"
+
+Deleting a row does not stop a daemon still running on the host. Stopping or reinstalling a machine often leaves an old registration; belt remote list hints at belt remote rm when a remote has not been seen for over a week.
+
+List harness sessions
+
+GET /remotes/{id}/sessions
+
+Asks the connected daemon which harness sessions exist on the machine — sessions inference started and sessions someone opened locally. Use the result to offer continue on an idle session or watch an active one. Requires remotes:read. The remote must be connected and registered with agents_enabled: true.
+
+ | Query | Description
+
+ | cwd | Optional. Restrict the list to sessions under this working directory.
+
+Response
+
+data is a session list payload:
+
+ | Field | Type | Description
+
+ | request_id | string | Correlates with the daemon request
+
+ | sessions | array | Harness sessions on the host (see below)
+
+ | errors | array | Harness stores the daemon could not read
+
+Each entry in sessions:
+
+ | Field | Type | Description
+
+ | harness | string | Harness registry id
+
+ | id | string | Harness session id (pass as resume_session_id when launching)
+
+ | cwd | string | Working directory for the session
+
+ | title | string | Session title when known
+
+ | updated | string | Last activity time (RFC 3339)
+
+ | live | object | Whether a process holds the session now (state: active, idle, or unknown)
+
+Errors
+
+ | HTTP | Code | Cause
+
+ | 409 | agents_disabled | The daemon was not started with --agents
+
+ | 409 | remote_offline | The daemon is not connected
+
+ | 504 | remote_timeout | The daemon did not answer within 10 seconds
+
+bashcopy
+
+1curl "https://api.inference.sh/remotes/remote_abc123/sessions?cwd=/home/you/project" \2  -H "Authorization: Bearer inf_your_key"
+
+Launch harness session
+
+POST /remotes/{id}/sessions
+
+Opens a new chat with a harness profile on a connected remote — for example Claude Code, Cursor, or Pi on your laptop, in a project folder. Requires remotes:write and agents:execute. The remote must have agents_enabled: true, the profile must belong to that remote, and the daemon must report capabilities for the harness (undriveable harnesses are not offered).
+
+The first launch for a profile creates a harness agent (for example Claude Code · work-laptop) and reuses it on later launches. Connecting belt remote alone does not create agents anymore.
+
+Request
+
+ | Field | Type | Required | Description
+
+ | profile_id | string | Yes | Profile id from GET /remotes/{id} → profiles[].id
+
+ | work_dir | string | No | Folder the harness works in on the remote. Empty uses the daemon default.
+
+ | resume_session_id | string | No | Continue a harness session from List harness sessions instead of starting fresh
+
+Response
+
+Returns a ChatDTO (same shape as Get chat), including:
+
+ | Field | Description
+
+ | name | Typically {display_name} · {remote name}
+
+ | work_dir | Normalized working directory for this chat
+
+ | harness_session_id | Set when resume_session_id was provided
+
+ | agent_id | The harness agent created or reused for this profile
+
+Send the first user message with POST /chats/:id/messages or POST /agents/run to start the harness turn.
+
+Runtime on the remote
+
+The chat exists in the API as soon as this endpoint returns; the harness process on the machine starts when the platform asks the daemon to open a session for that chat (typically on the first user message). Progress flows over the remote WebSocket (see Harness session frames):
+
+ | Daemon → server event | Meaning
+
+ | remote_session_opened | Harness process is ready (harness_session_id, resumed, seq)
+
+ | remote_session_event | Sequenced harness output (AgentEvent payload, monotonic seq)
+
+ | remote_session_closed | Session ended; error when open or a turn failed
+
+The daemon waits up to 60 seconds for the harness to finish opening. If the CLI is stuck on sign-in, an update prompt, or another interactive gate, it sends remote_session_closed with an error such as {display name} did not start a session within 1m0s. Check it works in a terminal on this machine: it may be waiting to sign in or to update. The API fails the active run with that reason. A harness that starts after the deadline is closed on the machine so the slot is freed.
+
+When a user message cannot be delivered (no live session on the daemon), the daemon sends remote_session_closed so the run fails instead of staying in progress. When Prompt fails on a live session, the daemon emits an error agent event on the run before reporting failure.
+
+Turn timeouts (belt with agentprotocol v0.12.1+). Opening a session is bounded by 60 seconds (above). Each user message is bounded only until the harness shows its first sign of work — an assistant message, tool call, permission request, plan update, or similar. Session bookkeeping and echoes of the user's prompt do not count. If nothing qualifies within 2 minutes, the daemon emits an error event with code no_response, cancels the in-flight prompt on the harness, and fails the run. After work has started, there is no fixed total prompt timeout; long tool loops can run until the harness completes the turn.
+
+Harness stderr on failures. Session drivers keep the last 4 KiB of the harness process stderr. Open failures, no_response, process exit, and other driver errors append ; agent stderr: … to the error message on the error event and on remote_session_closed when applicable, so API clients and the workspace can surface CLI output without SSH access to the host.
+
+Errors
+
+ | HTTP | Code | Cause
+
+ | 400 | invalid_request | Missing or invalid body, or profile_id is empty
+
+ | 404 | profile_not_found | No profile with that id on this remote
+
+ | 409 | agents_disabled | The daemon was not started with --agents
+
+ | 409 | harness_not_drivable | The profile has no reported capabilities
+
+ | 409 | harness_too_old | Installed harness is below the driver's minimum (profiles[].support.level is older-than-supported). The error message includes what is missing and upgrade_cmd.
+
+bashcopy
+
+1curl -X POST "https://api.inference.sh/remotes/remote_abc123/sessions" \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"profile_id": "prof_xyz", "work_dir": "/home/you/project"}'
+
+Heartbeat
+
+POST /remotes/{id}/heartbeat
+
+Records a liveness ping and updates heartbeat_at. Requires remotes:write. belt remote sends its heartbeats over the WebSocket. This endpoint is the HTTP equivalent. The body is optional. The response is a bare empty JSON object without the standard envelope:
+
+jsoncopy
+
+1{}
+
+revived is always false: heartbeats no longer change lifecycle status. Reconnection over the WebSocket moves a remote back to running.
+
+To refresh system_info with live CPU, RAM, and home-disk usage, the daemon sends system_info on every third WebSocket remote_heartbeat frame instead of this HTTP route.
+
+Dispatch exec
+
+POST /remotes/{id}/execs
+
+Runs a command on a connected remote. Returns an ExecRunDTO immediately. Output is read separately. The Exec Runs API page lists every response field.
+
+Request
+
+ | Field | Type | Description
+
+ | command | string | Executable name or path (required)
+
+ | args | string[] | Arguments
+
+ | cwd | string | Working directory on the remote
+
+ | env | string[] | Extra KEY=VALUE entries
+
+ | pty | boolean | Run under a pseudo-terminal
+
+ | timeout_ms | integer | Timeout in milliseconds (0 = no limit)
+
+bashcopy
+
+1curl -X POST "https://api.inference.sh/remotes/remote_abc123/execs" \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"command": "uname", "args": ["-a"]}'
+
+Errors
+
+ | HTTP | Code | Cause
+
+ | 400 | invalid_request | command is empty or the body is not valid JSON
+
+ | 403 | exec_disabled | The daemon was not started with belt remote start --exec
+
+ | 409 | remote_offline | The remote is not connected
+
+Get exec run
+
+GET /execs/{id}
+
+Returns an ExecRunDTO: command, status, exit code, timing, and last_seq (highest output sequence number).
+
+ | status | Terminal? | Meaning
+
+ | pending | No | Created, not yet sent to the host
+
+ | running | No | Sent to the host
+
+ | exited | Yes | Process ended. exit_code is set.
+
+ | killed | Yes | Ended without an exit code: signal, timeout, cancel, remote disconnect, or the daemon refused the run
+
+ | denied | Yes | The API could not deliver the command to the daemon
+
+List exec runs
+
+GET /execs or POST /execs/list
+
+Cursor-paginated list of exec runs. Requires remotes:read.
+
+Read exec output
+
+GET /execs/{id}/output?after_seq={n}
+
+Returns an array of ExecRunOutputDTO chunks with seq > after_seq, in order, up to 2000 per call. Poll with an increasing after_seq until the run reaches a terminal status.
+
+ | Field | Type | Description
+
+ | seq | integer | Sequence number within the run
+
+ | stream | string | stdout or stderr
+
+ | data | string | Output bytes, base64-encoded
+
+bashcopy
+
+1curl "https://api.inference.sh/execs/exec_abc123/output?after_seq=0" \2  -H "Authorization: Bearer inf_your_key"
+
+Signal exec
+
+POST /execs/{id}/signal
+
+Kills a running exec. Returns {"ok": true}. A run that is already terminal returns the same response and nothing is sent.
+
+bashcopy
+
+1curl -X POST "https://api.inference.sh/execs/exec_abc123/signal" \2  -H "Authorization: Bearer inf_your_key"
+
+WebSocket protocol
+
+The daemon connects to /ws/remotes/{id} with Authorization: Bearer <api-key> and optional X-Team-ID. Requires remotes:write.
+
+Server to remote:
+
+ | Event | Purpose
+
+ | remote_exec_start | Start a command (exec_run_id, command, args, cwd, env, pty, timeout_ms)
+
+ | remote_exec_signal | Kill a run
+
+ | remote_session_open | Start or resume a harness session for a chat (chat_id, harness, cwd, optional resume_session_id)
+
+ | remote_session_prompt | Send a user message for a turn (chat_id, run_id, text)
+
+ | remote_session_interrupt | Cancel the turn in flight, keep the session (chat_id)
+
+ | remote_session_resolve | Answer a harness permission request (chat_id, request_id, decision, optional scope, reason)
+
+ | remote_session_close | End the chat's session (chat_id)
+
+ | remote_session_ack | Drop buffered events stored through seq (chat_id, seq)
+
+ | remote_session_replay | Resend buffered events after after_seq (chat_id, after_seq)
+
+ | remote_sessions_list | List harness sessions on disk (request_id, optional cwd filter)
+
+Remote to server:
+
+ | Event | Purpose
+
+ | remote_heartbeat | Last-seen ping (updates heartbeat_at). Optional system_info on every third beat (~15s at default cadence) with live CPU, RAM, and home volume usage; stored on the remote when present. Lifecycle status follows the socket, not each beat.
+
+ | remote_exec_output | Sequenced stdout/stderr chunk
+
+ | remote_exec_exit | Run finished (exit_code, error, timed_out, duration_ms)
+
+ | remote_session_opened | Session is live (chat_id, harness_session_id, resumed, seq) — seq is the last event number the session has produced (0 for a process just launched; resets when the harness process restarts)
+
+ | remote_session_event | One harness event (chat_id, seq, event, optional gap on replay)
+
+ | remote_session_closed | Session ended (chat_id, optional error, for example when agents_enabled is false)
+
+ | remote_sessions_listed | Answer to remote_sessions_list (request_id, sessions[], optional per-harness errors[])
+
+Each entry in sessions includes harness, id, cwd, title, updated, and live (whether a process holds the session, with evidence and heuristic flags from the harness transcript layer). Listing reads metadata only, never transcript bodies.
+
+Harness session frames require agents_enabled: true on the remote (set when the daemon starts with belt remote start --agents). The protocol also defines remote_terminal_* frames for interactive PTY sessions on the host. Opening, prompting, and closing harness sessions happens only over this socket; GET /remotes/{id}/sessions is the HTTP wrapper for listing metadata.
+
+Ordering. The daemon handles incoming frames in parallel lanes keyed by chat_id, exec_run_id, or terminal session_id, so one slow harness session does not block exec output or another chat. Outbound frames use the same keys so session and exec events stay in order within each lane.
+
+Open vs launch. remote_session_open reserves the chat's slot before the daemon replies with remote_session_opened; the harness process starts in the background. A remote_session_prompt sent immediately after open waits for that launch instead of racing an empty slot.
+
+Persistence and replay. After each stored remote_session_event, the API sends remote_session_ack with the persisted sequence so the daemon can trim its replay buffer. On reconnect, the API sends remote_session_replay with after_seq set to the chat's stored position (harness_event_seq); events at or below that sequence are ignored. If the daemon restarts and reports a lower sequence in remote_session_opened, the stored position resets.
+
+When a remote transitions to disconnected or stopped, unfinished exec runs and active harness agent runs on that remote fail (not retried). See Exec Runs API — Status and Remote harness runs.
+
+→ Remotes guide — Agent harness sessions
+
+Harness session frames
+
+When agents_enabled is true, the API and daemon exchange harness chat control on the same WebSocket:
+
+Server → remote
+
+ | Event | Purpose
+
+ | remote_session_open | Start or resume a harness for a chat (chat_id, harness kind, cwd, optional resume_session_id)
+
+ | remote_session_prompt | User message for a turn (chat_id, run_id, text)
+
+ | remote_session_interrupt | Cancel the turn in flight
+
+ | remote_session_resolve | Answer a permission prompt (request_id, decision, optional scope)
+
+ | remote_session_close | End the chat's harness session
+
+ | remote_session_ack | Drop buffered events through seq
+
+ | remote_session_replay | Resend events after after_seq
+
+ | remote_sessions_list | List harness sessions on the host (HTTP GET /remotes/{id}/sessions uses the same path)
+
+Remote → server
+
+ | Event | Purpose
+
+ | remote_session_opened | Open succeeded
+
+ | remote_session_event | One sequenced harness event
+
+ | remote_session_closed | Session ended (error when not a clean close)
+
+ | remote_sessions_listed | Answer to remote_sessions_list
+
+Open is bounded by a 60 second deadline on the daemon. See Launch harness session — Runtime on the remote.
+
+Scopes
+
+ | Scope | Access
+
+ | remotes:read | List and get remotes, list harness sessions, list and get exec runs, read output
+
+ | remotes:write | Register, update, and delete remotes, heartbeat, WebSocket connect, dispatch execs, signal runs, launch harness chats (also needs agents:execute)
+
+ | agents:execute | Required together with remotes:write for POST /remotes/{id}/sessions

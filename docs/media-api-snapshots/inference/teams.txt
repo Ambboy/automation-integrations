@@ -1,0 +1,617 @@
+Manage workspaces, members, and invites. Workspaces are called teams in the API: endpoints live under /teams and requests carry team_id. Every API key belongs to a workspace, and apps, tasks, secrets, and billing are scoped to it.
+
+Requires API key scopes teams:read (list, get, members, invites) or teams:write (create, update, delete, member changes, invite management). Create keys in settings → workspace → api keys.
+
+→ Authentication · Entitlements: plan limits per workspace
+
+Get current user
+
+GET /me
+
+Returns the authenticated user and the current workspace (team) resolved from the API key (or guest context). Requires a valid API key.
+
+Response
+
+jsoncopy
+
+1{2  "user": {3    "id": "usr_abc123",4    "email": "[email protected]",5    "name": "you",6    "full_name": "Alex Example",7    "default_team_id": "team_personal",8    "avatar_url": "https://...",9    "metadata": {10      "completed_onboarding": true,11      "use_case": "agents",12      "signup_source": "github",13      "terms_accepted_at": "2026-01-15T10:30:00Z",14      "terms_version": "2026-01"15    }16  },17  "team": {18    "id": "team_xyz",19    "type": "team",20    "name": "Acme",21    "username": "acme",22    "setup_completed": true,23    "status": "active"24  }25}
+
+team is omitted when no workspace context is attached to the request.
+
+The nested user.metadata object (UserMetadataDTO) tracks onboarding and consent state:
+
+ | Field | Description
+
+ | completed_onboarding | Whether the user finished workspace onboarding
+
+ | use_case, use_case_reason, use_case_privacy | Onboarding survey answers
+
+ | signup_source | How the account was created (e.g. github, google)
+
+ | terms_accepted_at | ISO timestamp when the user accepted the current terms (optional)
+
+ | terms_version | Terms version string the user accepted
+
+JavaScript SDK:
+
+typescriptcopy
+
+1const { user, team } = await client.teams.me();
+
+Example:
+
+bashcopy
+
+1curl https://api.inference.sh/me \2  -H "Authorization: Bearer inf_your_key"
+
+Survey
+
+Customer-discovery and open feedback submitted from the CLI (belt feedback) or other clients.
+
+List your responses
+
+GET /me/survey
+
+Returns survey answers for the authenticated user. The response lists every structured answer first (discovery, use_case, need, testimonial, and legacy feedback), then the most recent freeform open:* rows, up to 100 rows in total. Open feedback never pushes structured answers off the list. The CLI uses this list to decide which onboarding questions are still pending.
+
+Response:
+
+jsoncopy
+
+1{2  "responses": [3    {4      "id": "srv_abc123",5      "question_id": "discovery",6      "response": "github",7      "agent": "cursor",8      "source": "cli",9      "context": "belt login, belt app run, belt task get abc123"10    }11  ]12}
+
+Submit a response
+
+POST /me/survey
+
+ | Field | Type | Required | Description
+
+ | question_id | string | Yes | discovery, use_case, need, testimonial, feedback (legacy), or open (freeform)
+
+ | response | string | Yes | Answer text
+
+ | agent | string | No | Agent runtime that submitted the answer (e.g. cursor, claude-code)
+
+ | source | string | No | Client identifier (CLI sends cli)
+
+ | context | string | No | Recent commands that led to submission. The CLI sends the last five belt commands (comma-separated) from ~/.belt/history. Other clients may send a page path or other freeform string.
+
+Structured question IDs (discovery, use_case, need, testimonial, feedback) are append-only — each submit creates a new response row. The CLI prompts for all four active questions (use_case, discovery, need, testimonial) in order; feedback is a legacy ID still accepted by the API. Open feedback (open) also creates a new entry each time (stored with a unique question_id suffix server-side).
+
+Rewards: The response includes granted_amount (microcents). The first answer to each structured question earns $1 in credits when the trimmed response meets the minimum length (discovery: 2 characters; use_case, need, testimonial, feedback: 10 characters). Open feedback never earns credits. Rewards expire after 30 days.
+
+When the answer is recorded but no credits are granted, reward_blocked_reason says why:
+
+ | Value | Meaning
+
+ | already_answered | This question was answered before. Later answers are stored but not paid.
+
+ | too_short | The trimmed response is below the minimum length for this question
+
+ | payment_method_required | The reward is withheld until your workspace adds a saved payment method. See Billing settings.
+
+ | reward_unavailable | The grant failed server-side. The answer is still recorded.
+
+Fill-in placeholder text (for example your answer here or <your answer>, copied from CLI help) is rejected with 400 and nothing is stored, so it cannot use up the question's one rewarded answer.
+
+Example:
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/me/survey \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "question_id": "discovery",6    "response": "github",7    "source": "cli",8    "context": "belt login, belt app run, belt task get abc123"9  }'
+
+Response:
+
+jsoncopy
+
+1{2  "response": {3    "id": "srv_abc123",4    "question_id": "discovery",5    "response": "github",6    "source": "cli",7    "context": "belt login, belt app run, belt task get abc123"8  },9  "granted_amount": 10000000010}
+
+granted_amount is in microcents (100000000 = $1.00). Omitted or 0 when no reward was earned.
+
+No-reward example (duplicate answer):
+
+jsoncopy
+
+1{2  "response": {3    "id": "srv_def456",4    "question_id": "discovery",5    "response": "web dashboard",6    "source": "cli"7  },8  "reward_blocked_reason": "already_answered"9}
+
+Errors (400):
+
+ | Message | Cause
+
+ | unknown question: <id> | Invalid question_id
+
+ | response cannot be empty | Missing or whitespace-only response
+
+ | response is the placeholder text — replace it with your actual answer | The response is fill-in template text
+
+→ CLI setup — Feedback
+
+Bounties
+
+Incentive programs that grant credits when you complete qualifying actions (for example, deploying a useful app or answering survey questions). Requires authentication.
+
+List active programs
+
+GET /bounties
+
+Returns active bounty programs sorted by notice_priority (ascending). Each program includes its stable name (used as bounty_id when claiming), reward amount, proof requirements, and CLI notice configuration.
+
+The belt CLI calls this endpoint to populate stderr bounty notices. Responses are cached locally for 6 hours (~/.belt/cache/bounty-programs.json); admin edits to notice fields propagate on the next cache refresh without a CLI release.
+
+Response — array of BountyProgramDTO objects:
+
+ | Field | Description
+
+ | name | Program ID (for example app-builder, survey-discovery)
+
+ | description | Rules shown to users and agents
+
+ | amount_microcents | Reward per claim, in microcents
+
+ | grant_type | Credit grant type (bounty or survey)
+
+ | expiry_days | Days until granted credits expire
+
+ | max_per_user | Total claims per user (0 = unlimited). Independent of max_per_day — surveys default to 1.
+
+ | max_per_day | Daily claim cap (0 = no daily cap, unique proof only)
+
+ | proof_type | Required proof: app, text, or none
+
+ | proof_min_length | Minimum length for text proofs
+
+ | status | active, paused, or ended
+
+ | notice_text | Message shown in CLI stderr notices
+
+ | notice_cooldown_hours | Hours between notice displays
+
+ | notice_priority | Lower values surface first when multiple notices are due
+
+Claim a bounty
+
+POST /me/bounty
+
+ | Field | Type | Required | Description
+
+ | bounty_id | string | Yes | Program name (for example app-builder)
+
+ | proof_id | string | Yes | Proof identifier — app ID for proof_type: app, or other proof key
+
+ | agent | string | No | Agent runtime that submitted the claim (CLI sends detected runtime)
+
+ | source | string | No | Client identifier (CLI sends cli)
+
+For proof_type: app, proof_id must be an app you own that has been deployed (version_id set). The server records proof_ref as namespace/name and resource_id as the app ID (same value as proof_id for app proofs).
+
+Response:
+
+jsoncopy
+
+1{2  "submission": {3    "id": "bsm_abc123",4    "bounty_id": "app-builder",5    "resource_id": "01abc123def456",6    "proof_id": "01abc123def456",7    "proof_ref": "you/my-app",8    "agent": "cursor",9    "source": "cli"10  },11  "granted_amount": 50000000012}
+
+ | submission field | Description
+
+ | resource_id | Linked resource ID when applicable — for proof_type: app, the app ID
+
+ | proof_id | Stable proof key used for duplicate detection
+
+ | proof_ref | Human-readable proof reference (for apps, namespace/name)
+
+granted_amount is in microcents (500000000 = $5.00). Omitted or 0 when no credits were granted (for example, duplicate claim).
+
+submission.resource_id is the app ID resolved from proof_id when the program's proof_type is app — omitted for other proof types.
+
+Errors (400):
+
+ | Message | Cause
+
+ | unknown bounty: <id> | Program not found
+
+ | bounty program <id> is not active | Program paused or ended
+
+ | proof_id is required | Missing proof_id
+
+ | app not found: <id> | App does not exist or is not yours
+
+ | app must be deployed before claiming a bounty | App has no deployed version
+
+ | bounty already claimed for this proof | Same proof_id already submitted for this program
+
+ | bounty limit reached — you've already claimed this N time(s) | max_per_user exceeded (total claims for this program)
+
+ | daily bounty limit reached — try again tomorrow | max_per_day exceeded
+
+When the team has no saved payment method, the API may return 402 with code payment_method_required and meta.billing_page set to /settings/team/billing/payments (add a card under team billing settings before credits are granted).
+
+Example:
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/me/bounty \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "bounty_id": "app-builder",6    "proof_id": "01abc123def456",7    "source": "cli"8  }'
+
+Survey rewards use the same bounty system internally (bounty_id = survey-<question_id>) but are claimed automatically via POST /me/survey — see Survey above.
+
+Bounty program administration (creating programs, pausing, viewing claims) is internal and not exposed on the public REST API.
+
+SDKs: No client.bounties namespace yet in either SDK. Import BountyProgramDTO, SubmitBountyRequest, and SubmitBountyResponse from inferencesh.types (Python) or @inferencesh/sdk (JavaScript) when calling these endpoints directly — see Python SDK — generated bounty types and JavaScript SDK — generated bounty types.
+
+→ CLI setup — App bounties · Billing — credit grants
+
+Data export
+
+Request a ZIP archive of your account and workspace data (GDPR Articles 15 and 20: right of access and data portability). Requires authentication as the account owner (session token or API key).
+
+Request export
+
+POST /me/export
+
+Starts an asynchronous export job. Returns 202 Accepted with the export ID and initial status.
+
+Response:
+
+jsoncopy
+
+1{2  "id": "uex_abc123",3  "status": "pending"4}
+
+If you already have a pending or processing export from the last 24 hours, the API returns that existing job instead of starting a duplicate.
+
+Get export status
+
+GET /me/export/{id}
+
+Poll until status is completed or failed. When complete, the response includes a presigned download_url (valid for one hour).
+
+ | Field | Description
+
+ | id | Export job ID
+
+ | status | pending, processing, completed, or failed
+
+ | download_url | Presigned URL to the ZIP (when completed)
+
+ | completed_at | ISO timestamp when the archive was ready
+
+ | expires_at | When the download link expires (seven days after completion)
+
+ | error | Failure message (when failed)
+
+Example:
+
+bashcopy
+
+1# Start export2curl -X POST https://api.inference.sh/me/export \3  -H "Authorization: Bearer $(belt auth token)"45# Poll for download URL6curl https://api.inference.sh/me/export/uex_abc123 \7  -H "Authorization: Bearer $(belt auth token)"
+
+The ZIP contains JSON files for your user profile, sessions (tokens redacted), API keys (masked), workspace resources (apps, agents, flows, knowledge, projects, chats, tasks, files, secrets, integrations, triggers), billing, notifications, and survey responses. Processing may take several minutes; the server enforces a 10-minute timeout per job.
+
+List workspaces
+
+GET /teams
+
+Returns all workspaces the authenticated user belongs to (personal workspace, shared workspaces, and organization workspaces you administer).
+
+Requires teams:read.
+
+Response
+
+Array of workspace objects:
+
+ | Field | Description
+
+ | id | Workspace ID
+
+ | type | personal, team, org, or system. See Workspace types.
+
+ | name | Display name
+
+ | username | Unique workspace username (used in namespaces and belt auth switch)
+
+ | avatar_url | Avatar URL
+
+ | setup_completed | Whether the workspace finished onboarding (username chosen)
+
+ | status | Workspace status
+
+ | email | Contact email (when set)
+
+ | org_id | Org this workspace belongs to. An org workspace points at itself. Omitted for standalone workspaces.
+
+ | max_concurrency | Platform-managed field (usually 0). Your workspace's concurrent task limit comes from the concurrency entitlement on your subscription plan. See Entitlements: concurrent task limits
+
+Workspace types
+
+ | type | Description
+
+ | personal | Personal workspace, one per account
+
+ | team | Shared workspace for collaborators. When attached to an org, org_id is the org's ID.
+
+ | org | An organization's own workspace. Created with the org, with the same ID as the org, and org_id points at itself. Its members are the org's admins, so it has owners and admins only. Holds org billing and org-scope credentials.
+
+ | system | Internal platform workspace
+
+Example:
+
+bashcopy
+
+1curl https://api.inference.sh/teams \2  -H "Authorization: Bearer inf_your_key"
+
+JavaScript SDK: client.teams.list()
+
+Get workspace
+
+GET /teams/{id}
+
+Returns a single workspace by ID. Requires teams:read and membership (or admin access).
+
+JavaScript SDK: client.teams.get(teamId)
+
+Create workspace
+
+POST /teams
+
+Requires teams:write.
+
+Request
+
+ | Field | Required | Description
+
+ | name | yes | Display name
+
+ | username | yes | Unique workspace username (kebab-case)
+
+ | email | no | Contact email
+
+jsoncopy
+
+1{2  "name": "Acme Engineering",3  "username": "acme-eng",4  "email": "[email protected]"5}
+
+Returns the created workspace object. New workspaces may need Complete setup before all features are available.
+
+JavaScript SDK: client.teams.create({ name, username, email })
+
+Update workspace
+
+POST /teams/{id}
+
+Updates workspace metadata. Requires teams:write and appropriate role (owner or admin).
+
+JavaScript SDK: client.teams.update(teamId, { name, username, email })
+
+Delete workspace
+
+DELETE /teams/{id}
+
+Permanently deletes a workspace. Requires teams:write and owner role. Personal workspaces cannot be deleted.
+
+JavaScript SDK: client.teams.delete(teamId)
+
+Check username availability
+
+GET /teams/check-username?username={name}
+
+Returns an AvailabilityResponse, the same shape used by page slug availability checks. Use before create or rename.
+
+ | Query | Required | Description
+
+ | username | Yes | Proposed username (normalized to lowercase server-side)
+
+ | exclude_team_id | No | Workspace ID to ignore. Use when updating so the workspace's current username does not count as a conflict
+
+Requires teams:read.
+
+Response:
+
+ | Field | Type | Description
+
+ | value | string | Normalized username (lowercased)
+
+ | available | boolean | true if the username can be used
+
+ | reason | string | When available is false: taken (username in use) or reserved (on the platform reserved-name list). Omitted when available.
+
+Use reason for user-facing messages instead of maintaining a client-side reserved-name list — the server owns the full reserved namespace.
+
+jsoncopy
+
+1{2  "value": "acme-eng",3  "available": false,4  "reason": "taken"5}
+
+JavaScript SDK: client.teams.checkUsername('acme-eng')
+
+Complete setup
+
+POST /teams/{id}/complete-setup
+
+Chooses the workspace username during onboarding.
+
+Request
+
+jsoncopy
+
+1{2  "username": "acme"3}
+
+Requires teams:write.
+
+Members
+
+List members
+
+GET /teams/{id}/members
+
+Returns workspace members with roles. Requires teams:read.
+
+ | Field | Description
+
+ | id | Membership row ID
+
+ | user_id | Member user ID
+
+ | team_id | Team ID
+
+ | role | owner, admin, or member
+
+ | user | Nested user profile (email, name, avatar_url)
+
+ | assignable_roles | Roles the authenticated caller may set on this member, including their current role. Populated only when the caller may manage members. Empty or omitted when the caller cannot change anyone (for example, a member), when an admin views an owner they cannot demote, or when the sole owner cannot step down until another owner exists. Only owners may include owner in this list.
+
+ | removable | Whether the caller may remove this member. true only when removal is allowed (the last owner on a team is never removable). Omitted when the caller cannot manage members.
+
+These fields mirror the same checks enforced by POST /teams/{id}/members/{userId}/role and DELETE /teams/{id}/members/{userId}.
+
+Use them to drive member-management UIs without reimplementing server rules:
+
+Only owners may grant the owner role; admins cannot demote an existing owner.
+
+A team must keep at least one owner (the last owner cannot be demoted or removed).
+
+The organization workspace team accepts owner and admin only — member is not assignable there.
+
+Mutations still enforce the same rules and return 403 or validation errors when a change is not allowed.
+
+JavaScript SDK: client.teams.getMembers(teamId) — typed as TeamMemberDTO with assignable_roles and removable.
+
+Python SDK: import TeamMemberDTO from inferencesh.types when calling this endpoint with httpx or requests (no client.teams namespace yet).
+
+Add member
+
+POST /teams/{id}/members
+
+jsoncopy
+
+1{2  "email": "[email protected]",3  "role": "member"4}
+
+Requires teams:write. Adds an existing platform user by email, or creates a pending invite when the email is not registered.
+
+JavaScript SDK: client.teams.addMember(teamId, { email, role })
+
+Remove member
+
+DELETE /teams/{id}/members/{userId}
+
+Requires teams:write.
+
+JavaScript SDK: client.teams.removeMember(teamId, userId)
+
+Update member role
+
+POST /teams/{id}/members/{userId}/role
+
+jsoncopy
+
+1{2  "role": "admin"3}
+
+Requires teams:write.
+
+JavaScript SDK: client.teams.updateMemberRole(teamId, userId, 'admin')
+
+Invites
+
+List workspace invites
+
+GET /teams/{id}/invites
+
+Returns pending invites for a workspace. Requires teams:read.
+
+JavaScript SDK: client.teams.listInvites(teamId)
+
+Create invite
+
+POST /teams/{id}/invites
+
+jsoncopy
+
+1{2  "email": "[email protected]",3  "role": "member"4}
+
+Requires teams:write.
+
+JavaScript SDK: client.teams.createInvite(teamId, { email, role })
+
+Revoke invite
+
+DELETE /teams/{id}/invites/{inviteId}
+
+Requires teams:write.
+
+JavaScript SDK: client.teams.revokeInvite(teamId, inviteId)
+
+List my pending invites
+
+GET /invites/me
+
+Returns invites addressed to the authenticated user's email. Requires teams:read.
+
+Get invite info (public)
+
+GET /invites/info?token={token}
+
+Returns a TeamInviteInfoDTO for the accept page. No API key required — the invite token is the credential.
+
+Response is a TeamInviteInfoDTO:
+
+ | Field | Description
+
+ | id | Invite ID
+
+ | email | Address the invite was sent to
+
+ | role | Role the invitee receives on accept
+
+ | status | Standing now: a pending invite past expires_at reads expired; an invite to a workspace that no longer admits members reads revoked
+
+ | expires_at | ISO timestamp when a pending invite stops being valid
+
+ | team | Workspace summary: id, type (personal, team, or org), name, avatar_url
+
+ | org_name | Organization name when the workspace is a member team inside an org. Omitted for standalone workspaces and for the org's own workspace
+
+ | invited_by | Display name of the inviter, as the invite email names them
+
+ | HTTP status | When | Client behavior
+
+ | 400 | token query parameter is missing | Fix the link — it must include ?token=…
+
+ | 404 | No invite matches the token | Treat the link as invalid (truncated URL, revoked invite, or wrong token)
+
+ | 5xx | Server error while loading invite info | The token may still be valid; retry the lookup
+
+Only 404 means the link does not work; other failures say nothing about whether the invite stands, so the workspace invite page offers try again for them.
+
+Accept invite
+
+POST /invites/accept
+
+Requires authentication. Pass the invite token in the JSON body or token query parameter:
+
+jsoncopy
+
+1{2  "token": "invite_token_from_email"3}
+
+Returns the new TeamMemberDTO.
+
+Decline invite
+
+POST /invites/decline
+
+Pass the same token shape. Does not require the invitee to be logged in.
+
+Roles
+
+ | Role | Typical permissions
+
+ | owner | Full workspace control, billing, delete workspace
+
+ | admin | Manage members, settings, and workspace resources
+
+ | member | Use workspace resources within plan limits
+
+Owners and admins can list and manage other members' private resources, for example after a member leaves. Pass include_private: true on cursor-list requests, or access an individual resource by ID. Both paths are audited. See REST overview: Workspace admin visibility.
+
+Related
+
+REST overview: authentication and response format
+
+Entitlements: per-workspace plan limits
+
+Billing · Subscription: workspace balance and plans
+
+SDK overview: client.teams namespace (JavaScript)

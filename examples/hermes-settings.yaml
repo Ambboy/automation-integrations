@@ -1,0 +1,16 @@
+# Merge only after checking the chosen host's origin contract. Do not overwrite config.yaml.
+plugins:
+  enabled:
+    - automation-bridge
+  entries:
+    automation-bridge:
+      settings:
+        enabled: true
+        endpoint: http://127.0.0.1:8787
+        token_file: /home/operator/.config/automation-integrations/bridge-token
+        state_dir: /home/operator/.local/state/automation-bridge/server
+        origin_contract: unavailable
+        # Only a verified build supplying trusted request_origin may use:
+        # origin_contract: hermes-request-origin-v1
+        topic_icons: false
+        voice_reply: true

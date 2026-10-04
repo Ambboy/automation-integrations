@@ -1,0 +1,109 @@
+Browse GPU instance types and hourly pricing across cloud providers. This endpoint powers comparison views in the workspace and is available without authentication.
+
+List instance types
+
+GET /instances/types
+
+Returns GPU instance types aggregated from cloud providers (via Shadeform). Results are filtered to common GPU families (for example A100, H100, L40S, RTX series).
+
+No API key is required. Responses are cached for one hour (Cache-Control: public, max-age=3600).
+
+Query parameters
+
+ | Parameter | Type | Description
+
+ | gpu_type | string | Filter by GPU model name (for example H100, A100)
+
+ | num_gpus | string | Filter by GPU count (for example 1, 8)
+
+ | cloud | string | Filter by provider key (for example aws, runpod, lambdalabs)
+
+ | region | string | Filter by region code
+
+ | available | string | When true, only types with at least one available region
+
+ | shade_instance_type | string | Filter by instance type key
+
+ | rental_type | string | on_demand or spot. Keeps only that rental type's availability entries; with available=true, drops types that have none in stock
+
+ | sort | string | Sort order (passed through to the provider catalog)
+
+Response
+
+The body is a JSON array of instance type objects under data.
+
+jsoncopy
+
+1[2  {3    "id": "runpod.NVIDIA H100 80GB HBM3",4    "cloud": "runpod",5    "cloud_logo_url": "https://cloud.inference.sh/logos/runpod.com.png",6    "region": "us-east-1",7    "shade_instance_type": "NVIDIA H100 80GB HBM3",8    "cloud_instance_type": "gpu_1x_h100_sxm5",9    "deployment_type": "vm",10    "hourly_price": 299,11    "configuration": {12      "gpu_type": "H100",13      "gpu_manufacturer": "nvidia",14      "interconnect": "sxm5",15      "memory_in_gb": 180,16      "num_gpus": 1,17      "nvlink": false,18      "os_options": ["ubuntu22.04"],19      "storage_in_gb": 500,20      "vcpus": 26,21      "vram_per_gpu_in_gb": 8022    },23    "availability": [24      { "available": true, "region": "us-east-1", "rental_type": "on_demand" },25      { "available": true, "region": "us-east-1", "rental_type": "spot", "hourly_price": 120 }26    ],27    "boot_time": {28      "average_seconds": 420,29      "updated_at": "2026-05-20T12:00:00Z",30      "sample_size": 12031    }32  }33]
+
+Fields
+
+ | Field | Description
+
+ | id | Stable id ({cloud}.{shade_instance_type})
+
+ | cloud | Provider key (aws, runpod, lambdalabs, …)
+
+ | cloud_logo_url | Provider logo URL (https://cloud.inference.sh/logos/{domain}.png)
+
+ | region | Default or selected region for this row
+
+ | shade_instance_type | Provider catalog name
+
+ | cloud_instance_type | Provider-specific SKU or machine type
+
+ | deployment_type | vm, container, or baremetal
+
+ | hourly_price | On-demand price in cents per hour (divide by 100 for USD)
+
+ | configuration | GPU and machine specs (see below)
+
+ | availability | Per-region availability flags. Each entry has a rental_type (on_demand or spot); types that offer spot list a region once per rental type. Spot entries carry their own hourly_price in cents. Spot instances are cheaper but the provider can reclaim them at any time
+
+ | boot_time | Optional average boot time stats
+
+configuration
+
+ | Field | Description
+
+ | gpu_type | GPU model name
+
+ | gpu_manufacturer | Chip vendor (for example nvidia, amd)
+
+ | interconnect | Interconnect type when applicable
+
+ | num_gpus | Number of GPUs
+
+ | nvlink | Whether NVLink is available on this type
+
+ | vram_per_gpu_in_gb | VRAM per GPU
+
+ | memory_in_gb | System RAM
+
+ | vcpus | vCPU count
+
+ | storage_in_gb | Attached storage
+
+ | os_options | Supported OS images
+
+Example
+
+bashcopy
+
+1curl "https://api.inference.sh/instances/types?gpu_type=H100&available=true"
+
+bashcopy
+
+1curl "https://api.inference.sh/instances/types?cloud=runpod&num_gpus=1"
+
+Authenticated catalog (workspace)
+
+When provisioning remote engines in the workspace, the authenticated endpoint GET /engines/types (requires engines:read scope) returns a deduplicated catalog: one cheapest option per GPU type, GPU count and rental type for engine setup flows. Each entry has a rental_type, and its region and hourly_price are for that rental type. Spot options are listed only while in stock. CPU-only types get one entry per shape (vCPUs and RAM). Each entry also has options: every in-stock provider for it, cheapest first, with its configuration and in-stock regions (each with its own hourly_price in cents; spot prices can differ by region). Launch with an option's cloud and shade_instance_type, one of its regions, and the entry's rental_type. Pass the entry's rental_type when creating the engine; the price is set by the server from the live catalog. A reclaimed spot engine stops with reason preempted and unused time is refunded.
+
+Use GET /instances/types for the full public catalog with filters; use GET /engines/types inside authenticated integrations tied to engine provisioning.
+
+Related
+
+→ Workers concept — cloud vs private workers for running apps
+→ Private engine configuration — GPU workers on your own hardware
+→ REST overview — base URL and authentication

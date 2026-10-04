@@ -1,0 +1,616 @@
+Manage flow definitions, the saved graphs you edit in the web app, via REST.
+
+To execute a saved flow, use Flow Runs (POST /flowruns). Flow definitions and flow runs are separate resources: definitions hold the graph; runs track execution.
+
+→ Flows concept — how flows chain apps and relate to tasks
+
+Authentication
+
+ | Scope | Access
+
+ | flows:read | List, get, list versions, stream
+
+ | flows:write | Create, update, delete, update visibility, transfer, apply graph actions, duplicate, deploy as app
+
+ | flows:execute | Create and cancel flow runs (see Flow Runs)
+
+Create keys in settings → workspace → api keys.
+
+Create flow
+
+POST /flows
+
+Creates a new flow with an empty draft graph. Requires flows:write.
+
+Request
+
+ | Field | Type | Required | Description
+
+ | name | string | No | Display name. Auto-generated if omitted.
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/flows \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"name":"image-pipeline"}'
+
+CLI equivalent: belt flow create --name image-pipeline (add --json for the raw response).
+
+Response
+
+Returns a Flow object with draft_version_id, draft_version (graph state), and metadata fields (name, description, nodes, edges, node_data, schemas, and output mappings).
+
+JavaScript SDK
+
+typescriptcopy
+
+1const flow = await client.flows.create('image-pipeline');
+
+Get flow
+
+By ID
+
+GET /flows/{id}
+
+Returns a single flow by full ID or short ID, including draft_version and published_version when set. Requires flows:read.
+
+bashcopy
+
+1curl https://api.inference.sh/flows/flow_abc123 \2  -H "Authorization: Bearer inf_your_key"
+
+By ref
+
+GET /flows/{namespace}/{name}
+
+Returns a flow by workspace namespace and name. Requires flows:read.
+
+bashcopy
+
+1curl https://api.inference.sh/flows/myteam/voice-pipeline \2  -H "Authorization: Bearer inf_your_key"
+
+CLI equivalent: belt flow get <ref>, belt flow describe <ref>, and other flow commands accept namespace/name or a flow ID — same ref resolution as belt agent get. See CLI setup — Flows.
+
+List flows
+
+GET /flows or POST /flows/list
+
+Cursor-paginated list of your workspace's flows. Requires flows:read.
+
+ | Field | Type | Description
+
+ | limit | number | Page size (default 50, max 100)
+
+ | cursor | string | Cursor from a previous response
+
+ | filters | array | Filter objects (field, operator, value)
+
+ | sort | array | Sort objects (field, dir)
+
+JavaScript SDK
+
+typescriptcopy
+
+1const page = await client.flows.list({ limit: 20 });
+
+CLI equivalent: belt flow list (add --json for the raw items array).
+
+Update flow metadata
+
+Update display metadata on a flow definition. Graph edits go through Apply graph actions instead of these endpoints.
+
+Partial update (recommended)
+
+PATCH /flows/{id}
+
+Updates only the fields you include in the request body; all other fields are left unchanged. Requires flows:write.
+
+ | Field | Type | Description
+
+ | name | string | Display name
+
+ | description | string | Description text
+
+ | card_image | string | Card image URL
+
+ | thumbnail | string | Thumbnail image URL
+
+ | banner_image | string | Banner image URL
+
+bashcopy
+
+1curl -X PATCH https://api.inference.sh/flows/flow_abc123 \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"name":"renamed-pipeline","description":"Updated description"}'
+
+Returns the updated Flow object.
+
+Full update
+
+POST /flows/{id}
+
+Replaces the flow resource with the request body. Requires flows:write. For metadata-only changes, prefer PATCH so omitted fields are not cleared.
+
+The JavaScript SDK client.flows.update() currently calls this endpoint with POST.
+
+visibility is not updated by these endpoints — use Update visibility instead.
+
+System-managed fields (id, short_id, user_id, team_id, created_at, deleted_at) are ignored if included in a PATCH body. A request that contains only protected fields returns 400 invalid_request.
+
+Update visibility
+
+POST /flows/{id}/visibility
+
+Changes the flow's sharing visibility. Requires flows:write. Only the flow owner can update visibility.
+
+Request
+
+jsoncopy
+
+1{2  "visibility": "private"3}
+
+ | Value | Description
+
+ | private | Only visible to your workspace (default)
+
+ | public | Readable outside your workspace
+
+ | unlisted | Accessible with a link but not listed publicly
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/flows/flow_abc123/visibility \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"visibility":"public"}'
+
+Returns the updated Flow object.
+
+JavaScript SDK
+
+typescriptcopy
+
+1const flow = await client.flows.updateVisibility('flow_abc123', 'public');
+
+Delete flow
+
+DELETE /flows/{id}
+
+Permanently deletes a flow. Requires flows:write.
+
+List versions
+
+GET /flows/{id}/versions or POST /flows/{id}/versions/list
+
+Returns version history for a flow (draft and published snapshots). Requires flows:read. Uses the same cursor pagination shape as list flows.
+
+Each FlowVersion includes graph_version (server sequence number), nodes, edges, node_data, input/output schemas, and output mappings.
+
+JavaScript SDK
+
+typescriptcopy
+
+1const versions = await client.flows.listVersions('flow_abc123');
+
+Apply graph actions
+
+POST /flows/{id}/actions
+
+Apply a batch of graph mutations to the flow's draft version. Requires flows:write.
+
+The server merges actions CRDT-style — there is no optimistic locking or version conflict. The response includes the new graph_version sequence number for SSE catch-up.
+
+CLI equivalent: belt flow edit subcommands (node add, set-input, edge add, output set, set-schema, and others) or belt flow edit actions <id> [json] for raw action payloads. → CLI setup — Flows
+
+Request
+
+jsoncopy
+
+1{2  "actions": [3    {4      "type": "node.add",5      "payload": { "id": "node_1", "type": "app", "position": { "x": 0, "y": 0 }, "data": {} }6    }7  ]8}
+
+Response
+
+ | Field | Type | Description
+
+ | version | number | New server sequence number (graph_version)
+
+ | actions | array | Echo of applied actions
+
+ | errors | array | Partial failure details (type, message) when some actions fail
+
+On partial failure the API returns HTTP 422 with the actions that succeeded before the error.
+
+Action types
+
+ | Type | Purpose
+
+ | node.add | Add a node
+
+ | node.remove | Remove a node
+
+ | node.move | Move one node
+
+ | node.move_many | Move multiple nodes
+
+ | node.duplicate | Duplicate a node
+
+ | node.rename | Rename a node
+
+ | node.set_app | Attach an app to a node
+
+ | node.update | Update node configuration
+
+ | node.set_input | Set node input values
+
+ | node.clear_input | Clear node inputs
+
+ | edge.add | Connect two nodes
+
+ | edge.remove | Remove an edge
+
+ | flow.set_input_schema | Set flow input schema
+
+ | flow.set_output_schema | Set flow output schema
+
+ | flow.set_output_mapping | Map a node output to a flow output field
+
+ | flow.remove_output_mapping | Remove an output mapping
+
+ | flow.rename_output_field | Rename a flow output field
+
+ | undo | Undo the caller's most recent graph action
+
+ | redo | Redo the caller's most recently undone action
+
+Each action's payload shape depends on the type. undo and redo take no payload. The web app's flow editor uses this endpoint for collaborative editing.
+
+Undo and redo
+
+The server keeps an action log for each flow. For every applied action it stores the inverse actions, so clients do not compute inverses. Send undo or redo as the only action in the batch:
+
+jsoncopy
+
+1{ "actions": [{ "type": "undo" }] }
+
+jsoncopy
+
+1{ "actions": [{ "type": "redo" }] }
+
+ | Behavior | Detail
+
+ | Scope | Per user. Each collaborator undoes only their own actions
+
+ | Redo stack | Cleared for the caller when they apply a new graph action
+
+ | History cap | The last 50 log entries per flow are kept. Older entries are pruned
+
+ | Empty stack | HTTP 200 with an errors entry (nothing to undo or nothing to redo)
+
+On success, the response actions array contains the actions that were replayed: the stored inverse actions for undo (for example node.remove after undoing a node.add), or the original action for redo. Undo and redo requests are not logged as new history entries.
+
+CLI: belt flow edit undo <ref> and belt flow edit redo <ref>.
+
+Flow input/output schema validation
+
+flow.set_input_schema and flow.set_output_schema validate the schema payload before applying it. Send null or omit the schema to clear it.
+
+ | Rule | Requirement
+
+ | Root type | JSON object with "type": "object"
+
+ | properties | If present, must be a JSON object
+
+ | required | If present, must be an array of strings; each entry must exist in properties
+
+Invalid schemas return an error in the errors array (HTTP 422) with a message such as missing "type" field or required field "text" not found in properties. The CLI belt flow edit set-schema uses the same validation via graph actions.
+
+Example valid input schema:
+
+jsoncopy
+
+1{2  "type": "object",3  "properties": {4    "text": { "type": "string" }5  },6  "required": ["text"]7}
+
+The v2 flow editor stores a file input field as "type": "object" with "format": "file", and a list of files as an array whose items have that shape:
+
+jsoncopy
+
+1{2  "type": "object",3  "properties": {4    "image": { "type": "object", "format": "file" },5    "attachments": { "type": "array", "items": { "type": "object", "format": "file" } }6  },7  "required": ["image"]8}
+
+Primitive utility nodes
+
+Gate, selector, merge, constant, and utility nodes are evaluated inline by the flow resolver as CEL expressions. They do not create a task.
+
+ | Node type | Purpose
+
+ | gate | Let downstream nodes run only when a condition is true
+
+ | selector | Pick one element from an array input
+
+ | merge | Wait for several branches and pass their inputs on
+
+ | constant | Emit a fixed value
+
+ | utility | Evaluate a custom CEL expression
+
+Store configuration on node_data[<node_id>]:
+
+ | Field | Status | Use
+
+ | utility | Preferred | UtilityConfig: a preset (gate, selector, merge, constant) or a custom CEL expression
+
+ | gate_condition | Legacy | Gate only. Used when utility is not set
+
+ | selector_config | Legacy | Selector only. Used when utility is not set
+
+The v2 flow editor writes gate and selector settings to both utility (with preset: "gate" / preset: "selector") and the legacy gate_condition / selector_config fields. Constant and merge nodes use utility only. When loading a node, the editor prefers the legacy fields and falls back to utility.gate or utility.selector when they are absent.
+
+The SDKs export UtilityConfig, GateCondition, and SelectorConfig, and FlowNodeData has a utility field next to the legacy fields.
+
+UtilityConfig fields
+
+ | Field | Type | Description
+
+ | preset | string | gate, selector, merge, or constant
+
+ | expression | string | Custom CEL expression. When set, it is used instead of the preset
+
+ | gate | object | GateCondition, used when preset is gate
+
+ | selector | object | SelectorConfig, used when preset is selector
+
+ | constant | any | Literal value, used when preset is constant and random is not set
+
+ | random | boolean | When true on a constant node, emit a random integer instead of evaluating CEL
+
+ | random_min | number | Lower bound for random mode (default 0)
+
+ | random_max | number | Upper bound for random mode (default 1000000)
+
+Expressions receive one variable:
+
+ | Variable | Type | Description
+
+ | input | map | The node's resolved inputs, keyed by the input keys set with node.set_input
+
+If the expression does not compile or fails at evaluation, the node is marked failed. Reading a key that is not in input is an evaluation error.
+
+Utility node output
+
+When a utility node completes, the runtime stores its result on the flow run under node_outputs, as { "<node_id>": { "value": <result> } }.
+
+ | Node | Stored value
+
+ | selector, constant, custom expression | The expression result
+
+ | merge | The node's resolved inputs map
+
+ | gate, condition true | The node's resolved inputs map
+
+ | gate, condition false | Nothing is stored
+
+Input connections and flow output mappings read a source node by its type:
+
+ | Source node type | Resolved from
+
+ | inputNode | Flow run input values
+
+ | gate, selector, merge, constant, utility | node_outputs[<node_id>].value
+
+ | App nodes | The node's completed task output
+
+Input connections
+
+Wire a downstream input to a utility node with node.set_input:
+
+jsoncopy
+
+1{2  "type": "node.set_input",3  "payload": {4    "node_id": "upscale",5    "input_key": "scale",6    "input": {7      "connection": { "nodeId": "default_scale", "key": "value", "type": "number" }8    }9  }10}
+
+ | Connection key | Resolves to
+
+ | "value" or empty | The full stored value
+
+ | Any other key, stored value is a map | The value at that key (for example one input of a merge or gate node)
+
+ | Any other key, stored value is not a map | The full stored value
+
+Flow output mappings
+
+When a flow run completes, the flow.set_output_mapping entries fill the run's output object. For each mapping the resolver reads node_outputs for the source node first. If there is no value there, it reads the source node's task output. sourceFieldPath follows the same rules as the connection key:
+
+jsoncopy
+
+1{2  "type": "flow.set_output_mapping",3  "payload": {4    "field": "scale",5    "mapping": {6      "sourceNodeId": "default_scale",7      "sourceFieldPath": "value",8      "outputFieldName": "scale",9      "type": "number"10    }11  }12}
+
+A mapping whose source has no value is left out of output.
+
+Gate nodes
+
+A gate node (type: "gate") evaluates a boolean condition against its inputs.
+
+ | Outcome | Runtime behavior
+
+ | Condition true | The gate completes and stores its inputs as its output. Downstream nodes run
+
+ | Condition false | The gate is marked failed and its dependent nodes are marked blocked. The flow run does not fail because of it
+
+ | No condition configured | The gate completes
+
+ | Expression error (for example a missing field) | The gate is marked failed, the same as a false condition
+
+A failed node normally ends the run as failed with "One or more nodes failed". Gate nodes are exempt, so a run whose only failed nodes are gates finishes as completed. The exemption applies to type: "gate" nodes and to type: "utility" nodes with preset: "gate". Both block their dependents when the condition is false and neither fails the overall run.
+
+Configuration
+
+Add the node with node.add and wire the value to test into one of its inputs. field names that input key.
+
+jsoncopy
+
+1{2  "actions": [3    {4      "type": "node.add",5      "payload": {6        "id": "check_status",7        "type": "gate",8        "position": { "x": 400, "y": 0 },9        "data": {10          "utility": {11            "preset": "gate",12            "gate": { "field": "status", "operator": "equals", "value": "approved" }13          }14        }15      }16    },17    {18      "type": "node.set_input",19      "payload": {20        "node_id": "check_status",21        "input_key": "status",22        "input": { "connection": { "nodeId": "classifier", "key": "label", "type": "string" } }23      }24    }25  ]26}
+
+GateCondition fields
+
+ | Field | Type | Description
+
+ | field | string | Input key on the gate node
+
+ | operator | string | One of the operators below
+
+ | value | any | Right-hand value. Not used by is_empty and is_not_empty
+
+Operators
+
+ | Operator | Generated expression
+
+ | equals | input.<field> == "<value>" (value is compared as a string)
+
+ | not_equals | input.<field> != "<value>"
+
+ | contains | input.<field>.contains("<value>")
+
+ | gt | double(input.<field>) > double(<value>)
+
+ | lt | double(input.<field>) < double(<value>)
+
+ | is_empty | input.<field> == ""
+
+ | is_not_empty | input.<field> != ""
+
+These are the only supported operators. Short forms such as eq are not accepted. An unknown operator value is treated as a false condition (the gate blocks its dependents).
+
+→ Flow Runs API: Per-node progress
+
+Selector nodes
+
+A selector node (type: "selector") picks one element from an array input.
+
+jsoncopy
+
+1{2  "actions": [3    {4      "type": "node.add",5      "payload": {6        "id": "pick_first",7        "type": "selector",8        "position": { "x": 400, "y": 0 },9        "data": {10          "utility": {11            "preset": "selector",12            "selector": { "field": "items", "mode": "first" }13          }14        }15      }16    },17    {18      "type": "node.set_input",19      "payload": {20        "node_id": "pick_first",21        "input_key": "items",22        "input": { "connection": { "nodeId": "list_apps", "key": "results", "type": "array" } }23      }24    }25  ]26}
+
+SelectorConfig fields
+
+ | Field | Type | Description
+
+ | field | string | Input key on the selector node that holds the array
+
+ | mode | string | first, last, or index
+
+ | index | number | Zero-based index, used when mode is index. Defaults to 0
+
+Modes
+
+ | Mode | Generated expression
+
+ | first | input.<field>[0]
+
+ | last | input.<field>[size(input.<field>) - 1]
+
+ | index | input.<field>[<index>]
+
+Any other mode value selects the first element. This includes random, which the v2 editor offers.
+
+If the field is missing, is not an array, or the index is out of range (including an empty array), the expression fails and the node is marked failed. A selector is not exempt from run failure, so the run ends as failed.
+
+When the selector config is omitted, the node passes its whole input map through as its value.
+
+Read the selected element downstream with connection key "value" (see Utility node output):
+
+jsoncopy
+
+1{2  "type": "node.set_input",3  "payload": {4    "node_id": "process_item",5    "input_key": "item",6    "input": { "connection": { "nodeId": "pick_first", "key": "value", "type": "object" } }7  }8}
+
+Merge nodes
+
+A merge node (type: "merge") joins parallel branches. It runs when all of its upstream nodes have completed, and stores its resolved inputs map as its value. It does not combine the inputs into a new object.
+
+Wire each branch to a distinct input key:
+
+jsoncopy
+
+1{2  "actions": [3    {4      "type": "node.add",5      "payload": { "id": "join", "type": "merge", "position": { "x": 600, "y": 0 }, "data": {} }6    },7    {8      "type": "node.set_input",9      "payload": {10        "node_id": "join",11        "input_key": "branch_a",12        "input": { "connection": { "nodeId": "step_a", "key": "output", "type": "object" } }13      }14    },15    {16      "type": "node.set_input",17      "payload": {18        "node_id": "join",19        "input_key": "branch_b",20        "input": { "connection": { "nodeId": "step_b", "key": "output", "type": "object" } }21      }22    }23  ]24}
+
+Downstream nodes connect to the merge node with key "value" for the full inputs map, or with an input key (for example "branch_a") for one branch.
+
+Constant nodes
+
+A constant node (type: "constant") emits a value at run time. Set utility.preset to "constant".
+
+Fixed value
+
+Set utility.constant to the value:
+
+jsoncopy
+
+1{2  "actions": [3    {4      "type": "node.add",5      "payload": {6        "id": "default_label",7        "type": "constant",8        "position": { "x": 400, "y": 0 },9        "data": { "utility": { "preset": "constant", "constant": "approved" } }10      }11    }12  ]13}
+
+constant accepts a string, number, or boolean. A string is emitted as a quoted CEL string and other values as CEL literals. An omitted or null constant emits an empty string.
+
+Random value
+
+Set utility.random to true to emit a random integer in [random_min, random_max) instead of evaluating CEL. Bounds default to 0 and 1000000 when omitted:
+
+jsoncopy
+
+1{2  "actions": [3    {4      "type": "node.add",5      "payload": {6        "id": "random_seed",7        "type": "constant",8        "position": { "x": 400, "y": 0 },9        "data": {10          "utility": {11            "preset": "constant",12            "random": true,13            "random_min": 1,14            "random_max": 10015          }16        }17      }18    }19  ]20}
+
+When random is true, constant is ignored. The v2 flow editor writes random, random_min, and random_max when you choose random mode on a constant node.
+
+Read the value downstream with connection key "value", or map it to a flow output with sourceFieldPath: "value".
+
+Utility nodes (custom CEL)
+
+A utility node (type: "utility") evaluates a custom CEL expression against its inputs. Set utility.expression:
+
+jsoncopy
+
+1{2  "actions": [3    {4      "type": "node.add",5      "payload": {6        "id": "check_score",7        "type": "utility",8        "position": { "x": 400, "y": 0 },9        "data": { "utility": { "expression": "input.score > 0.8" } }10      }11    },12    {13      "type": "node.set_input",14      "payload": {15        "node_id": "check_score",16        "input_key": "score",17        "input": { "connection": { "nodeId": "classifier", "key": "confidence", "type": "number" } }18      }19    }20  ]21}
+
+The expression result is stored in node_outputs and the node completes, whatever the result is. Only gates treat a false result as a stop. A utility node with no config passes its input map through.
+
+The CLI has no dedicated subcommand for utility nodes. Use belt flow edit actions <ref> [json] with the actions above.
+
+Duplicate flow
+
+POST /flows/{id}/duplicate
+
+Creates a copy of the flow. Requires flows:write. Returns the new Flow object.
+
+JavaScript SDK
+
+typescriptcopy
+
+1const copy = await client.flows.duplicate('flow_abc123');
+
+Deploy as app
+
+POST /flows/{id}/app
+
+Creates a deployed app from the flow's published graph. Requires flows:write. Returns an App object.
+
+Same outcome as Deploy as App in the web app. See Deploying as App.
+
+JavaScript SDK
+
+typescriptcopy
+
+1const app = await client.flows.createApp('flow_abc123');
+
+Stream updates
+
+Real-time SSE for flow editor state and per-node task updates during development runs.
+
+ | Endpoint | Scope | Description
+
+ | GET /flows/{id}/stream | flows:read | Flow definition and draft graph updates
+
+ | GET /flows/{id}/tasks/stream | flows:read | Task updates for nodes in the flow
+
+Send Accept: text/event-stream. Event format matches Streaming API.
+
+JavaScript SDK
+
+typescriptcopy
+
+1const source = client.flows.stream('flow_abc123');
+
+For streaming flow run execution (after POST /flowruns), use Flow Runs streaming instead.
+
+Related
+
+→ Flow Runs API — execute flows, cancel runs, clone from a run
+→ Tasks API — parent task status, logs, and cost for completed runs
+→ Apps API — manage the app created by POST /flows/{id}/app
+→ REST overview — authentication and response format

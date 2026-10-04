@@ -1,0 +1,157 @@
+Manage publications — the configuration that makes an agent embeddable on external sites.
+
+The Publish tab in the web app uses these endpoints. After publishing, visitors can chat via the hosted iframe or the Embed API without API keys. Your workspace pays for inference.
+
+→ Publishing and embedding agents: web app workflow, origins, themes, and iframe snippets
+
+Authentication
+
+ | Scope | Access
+
+ | agents:read | List and get publications
+
+ | agents:write | Create, update, and delete publications
+
+Create keys in settings → workspace → api keys. You must have write permission on the agent being published. The API enforces ownership in the service layer.
+
+Publication object
+
+ | Field | Type | Description
+
+ | id | string | Publication ID
+
+ | resource_type | string | Resource kind (agent is the only supported value today)
+
+ | resource_id | string | Agent ID
+
+ | namespace | string | Agent namespace (set from the agent on create)
+
+ | name | string | Agent name (set from the agent on create)
+
+ | allowed_origins | string[] | Origins allowed to embed or call the embed API. Empty = all origins.
+
+ | rate_limit_rpm | number | Optional per-publication rate limit (requests per minute)
+
+ | theme | object | Optional light / dark color tokens for the embed UI
+
+ | label | string | Optional display label
+
+ | enabled | boolean | Whether the publication is active
+
+Theme colors (theme.light, optional theme.dark):
+
+ | Field | Description
+
+ | primary | Primary accent color
+
+ | secondary | Secondary accent color
+
+ | background | Chat background
+
+ | text | Body text color
+
+ | border | Border color (optional)
+
+List publications for a resource
+
+GET /publications?resource_type=agent&resource_id={agentId}
+
+Returns all publications for the given resource (including disabled). Requires agents:read.
+
+Both query parameters are required.
+
+bashcopy
+
+1curl "https://api.inference.sh/publications?resource_type=agent&resource_id=agent_abc123" \2  -H "Authorization: Bearer inf_your_key"
+
+Get publication
+
+GET /publications/{id}
+
+Returns a single publication by ID. Requires agents:read.
+
+bashcopy
+
+1curl https://api.inference.sh/publications/pub_abc123 \2  -H "Authorization: Bearer inf_your_key"
+
+Create publication
+
+POST /publications
+
+Publishes an agent. Requires agents:write and write access to the agent.
+
+Request
+
+ | Field | Type | Required | Description
+
+ | resource_type | string | Yes | agent
+
+ | resource_id | string | Yes | Agent ID to publish
+
+ | allowed_origins | string[] | No | Origin allowlist (default: allow all)
+
+ | theme | object | No | Embed UI branding colors
+
+ | label | string | No | Optional label
+
+ | rate_limit_rpm | number | No | Optional rate limit
+
+namespace and name are populated from the agent. New publications are created with enabled: true.
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/publications \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "resource_type": "agent",6    "resource_id": "agent_abc123",7    "allowed_origins": ["https://example.com"]8  }'
+
+Errors
+
+ | HTTP | When
+
+ | 400 | Invalid body, agent not found, or insufficient permission on the agent
+
+ | 403 | API key lacks agents:write scope
+
+Update publication
+
+PUT /publications/{id}
+
+Update origins, theme, label, rate limit, or other fields. Requires agents:write.
+
+Send the fields you want to persist (the web app sends the full publication object).
+
+bashcopy
+
+1curl -X PUT https://api.inference.sh/publications/pub_abc123 \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "allowed_origins": ["https://example.com", "https://app.example.com"],6    "theme": {7      "light": {8        "primary": "#000000",9        "secondary": "#666666",10        "background": "#ffffff",11        "text": "#000000"12      }13    }14  }'
+
+Delete publication
+
+DELETE /publications/{id}
+
+Unpublish an agent (removes the publication record). Requires agents:write.
+
+bashcopy
+
+1curl -X DELETE https://api.inference.sh/publications/pub_abc123 \2  -H "Authorization: Bearer inf_your_key"
+
+Response
+
+jsoncopy
+
+1{ "deleted": true }
+
+After publishing
+
+ | Surface | URL / path
+
+ | Hosted iframe | https://app.inference.sh/embed/agents/{namespace}/{name}
+
+ | Embed API | GET /embed/agents/{namespace}/{name}, POST /embed/agents/run, …
+
+See Embed API for anonymous chat endpoints and Publishing for origin rules and host-page context.
+
+Related
+
+Publishing and embedding agents
+
+Embed API
+
+Agents API
