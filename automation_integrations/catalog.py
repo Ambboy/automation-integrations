@@ -97,7 +97,12 @@ class Catalog:
     def context(self):
         data = self.load()
         rows = [f"- {s['id']}: {s['name']} — {s['summary']}" for s in data['services']]
-        return ('Доступные интеграции Грейфа, реестр ' + data['version'] + '.\n'
+        heading = 'Доступные интеграции ' + data.get('agent_name', 'Грейфа') + ', реестр ' + data['version'] + '.\n'
+        if 'instructions' in data:
+            if not isinstance(data['instructions'], str) or not data['instructions'].strip():
+                raise ValueError('invalid_catalog_instructions')
+            return heading + data['instructions'] + '\n' + '\n'.join(rows)
+        return (heading +
                 'Перед поиском нового способа работы с этими ресурсами вызови integration_catalog '
                 'и используй существующие операции integration_read. Поиск работает по задаче, '
                 'даже если пользователь не назвал сервис. Не проси ключ заново только из-за '

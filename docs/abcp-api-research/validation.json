@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-10-05T21:41:09.043647+00:00",
+  "command": "python3 docs/abcp-api-research/verify_catalog.py",
+  "exit_code": 0,
+  "test_count": 17,
+  "result": "passed",
+  "stdout": "",
+  "stderr": "test_binary_export_and_empty_chat (__main__.CatalogTest.test_binary_export_and_empty_chat) ... ok\ntest_capability_parity_and_no_unverified_claim (__main__.CatalogTest.test_capability_parity_and_no_unverified_claim) ... ok\ntest_credentials_not_agent_parameters (__main__.CatalogTest.test_credentials_not_agent_parameters) ... ok\ntest_families (__main__.CatalogTest.test_families) ... ok\ntest_full_baseline (__main__.CatalogTest.test_full_baseline) ... ok\ntest_garage_admin_prose_and_json_strings (__main__.CatalogTest.test_garage_admin_prose_and_json_strings) ... ok\ntest_get_payment_links_are_guarded (__main__.CatalogTest.test_get_payment_links_are_guarded) ... ok\ntest_ids_and_paths (__main__.CatalogTest.test_ids_and_paths) ... ok\ntest_json_exception (__main__.CatalogTest.test_json_exception) ... ok\ntest_nested_request_and_additional_filters (__main__.CatalogTest.test_nested_request_and_additional_filters) ... ok\ntest_partial_commit_is_explicit (__main__.CatalogTest.test_partial_commit_is_explicit) ... ok\ntest_post_reads (__main__.CatalogTest.test_post_reads) ... ok\ntest_public_credential_recovery_and_archive (__main__.CatalogTest.test_public_credential_recovery_and_archive) ... ok\ntest_scalar_request_fields_not_response_models (__main__.CatalogTest.test_scalar_request_fields_not_response_models) ... ok\ntest_snapshot_integrity (__main__.CatalogTest.test_snapshot_integrity) ... ok\ntest_upload_credentials_and_file_schema (__main__.CatalogTest.test_upload_credentials_and_file_schema) ... ok\ntest_vinqu_hash_alias (__main__.CatalogTest.test_vinqu_hash_alias) ... ok\n\n----------------------------------------------------------------------\nRan 17 tests in 0.023s\n\nOK\n",
+  "artifacts": {
+    "registry/contracts/abcp.json": "608b951672b457fcfa076879ed1012e15048662862fef94f9ab92b94f200ebcd",
+    "registry/capabilities/abcp.json": "f3d9f083bcf8100d216243482992ee45e50e7f9556893c7c76c85e69e5761ea4"
+  }
+}

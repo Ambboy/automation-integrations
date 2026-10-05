@@ -1,5 +1,9 @@
 # Automation Integrations
 
+Добавлен коннектор ABCP: 287 документированных методов, отдельный runtime,
+чтение и подтверждаемая запись через штатный внешний плагин Hermes.
+Установка и ограничения — [ABCP_CONNECTOR.md](docs/ABCP_CONNECTOR.md).
+
 Актуальное дополнение 04.10.2026: в Грайфе на Kronstadt установлен API-плагин
 0.8.0 с fal.ai и inference.sh. Полный реестр, проверки, расходы и откат —
 [GREIF_MEDIA_CONNECTORS.md](docs/GREIF_MEDIA_CONNECTORS.md). Inference прошёл

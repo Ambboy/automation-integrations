@@ -1,0 +1,288 @@
+family,method,path,title,source,verification
+abcp-client,GET,/advices,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,POST,/advices/batch,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/articles/brands,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/articles/info,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,POST,/basket/add,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,POST,/basket/clear,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/basket/content,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/basket/multibasket,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/basket/options,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,POST,/basket/order,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/basket/paymentMethods,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,POST,/basket/shipmentAddress,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/basket/shipmentAddresses,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/basket/shipmentDates,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/basket/shipmentMethods,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/basket/shipmentOffices,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/carbase/manufacturers,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/carbase/models,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/carbase/modificationInfo,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/carbase/modifications,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/cartree/manufacturers,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/cartree/models,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/cartree/modifications,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/cartree/years,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/form/fields,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/orders,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,POST,/orders/cancelPosition,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,POST,/orders/instant,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/orders/list,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/orders/statuses,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/orders/version,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/search/articles,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,POST,/search/batch,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/search/brands,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/search/history,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/search/tips,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,POST,/user/activation,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/user/garage,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,POST,/user/garage/add,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/user/garage/car,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,POST,/user/garage/delete,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,POST,/user/garage/update,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,GET,/user/info,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,POST,/user/new,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp-client,POST,/user/restore,,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client,documented_only
+abcp1-admin,GET,/cp/actionsHistory,Получение данных из истории операций,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-данных-из-истории-операций,documented_only
+abcp1-admin,GET,/cp/articles/brandGroups,Получение справочника групп брендов,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-справочника-групп-брендов,documented_only
+abcp1-admin,GET,/cp/articles/brands,Получение справочника брендов,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-справочника-брендов,documented_only
+abcp1-admin,POST,/cp/articles/info/batch,Пакетное получение информации об артикулах,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#пакетное-получение-информации-об-артикулах,documented_only
+abcp1-admin,GET,/cp/catalog/info,Получение информации по одному каталогу,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-информации-по-одному-каталогу,documented_only
+abcp1-admin,POST,/cp/catalog/search,Получение списка артикулов по переданным значениям фильтров,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-списка-артикулов-по-переданным-значениям-фильтров,documented_only
+abcp1-admin,POST,/cp/distributor,Сохранение информации о поставщике,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#сохранение-информации-о-поставщике,documented_only
+abcp1-admin,POST,/cp/distributor/copy,Копирование поставщика,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#копирование-поставщика,documented_only
+abcp1-admin,POST,/cp/distributor/delete,Удаление/отключение поставщика,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#удалениеотключение-поставщика,documented_only
+abcp1-admin,POST,/cp/distributor/pricelistUpdate,Загрузка прайс-листа поставщика,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#загрузка-прайс-листа-поставщика,documented_only
+abcp1-admin,POST,/cp/distributor/status,Изменение статуса поставщика,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#изменение-статуса-поставщика,documented_only
+abcp1-admin,GET,/cp/distributors,Получение списка поставщиков,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-списка-поставщиков,documented_only
+abcp1-admin,GET,/cp/distributors/notes,Получение акций,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-акций,documented_only
+abcp1-admin,POST,/cp/distributors/notes,Редактирование акций,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#редактирование-акций,documented_only
+abcp1-admin,POST,/cp/finance/creditLimit,Обновление лимита кредита клиента,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#обновление-лимита-кредита-клиента,documented_only
+abcp1-admin,POST,/cp/finance/deleteLinkPayments,Удаление привязки оплаты,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#удаление-привязки-оплаты,documented_only
+abcp1-admin,POST,/cp/finance/deletePayments,Операция удаления оплат,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#операция-удаления-оплат,documented_only
+abcp1-admin,POST,/cp/finance/paymentOrderLink,Операция привязки по ранее добавленному платежу,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#операция-привязки-по-ранее-добавленному-платежу,documented_only
+abcp1-admin,GET,/cp/finance/paymentOrderLinks,Получение информации о привязках платежей из модуля Финансы,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-информации-о-привязках-платежей-из-модуля-финансы,documented_only
+abcp1-admin,POST,/cp/finance/paymentRefund,Операция возврата платежа,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#операция-возврата-платежа,documented_only
+abcp1-admin,GET,/cp/finance/payments,Получение информации об оплатах из фин. модуля,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-информации-об-оплатах-из-фин-модуля,documented_only
+abcp1-admin,POST,/cp/finance/payments,Добавление оплат,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#добавление-оплат,documented_only
+abcp1-admin,POST,/cp/finance/userBalance,Обновление баланса клиента,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#обновление-баланса-клиента,documented_only
+abcp1-admin,POST,/cp/finance/userInfo,Обновление финансовой информации клиента,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#обновление-финансовой-информации-клиента,documented_only
+abcp1-admin,GET,/cp/garage,Получение списка обновлённых автомобилей в гараже,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-списка-обновлённых-автомобилей-в-гараже,documented_only
+abcp1-admin,POST,/cp/manager,Обновление данных сотрудника,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#обновление-данных-сотрудника,documented_only
+abcp1-admin,GET,/cp/managers,Получение списка сотрудников,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-списка-сотрудников,documented_only
+abcp1-admin,GET,/cp/offices,Получение поставщиков офиса,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-поставщиков-офиса,documented_only
+abcp1-admin,POST,/cp/offices,Подключение поставщиков к офису,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#подключение-поставщиков-к-офису,documented_only
+abcp1-admin,GET,/cp/onlinePayments,Получение списка online платежей,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-списка-online-платежей,documented_only
+abcp1-admin,GET,/cp/order,Получение информации о заказе,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-информации-о-заказе,documented_only
+abcp1-admin,POST,/cp/order,Сохранение заказа,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#сохранение-заказа,documented_only
+abcp1-admin,POST,/cp/order/merge,Объединение заказов,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#объединение-заказов,documented_only
+abcp1-admin,GET,/cp/order/statusHistory,Получение истории изменений статуса позиции заказа,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-истории-изменений-статуса-позиции-заказа,documented_only
+abcp1-admin,GET,/cp/orders,Получение списка заказов,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-списка-заказов,documented_only
+abcp1-admin,POST,/cp/orders/fromArchive,Достать заказ из архива,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#пакетное-получение-истории-изменений-статусов-позиций-заказов,documented_only
+abcp1-admin,GET,/cp/orders/online,Получение параметров для отправки online-заказа поставщику,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-параметров-для-отправки-online-заказа-поставщику,documented_only
+abcp1-admin,POST,/cp/orders/online,Отправка online-заказа поставщику,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#отправка-online-заказа-поставщику,documented_only
+abcp1-admin,GET,/cp/orders/statusHistory,Пакетное получение истории изменений статусов позиций заказов,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#пакетное-получение-истории-изменений-статусов-позиций-заказов,documented_only
+abcp1-admin,POST,/cp/orders/toArchive,Вернуть заказ в архив,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#пакетное-получение-истории-изменений-статусов-позиций-заказов,documented_only
+abcp1-admin,GET,/cp/payment/token,Получение ссылки на оплату заказа,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-ссылки-на-оплату-заказа,documented_only
+abcp1-admin,GET,/cp/payment/top-balance-link,Получение ссылки на пополнение баланса,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-ссылки-на-пополнение-баланса,documented_only
+abcp1-admin,GET,/cp/payments/getPaymentMethodSettings,Получение списка настроек платёжных систем,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-списка-настроек-платёжных-систем,documented_only
+abcp1-admin,POST,/cp/productCards,Добавление / обновление карточки товара,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#добавление--обновление-карточки-товара,documented_only
+abcp1-admin,POST,/cp/productCards/delete,Удаление карточки товара,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#удаление-карточки-товара,documented_only
+abcp1-admin,POST,/cp/productCards/export,Экспорт карточек товаров в файл,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#экспорт-карточек-товаров-в-файл,documented_only
+abcp1-admin,GET,/cp/productCards/export/file,Получение файла экспорта,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-файла-экспорта,documented_only
+abcp1-admin,GET,/cp/productCards/file/status,Получение статуса задачи (импорт / экспорт),https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-статуса-задачи-импорт--экспорт,documented_only
+abcp1-admin,POST,/cp/productCards/import,Импорт карточек товаров файлом,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#импорт-карточек-товаров-файлом,documented_only
+abcp1-admin,GET,/cp/productCards/search,Поиск карточек товаров,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#поиск-карточек-товаров,documented_only
+abcp1-admin,GET,/cp/requisites,Получение списка реквизитов,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-списка-реквизитов,documented_only
+abcp1-admin,POST,/cp/route,Обновление данных маршрута поставщика,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#обновление-данных-маршрута-поставщика,documented_only
+abcp1-admin,POST,/cp/route/create,Создание маршрута поставщика,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#создание-маршрута-поставщика,documented_only
+abcp1-admin,POST,/cp/route/delete,Удаление маршрута поставщика,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#удаление-маршрута-поставщика,documented_only
+abcp1-admin,GET,/cp/routes,Получение списка маршрутов поставщика,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-списка-маршрутов-поставщика,documented_only
+abcp1-admin,POST,/cp/routes/status,Изменение статуса маршрута поставщика,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#изменение-статуса-маршрута-поставщика,documented_only
+abcp1-admin,GET,/cp/statuses,Получение списка статусов,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-списка-статусов,documented_only
+abcp1-admin,POST,/cp/user,Обновление данных пользователя,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#обновление-данных-пользователя,documented_only
+abcp1-admin,POST,/cp/user/new,Создание пользователя,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#создание-пользователя,documented_only
+abcp1-admin,GET,/cp/user/options,Получение клиентских опций,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-клиентских-опций,documented_only
+abcp1-admin,POST,/cp/user/options,Редактирование клиентских опций,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#редактирование-клиентских-опций,documented_only
+abcp1-admin,GET,/cp/user/shipmentAddressZones,Получение списка зон адресов доставки,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-списка-зон-адресов-доставки,documented_only
+abcp1-admin,POST,/cp/user/shipmentAddressZones,Сохранение зон адресов доставки,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#сохранение-зон-адресов-доставки,documented_only
+abcp1-admin,POST,/cp/user/shipmentAddressZones/new,Создание новой зоны адресов доставки,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#создание-новой-зоны-адресов-доставки,documented_only
+abcp1-admin,GET,/cp/user/shipmentAddressZones/{id},Получение одной зоны адресов доставки,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-одной-зоны-адресов-доставки,documented_only
+abcp1-admin,POST,/cp/user/shipmentAddressZones/{id}/delete,Удаление зоны адресов доставки,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#удаление-зоны-адресов-доставки,documented_only
+abcp1-admin,POST,/cp/user/shipmentAddressZones/{id}/update,Обновление зоны адресов доставки,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#обновление-зоны-адресов-доставки,documented_only
+abcp1-admin,GET,/cp/user/shipmentAddresses,Получение списка адресов доставки,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-списка-адресов-доставки,documented_only
+abcp1-admin,GET,/cp/user/smsSettings,Получение клиентских настроек SMS,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-клиентских-настроек-sms,documented_only
+abcp1-admin,GET,/cp/usercatalogs/{catalogId}/tasks/{taskId}/status,Статус импорта/экспорта каталога,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#статус-импортаэкспорта-каталога,documented_only
+abcp1-admin,POST,/cp/usercatalogs/{catalogId}/upload,Импорт каталога из файла,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#импорт-каталога-из-файла,documented_only
+abcp1-admin,GET,/cp/users,Получение списка пользователей,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-списка-пользователей,documented_only
+abcp1-admin,GET,/cp/users/garage,Получение автомобилей из гаража пользователя,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-автомобилей-из-гаража-пользователя,documented_only
+abcp1-admin,POST,/cp/users/profile,Обновление профиля,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#обновление-профиля,documented_only
+abcp1-admin,GET,/cp/users/profiles,Получение списка профилей,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-списка-профилей,documented_only
+abcp1-admin,GET,/komtet/getChecks,Получение списка чеков,https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-списка-чеков,documented_only
+carcare,GET,/car-cares/,,https://www.abcp.ru/d/docs/carcare/carcaremodule/api,documented_only
+carcare,GET,/reservation/,,https://www.abcp.ru/d/docs/carcare/carcaremodule/api,documented_only
+carcare,POST,/reservation/delete/,,https://www.abcp.ru/d/docs/carcare/carcaremodule/api,documented_only
+carcare,POST,/reservation/edit/,,https://www.abcp.ru/d/docs/carcare/carcaremodule/api,documented_only
+carcare,POST,/reservation/insert/,,https://www.abcp.ru/d/docs/carcare/carcaremodule/api,documented_only
+carcare,GET,/schedule/free/,,https://www.abcp.ru/d/docs/carcare/carcaremodule/api,documented_only
+ts-admin,GET,/cp/ts/agreements/list,Получение списка договоров,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-договоров,documented_only
+ts-admin,POST,/cp/ts/cart/clear,Очистка корзины,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#очистка-корзины,documented_only
+ts-admin,POST,/cp/ts/cart/create,Добавление позиции в корзину,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#добавление-позиции-в-корзину,documented_only
+ts-admin,POST,/cp/ts/cart/deletePositions,Удаление позиций корзины,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#удаление-позиций-корзины,documented_only
+ts-admin,GET,/cp/ts/cart/exist,Проверка наличия позиции в корзине,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#проверка-наличия-позиции-в-корзине,documented_only
+ts-admin,GET,/cp/ts/cart/list,Получение списка позиций в корзине,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-позиций-в-корзине,documented_only
+ts-admin,GET,/cp/ts/cart/summary,Получение суммарной информации по позициям корзины,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-суммарной-информации-по-позициям-корзины,documented_only
+ts-admin,POST,/cp/ts/cart/transfer,Передача позиций корзины гостя клиенту,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#передача-позиций-корзины-гостя-клиенту,documented_only
+ts-admin,POST,/cp/ts/cart/update,Обновление позиции в корзине,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#обновление-позиции-в-корзине,documented_only
+ts-admin,POST,/cp/ts/customerComplaints/changeStatusPosition,Изменение статуса позиции возврата покупателя,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#изменение-статуса-позиции-возврата-покупателя,documented_only
+ts-admin,POST,/cp/ts/customerComplaints/create,Создание возврата покупателя,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#создание-возврата-покупателя,documented_only
+ts-admin,POST,/cp/ts/customerComplaints/createPosition,Создание позиции возврата покупателя,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#создание-позиции-возврата-покупателя,documented_only
+ts-admin,POST,/cp/ts/customerComplaints/createPositionMultiple,Пакетное создание позиций возврата покупателя,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#пакетное-создание-позиций-возврата-покупателя,documented_only
+ts-admin,GET,/cp/ts/customerComplaints/get,Получение списка возвратов покупателя,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-возвратов-покупателя,documented_only
+ts-admin,GET,/cp/ts/customerComplaints/getPositions,Получение списка позиций операции возврата покупателя,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-позиций-операции-возврата-покупателя,documented_only
+ts-admin,POST,/cp/ts/customerComplaints/update,Обновление информации в возврате покупателя,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#обновление-информации-в-возврате-покупателя,documented_only
+ts-admin,POST,/cp/ts/customerComplaints/updateCustomFile,Обновление файла в возврате покупателя,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#обновление-файла-в-возврате-покупателя,documented_only
+ts-admin,POST,/cp/ts/customerComplaints/updatePosition,Обновление позиции возврата покупателя,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#обновление-позиции-возврата-покупателя,documented_only
+ts-admin,POST,/cp/ts/delivery/changeStatus,Изменение статуса доставки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#изменение-статуса-доставки,documented_only
+ts-admin,POST,/cp/ts/delivery/createByPos,Создание доставки для позиций клиентского заказа,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#создание-доставки-для-позиций-клиентского-заказа,documented_only
+ts-admin,GET,/cp/ts/delivery/list,Получение списка доставок,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-доставок,documented_only
+ts-admin,POST,/cp/ts/delivery/update,Обновление доставки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#обновление-доставки,documented_only
+ts-admin,GET,/cp/ts/deliveryMethod/forCo,Получение доступных способов доставки по позициям корзины,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-доступных-способов-доставки-по-позициям-корзины,documented_only
+ts-admin,GET,/cp/ts/deliveryMethod/list,Получение списка способов доставки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-способов-доставки,documented_only
+ts-admin,GET,/cp/ts/distributorOwners,Получение привязанного контрагента,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-привязанного-контрагента,documented_only
+ts-admin,POST,/cp/ts/distributorOwners/create,Создание привязки контрагента к поставщику,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#создание-привязки-контрагента-к-поставщику,documented_only
+ts-admin,POST,/cp/ts/distributorOwners/delete,Удаление привязки контрагента к поставщику,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#удаление-привязки-контрагента-к-поставщику,documented_only
+ts-admin,POST,/cp/ts/goodReceipts/changeStatus,Операция изменения статуса приёмки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-изменения-статуса-приёмки,documented_only
+ts-admin,POST,/cp/ts/goodReceipts/create,Операция создания приёмки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-создания-приёмки,documented_only
+ts-admin,POST,/cp/ts/goodReceipts/createPosition,Операция создания позиции приёмки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-создания-позиции-приёмки,documented_only
+ts-admin,POST,/cp/ts/goodReceipts/createPositionBuImage,Добавление изображения к позиции с износом (б/у),https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#добавление-изображения-к-позиции-с-износом-бу,documented_only
+ts-admin,POST,/cp/ts/goodReceipts/delete,Операция удаления приёмки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-удаления-приёмки,documented_only
+ts-admin,POST,/cp/ts/goodReceipts/deletePosition,Операция удаления позиции приёмки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-удаления-позиции-приёмки,documented_only
+ts-admin,POST,/cp/ts/goodReceipts/deletePositionBuImage,Удаление изображения позиции с износом (б/у),https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#удаление-изображения-позиции-с-износом-бу,documented_only
+ts-admin,GET,/cp/ts/goodReceipts/get,Получение списка операций приёмка,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-операций-приёмка,documented_only
+ts-admin,GET,/cp/ts/goodReceipts/getPosition,Операция получения позиции приёмки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-получения-позиции-приёмки,documented_only
+ts-admin,GET,/cp/ts/goodReceipts/getPositions,Получение списка позиций приёмки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-позиций-приёмки,documented_only
+ts-admin,POST,/cp/ts/goodReceipts/positionsChangeStatus,Операция смены статуса позиции приёмки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-смены-статуса-позиции-приёмки,documented_only
+ts-admin,POST,/cp/ts/goodReceipts/update,Операция изменения приёмки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-изменения-приёмки,documented_only
+ts-admin,POST,/cp/ts/goodReceipts/updatePosition,Операция изменения позиции приёмки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-изменения-позиции-приёмки,documented_only
+ts-admin,GET,/cp/ts/legalPersons/list,Получение списка юридических лиц,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-юридических-лиц,documented_only
+ts-admin,GET,/cp/ts/logs/read,Получение списка действий,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-действий,documented_only
+ts-admin,POST,/cp/ts/orderPickings/changeStatus,Изменение статуса операции отгрузка,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#изменение-статуса-операции-отгрузка,documented_only
+ts-admin,POST,/cp/ts/orderPickings/createByOldPos,Создание операции отгрузки по клиентскому заказу,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#создание-операции-отгрузки-по-клиентскому-заказу,documented_only
+ts-admin,POST,/cp/ts/orderPickings/deletePosition,Удаление позиции товара из операции отгрузки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#удаление-позиции-товара-из-операции-отгрузки,documented_only
+ts-admin,POST,/cp/ts/orderPickings/fastGetOut,"Операция быстрого создания приёмки, брони, отгрузки",https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-быстрого-создания-приёмки-брони-отгрузки,documented_only
+ts-admin,GET,/cp/ts/orderPickings/get,Получение списка операций отгрузка (расход),https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-операций-отгрузка-расход,documented_only
+ts-admin,GET,/cp/ts/orderPickings/getGoods,Получение списка позиций товаров операции отгрузки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-позиций-товаров-операции-отгрузки,documented_only
+ts-admin,POST,/cp/ts/orderPickings/markCodes/add,Добавление кодов маркировки к позиции операции отгрузки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#добавление-кодов-маркировки-к-позиции-операции-отгрузки,documented_only
+ts-admin,POST,/cp/ts/orderPickings/markCodes/delete,Удаление кодов маркировки у позиции операции отгрузки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#удаление-кодов-маркировки-у-позиции-операции-отгрузки,documented_only
+ts-admin,GET,/cp/ts/orderPickings/markCodes/list,Получение списка кодов маркировки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-кодов-маркировки,documented_only
+ts-admin,POST,/cp/ts/orderPickings/update,Изменение операции отгрузка,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#изменение-операции-отгрузка,documented_only
+ts-admin,POST,/cp/ts/orders/create,Создание заказа,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#создание-заказа,documented_only
+ts-admin,POST,/cp/ts/orders/createByCart,Создание заказа по позициям корзины,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#создание-заказа-по-позициям-корзины,documented_only
+ts-admin,GET,/cp/ts/orders/get,Получение одного заказа,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-одного-заказа,documented_only
+ts-admin,GET,/cp/ts/orders/list,Получение списка заказов,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-заказов-1,documented_only
+ts-admin,POST,/cp/ts/orders/merge,Объединение заказов,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#объединение-заказов,documented_only
+ts-admin,POST,/cp/ts/orders/messages/create,Создание сообщения,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#создание-сообщения-1,documented_only
+ts-admin,POST,/cp/ts/orders/messages/delete,Удаление сообщения,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#удаление-сообщения-1,documented_only
+ts-admin,GET,/cp/ts/orders/messages/get,Получение одного сообщения,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-одного-сообщения-1,documented_only
+ts-admin,GET,/cp/ts/orders/messages/list,Получение списка сообщений,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-сообщений-1,documented_only
+ts-admin,POST,/cp/ts/orders/messages/update,Редактирование сообщения,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#редактирование-сообщения-1,documented_only
+ts-admin,POST,/cp/ts/orders/refuse,Отказ от заказа,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#отказ-от-заказа,documented_only
+ts-admin,POST,/cp/ts/orders/reprice,Изменение суммы заказа,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#изменение-суммы-заказа,documented_only
+ts-admin,POST,/cp/ts/orders/split,Разделение заказа,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#разделение-заказа,documented_only
+ts-admin,POST,/cp/ts/orders/update,Обновление заказа,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#обновление-заказа,documented_only
+ts-admin,GET,/cp/ts/paymentMethods/list,Получение списка способов оплаты,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-способов-оплаты,documented_only
+ts-admin,POST,/cp/ts/payments/create,Создание платежа,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#создание-платежа,documented_only
+ts-admin,GET,/cp/ts/payments/list,Получение списка платежей,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-платежей,documented_only
+ts-admin,POST,/cp/ts/payments/update,Обновление платежа,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#обновление-платежа,documented_only
+ts-admin,POST,/cp/ts/positions/cancel,Аннулирование позиции,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#аннулирование-позиции,documented_only
+ts-admin,POST,/cp/ts/positions/changeStatus,Массовая смена статуса позиций,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#массовая-смена-статуса-позиций,documented_only
+ts-admin,POST,/cp/ts/positions/create,Создание позиции,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#создание-позиции,documented_only
+ts-admin,POST,/cp/ts/positions/createMultiple,Создание нескольких позиций и добавление их в новый или существующий заказ,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#создание-нескольких-позиций-и-добавление-их-в-новый-или-существующий-заказ,documented_only
+ts-admin,GET,/cp/ts/positions/get,Получение одной позиции,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-одной-позиции,documented_only
+ts-admin,GET,/cp/ts/positions/list,Получение списка позиций,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-позиций,documented_only
+ts-admin,POST,/cp/ts/positions/massCancel,Массовое аннулирование позиций,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#массовое-аннулирование-позиций,documented_only
+ts-admin,POST,/cp/ts/positions/merge,Объединение позиций,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#объединение-позиций,documented_only
+ts-admin,POST,/cp/ts/positions/message/create,Создание сообщения,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#создание-сообщения-1,documented_only
+ts-admin,POST,/cp/ts/positions/message/delete,Удаление сообщения,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#удаление-сообщения-1,documented_only
+ts-admin,GET,/cp/ts/positions/message/get,Получение одного сообщения,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-одного-сообщения-1,documented_only
+ts-admin,GET,/cp/ts/positions/message/list,Получение списка сообщений,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-сообщений-1,documented_only
+ts-admin,POST,/cp/ts/positions/message/update,Редактирование сообщения,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#редактирование-сообщения-1,documented_only
+ts-admin,POST,/cp/ts/positions/split,Разделение позиции,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#разделение-позиции,documented_only
+ts-admin,POST,/cp/ts/positions/update,Обновление позиции,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#обновление-позиции,documented_only
+ts-admin,POST,/cp/ts/stockRemoval/changeStatus,Операция изменения статуса списания,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-изменения-статуса-списания,documented_only
+ts-admin,POST,/cp/ts/stockRemoval/create,Операция создания списания,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-создания-списания,documented_only
+ts-admin,POST,/cp/ts/stockRemoval/createPositionAttr,Операция добавления файла к позиции списания,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-добавления-файла-к-позиции-списания,documented_only
+ts-admin,POST,/cp/ts/stockRemoval/createPositions,Операция пакетного создания позиций списания,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-пакетного-создания-позиций-списания,documented_only
+ts-admin,POST,/cp/ts/stockRemoval/deletePosition,Операция удаления позиции списания,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-удаления-позиции-списания,documented_only
+ts-admin,POST,/cp/ts/stockRemoval/deletePositionAttr,Операция удаления файла у позиции списания,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-удаления-файла-у-позиции-списания,documented_only
+ts-admin,GET,/cp/ts/stockRemoval/getPositions,Операция получение позиций списания,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-получение-позиций-списания,documented_only
+ts-admin,GET,/cp/ts/stockRemoval/list,Получение списка операций списания,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-операций-списания,documented_only
+ts-admin,POST,/cp/ts/stockRemoval/update,Операция изменения списания,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-изменения-списания,documented_only
+ts-admin,POST,/cp/ts/stockRemoval/updatePosition,Операция изменения позиции списания,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-изменения-позиции-списания,documented_only
+ts-admin,POST,/cp/ts/stockRemoval/updatePositionAttr,Операция обновления файла у позиции списания,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-обновления-файла-у-позиции-списания,documented_only
+ts-admin,POST,/cp/ts/supplierOrders/orders/list,Получение списка заказов,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-заказов-1,documented_only
+ts-admin,POST,/cp/ts/supplierOrders/positions/list,Получение списка позиций заказов,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-позиций-заказов,documented_only
+ts-admin,POST,/cp/ts/supplierReturns/operations/create,Создание возврата поставщику,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#создание-возврата-поставщику,documented_only
+ts-admin,POST,/cp/ts/supplierReturns/operations/delete,Удаление возврата поставщику,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#удаление-возврата-поставщику,documented_only
+ts-admin,GET,/cp/ts/supplierReturns/operations/get,Просмотр объекта возврата поставщику,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#просмотр-объекта-возврата-поставщику,documented_only
+ts-admin,GET,/cp/ts/supplierReturns/operations/list,Получение списка возвратов поставщику,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-возвратов-поставщику,documented_only
+ts-admin,GET,/cp/ts/supplierReturns/operations/sum,Получение сумм возвратов поставщику,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-сумм-возвратов-поставщику,documented_only
+ts-admin,POST,/cp/ts/supplierReturns/operations/update,Обновление возврата поставщику,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#обновление-возврата-поставщику,documented_only
+ts-admin,POST,/cp/ts/supplierReturns/positions/attr/create,Создание атрибута позиции возврата поставщику,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#создание-атрибута-позиции-возврата-поставщику,documented_only
+ts-admin,POST,/cp/ts/supplierReturns/positions/attr/delete,Удаление атрибута позиции возврата поставщику,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#удаление-атрибута-позиции-возврата-поставщику,documented_only
+ts-admin,POST,/cp/ts/supplierReturns/positions/attr/update,Обновление атрибута позиции возврата поставщику,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#обновление-атрибута-позиции-возврата-поставщику,documented_only
+ts-admin,POST,/cp/ts/supplierReturns/positions/changeStatus,Изменение статуса позиции возврата поставщику,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#изменение-статуса-позиции-возврата-поставщику,documented_only
+ts-admin,POST,/cp/ts/supplierReturns/positions/createMultiple,Создание позиций возврата поставщику,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#создание-позиций-возврата-поставщику,documented_only
+ts-admin,GET,/cp/ts/supplierReturns/positions/get,Просмотр объекта позиции возврата поставщику,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#просмотр-объекта-позиции-возврата-поставщику,documented_only
+ts-admin,GET,/cp/ts/supplierReturns/positions/list,Получение списка позиций возврата поставщику,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-позиций-возврата-поставщику,documented_only
+ts-admin,POST,/cp/ts/supplierReturns/positions/split,Разделение позиции возврата поставщику,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#разделение-позиции-возврата-поставщику,documented_only
+ts-admin,GET,/cp/ts/supplierReturns/positions/status,"Получение данных о количестве позиций, находящихся в не конечных статусах",https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-данных-о-количестве-позиций-находящихся-в-не-конечных-статусах,documented_only
+ts-admin,GET,/cp/ts/supplierReturns/positions/sum,Получение сумм позиций возврата поставщику,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-сумм-позиций-возврата-поставщику,documented_only
+ts-admin,POST,/cp/ts/supplierReturns/positions/update,Обновление позиции возврата поставщику,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#обновление-позиции-возврата-поставщику,documented_only
+ts-admin,POST,/cp/ts/tags/create,Операция создания тега,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-создания-тега,documented_only
+ts-admin,POST,/cp/ts/tags/delete,Операция удаления тега,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-удаления-тега-1,documented_only
+ts-admin,GET,/cp/ts/tags/list,Операция получения списка тегов,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-получения-списка-тегов,documented_only
+ts-admin,POST,/cp/ts/tagsRelationships/create,Операция создания связи тега,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-создания-связи-тега,documented_only
+ts-admin,POST,/cp/ts/tagsRelationships/delete,Операция удаления тега,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-удаления-тега-1,documented_only
+ts-admin,GET,/cp/ts/tagsRelationships/list,Операция получения списка связей тегов,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-получения-списка-связей-тегов,documented_only
+ts-admin,GET,/cp/ts/wmsLocations/list,Получение информации о ячейках склада,https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-информации-о-ячейках-склада,documented_only
+ts-client,GET,/ts/agreements/list,Получение списка договоров,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#получение-списка-договоров,documented_only
+ts-client,POST,/ts/cart/clear,Очистка корзины,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#очистка-корзины,documented_only
+ts-client,POST,/ts/cart/create,Добавление позиции в корзину,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#добавление-позиции-в-корзину,documented_only
+ts-client,POST,/ts/cart/deletePositions,Удаление позиций корзины,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#удаление-позиций-корзины,documented_only
+ts-client,GET,/ts/cart/exist,Проверка наличия позиции в корзине,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#проверка-наличия-позиции-в-корзине,documented_only
+ts-client,GET,/ts/cart/list,Получение списка позиций в корзине,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#получение-списка-позиций-в-корзине,documented_only
+ts-client,GET,/ts/cart/summary,Получение суммарной информации по позициям корзины,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#получение-суммарной-информации-по-позициям-корзины,documented_only
+ts-client,POST,/ts/cart/update,Обновление позиции в корзине,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#обновление-позиции-в-корзине,documented_only
+ts-client,POST,/ts/customerComplaints/cancelPosition,Отмена позиции возврата покупателя,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#отмена-позиции-возврата-покупателя,documented_only
+ts-client,POST,/ts/customerComplaints/create,Создание возврата покупателя,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#создание-возврата-покупателя,documented_only
+ts-client,POST,/ts/customerComplaints/createPositionMultiple,Пакетное создание позиций возврата покупателя,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#пакетное-создание-позиций-возврата-покупателя,documented_only
+ts-client,GET,/ts/customerComplaints/get,Получение списка операций возврата покупателя,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#получение-списка-операций-возврата-покупателя,documented_only
+ts-client,GET,/ts/customerComplaints/getPositions,Получение списка позиций возврата покупателя,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#получение-списка-позиций-возврата-покупателя,documented_only
+ts-client,POST,/ts/customerComplaints/updatePosition,Изменение позиции возврата покупателя,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#изменение-позиции-возврата-покупателя,documented_only
+ts-client,GET,/ts/deliveryMethod/forCo,Получение доступных способов доставки по позициям корзины,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#получение-доступных-способов-доставки-по-позициям-корзины,documented_only
+ts-client,POST,/ts/goodReceipts/create,Операция создания приёмки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#операция-создания-приёмки,documented_only
+ts-client,GET,/ts/goodReceipts/get,Получение списка операций приёмки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#получение-списка-операций-приёмки,documented_only
+ts-client,GET,/ts/goodReceipts/getPositions,Получение списка позиций приёмки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#получение-списка-позиций-приёмки,documented_only
+ts-client,GET,/ts/orderPickings/get,Получение списка операций отгрузки (расход),https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#получение-списка-операций-отгрузки-расход,documented_only
+ts-client,GET,/ts/orderPickings/getGoods,Получение списка позиций товаров отгрузки,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#получение-списка-позиций-товаров-отгрузки,documented_only
+ts-client,POST,/ts/orders/createByCart,Создание заказа по позициям корзины,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#создание-заказа-по-позициям-корзины,documented_only
+ts-client,GET,/ts/orders/get,Получение одного заказа,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#получение-одного-заказа,documented_only
+ts-client,GET,/ts/orders/list,Получение списка заказов,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#получение-списка-заказов-1,documented_only
+ts-client,POST,/ts/orders/refuse,Отказ от заказа,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#отказ-от-заказа,documented_only
+ts-client,POST,/ts/positions/cancel,Аннулирование позиции,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#аннулирование-позиции,documented_only
+ts-client,GET,/ts/positions/get,Получение одной позиции,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#получение-одной-позиции,documented_only
+ts-client,GET,/ts/positions/list,Получение списка позиций,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#получение-списка-позиций,documented_only
+ts-client,POST,/ts/positions/massCancel,Массовое аннулирование позиций,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#массовое-аннулирование-позиций,documented_only
+ts-client,POST,/ts/supplierOrders/orders/list,Получение списка заказов,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#получение-списка-заказов-1,documented_only
+ts-client,POST,/ts/supplierOrders/positions/list,Получение списка позиций заказов,https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#получение-списка-позиций-заказов,documented_only
+vinqu,GET,/brands/get,,https://www.abcp.ru/d/docs/vinqu/apivinqu,documented_only
+vinqu,POST,/vinquery/add,,https://www.abcp.ru/d/docs/vinqu/apivinqu,documented_only
+vinqu,POST,/vinquery/addComment,,https://www.abcp.ru/d/docs/vinqu/apivinqu,documented_only
+vinqu,GET,/vinquery/chatList,,https://www.abcp.ru/d/docs/vinqu/apivinqu,documented_only
+vinqu,GET,/vinquery/info/:id,,https://www.abcp.ru/d/docs/vinqu/apivinqu,documented_only
+vinqu,GET,/vinquery/list,,https://www.abcp.ru/d/docs/vinqu/apivinqu,documented_only
+vinqu,POST,/vinquery/off,,https://www.abcp.ru/d/docs/vinqu/apivinqu,documented_only
+vinqu,POST,/vinquery/on,,https://www.abcp.ru/d/docs/vinqu/apivinqu,documented_only
