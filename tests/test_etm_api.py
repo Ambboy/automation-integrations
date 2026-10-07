@@ -105,7 +105,11 @@ class EtmApiTests(unittest.TestCase):
             with self.subTest(response=response), tempfile.TemporaryDirectory() as state:
                 config = {'state_dir': state}
                 context = {'scope': ['owner', 'owner', 'session', 'topic'], 'message_id': '1'}
-                vault, http = FakeVault(), FakeHTTP(AUTH, response)
+                # Business acceptance/uncertainty now triggers read-only
+                # reconciliation. Model an unavailable readback explicitly;
+                # exhausting the fixture is not a provider failure.
+                vault, http = FakeVault(), FakeHTTP(
+                    AUTH, response, AUTH, Failure('etm_readback_unavailable', 503))
                 def action(request, message='1'):
                     return confirmed_write.process(request, {**context, 'message_id': message},
                                                    config, http=http, vault=vault, clock=lambda: 1000)
@@ -120,8 +124,17 @@ class EtmApiTests(unittest.TestCase):
                 if expected == 'rejected':
                     code = response.get('status', response)['code']
                     self.assertEqual(result['provider_code'], str(code))
+                    self.assertEqual(len(http.calls), 2)
+                else:
+                    self.assertEqual(result['last_error'], 'etm_readback_unavailable')
+                    self.assertEqual([args[:2] for args, _ in http.calls], [
+                        ('POST', '/user/login'), ('POST', '/invoice/1-2065278809/order'),
+                        ('POST', '/user/login'), ('GET', '/invoice/1-2065278809/body')])
+                before_retry = deepcopy(http.calls)
                 self.assertEqual(action(request), result)
-                self.assertEqual(len(http.calls), 2)
+                self.assertEqual(http.calls, before_retry)
+                self.assertEqual(sum(args[:2] == ('POST', '/invoice/1-2065278809/order')
+                                     for args, _ in http.calls), 1)
 
 
 if __name__ == '__main__':

@@ -92,11 +92,13 @@ class EtmDocumentTests(unittest.TestCase):
                 self.assertEqual(preview['affected_order_number'], BODY['OrderNumber'])
                 self.assertIn(phrase, preview['business_action'])
 
-    def test_confirmation_preview_discloses_destructive_effect_before_network(self):
+    def test_confirmation_preview_discloses_effect_and_live_target_before_mutation(self):
         for code, phrase in [('C', 'согласованные условия'), ('D', 'Отказаться')]:
             with self.subTest(code=code), tempfile.TemporaryDirectory() as state:
                 with patch('automation_integrations.extended_api.call',
-                           side_effect=AssertionError('Preparation must be offline')):
+                           side_effect=AssertionError('Preparation must not mutate')), \
+                     patch('automation_integrations.etm_lifecycle.preflight', return_value={
+                         'target_ids': ['1-123'], 'order_number': BODY['OrderNumber']}):
                     draft = confirmed_write.process(
                         {'action': 'prepare', 'service': 'etm', 'operation': 'invoice_create',
                          'params': {'body': {**BODY, 'DocumentFunctionCode': code}}},

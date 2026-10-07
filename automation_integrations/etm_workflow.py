@@ -92,7 +92,7 @@ def process(request, context, config, *, checkout=None, clock=time.time):
                                       'stage', 'checkout_started', 'last_error', 'http_status', 'provider_code',
                                       'receipt', 'result')}
         out.update(ok=True, service='etm', operation='order_checkout',
-                   mutation_verified=row['status'] == 'verified',
+                   mutation_verified=row['status'] in ('verified', 'canceled', 'replaced'),
                    verification='Final document checks establish placement only. '
                                 'Payment and pickup readiness require their own provider status.')
         if row['status'] == 'prepared':
@@ -110,24 +110,21 @@ def process(request, context, config, *, checkout=None, clock=time.time):
                                        'payment method and agreement. This draft requires a new owner message.')
         return out
 
-    def unresolved_checkout(exclude=None):
-        return unresolved_procurement(config, scope,
-            exclude=('etm-writes', exclude) if exclude else None)
+    def unresolved_checkout(row):
+        return unresolved_procurement(config, scope, exclude=('etm-writes', row['draft_id']),
+            operation='order_checkout', params=row['prepared']['params'], row=row)
 
     # One account checkout at a time, including reads that establish its basket
     # preconditions. Generic reads cannot mutate this basket.
     with procurement_lock(config), (root / 'checkout.lock').open('a') as lock, ExitStack() as cleanup:
         fcntl.flock(lock, fcntl.LOCK_EX)
         if action == 'prepare':
-            blocker = unresolved_checkout()
-            if blocker:
-                return blocker
             intent = digest({'params': params, 'target': target})
             for old_path in root.glob('*.json'):
                 old = json.loads(old_path.read_text())
                 if old.get('scope') != scope or old.get('intent_hash') != intent:
                     continue
-                if old['status'] in ('rejected', 'blocked'):
+                if old['status'] in ('rejected', 'blocked', 'canceled', 'replaced'):
                     continue
                 if old['status'] == 'verified' and old['created_message'] != message:
                     continue
@@ -179,12 +176,18 @@ def process(request, context, config, *, checkout=None, clock=time.time):
             save(path, row)
             return view(row)
         if action == 'status':
-            if row['status'] in ('accepted_unverified', 'outcome_unknown') and row.get('receipt'):
+            if row['status'] in ('accepted_unverified', 'outcome_unknown', 'specification') and row.get('receipt'):
                 if row['target_hash'] != target:
                     raise Failure('draft_contract_or_target_changed')
                 try:
-                    result = client().reconcile(row['prepared'], row['receipt'])
-                    if result.get('status') not in ('verified', 'accepted_unverified'):
+                    try:
+                        from . import etm_lifecycle
+                    except ImportError:
+                        import etm_lifecycle
+                    result = etm_lifecycle.reconcile_checkout(row, config, checkout=client())
+                    if result is None:
+                        result = client().reconcile(row['prepared'], row['receipt'])
+                    if result.get('status') not in ('verified', 'accepted_unverified', 'canceled', 'replaced', 'specification'):
                         raise Failure('invalid_checkout_result')
                     row.update(result=result, status=result['status'], last_error=None)
                 except Failure as exc:
@@ -206,7 +209,7 @@ def process(request, context, config, *, checkout=None, clock=time.time):
                     row.update(last_error=exc.code, http_status=exc.status, provider_code=exc.provider_code)
                 save(path, row)
             return view(row)
-        if row['status'] in ('verified', 'accepted_unverified', 'outcome_unknown', 'rejected', 'blocked'):
+        if row['status'] in ('verified', 'accepted_unverified', 'outcome_unknown', 'rejected', 'blocked', 'canceled', 'replaced', 'specification'):
             return view(row)
         direct = owner_command(context, config, 'etm', 'order_checkout', row['prepared']['params'])
         if row['status'] == 'prepared' and direct:
@@ -218,7 +221,7 @@ def process(request, context, config, *, checkout=None, clock=time.time):
             raise Failure('confirmation_expired')
         if row['target_hash'] != target:
             raise Failure('draft_contract_or_target_changed')
-        blocker = unresolved_checkout(exclude=ident)
+        blocker = unresolved_checkout(row)
         if blocker:
             return blocker
 
@@ -232,9 +235,20 @@ def process(request, context, config, *, checkout=None, clock=time.time):
 
         try:
             result = client().execute(row['prepared'], on_stage=stage)
-            if result.get('status') not in ('verified', 'accepted_unverified'):
+            if result.get('status') not in ('verified', 'accepted_unverified', 'canceled', 'replaced', 'specification'):
                 raise Failure('invalid_checkout_result')
             row.update(status=result['status'], result=result, last_error=None)
+            if row['status'] == 'accepted_unverified' and row.get('receipt'):
+                save(path, row)
+                try:
+                    from . import etm_lifecycle
+                except ImportError:
+                    import etm_lifecycle
+                recovered = etm_lifecycle.reconcile_checkout(row, config, checkout=client())
+                if recovered is not None:
+                    if recovered.get('status') not in ('verified', 'accepted_unverified', 'canceled', 'replaced', 'specification'):
+                        raise Failure('invalid_checkout_result')
+                    row.update(status=recovered['status'], result=recovered, last_error=None)
         except Failure as exc:
             record_failure(row, exc.code)
             row.update(http_status=exc.status, provider_code=exc.provider_code)

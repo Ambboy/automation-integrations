@@ -157,21 +157,29 @@ class EtmWorkflowTests(unittest.TestCase):
             self.config[field] = original[field]
         self.assertNotIn('reconcile', self.checkout.calls)
 
-    def test_unresolved_checkout_blocks_changed_intent_and_other_scope_without_disclosure(self):
+    def test_readonly_previews_continue_but_overlapping_execute_preserves_scope_privacy(self):
         ident = self.prepared()
         self.confirm(ident)
         self.checkout.error = Failure('request_timeout')
         self.run_action({'action': 'execute', 'draft_id': ident})
         different = deepcopy(self.request)
         different['params']['items'][0]['quantity'] = 200
-        same_scope = self.run_action(different, message='3', now=9000)
-        self.assertEqual(same_scope['draft_id'], ident)
-        other_scope = self.run_action(different, now=9000, context={
-            'scope': ['owner', 'owner', 'another-session', 'other-topic'], 'message_id': '4'})
-        self.assertEqual(other_scope['error'], 'other_unresolved_checkout')
+        preview = self.run_action(different, message='3', now=9000)
+        self.assertEqual(preview['status'], 'prepared')
+        self.assertNotEqual(preview['draft_id'], ident)
+        self.run_action({'action': 'confirm', 'confirmation_text': 'ПОДТВЕРЖДАЮ ' + preview['draft_id']}, message='4', now=9001)
+        denied = self.run_action({'action': 'execute', 'draft_id': preview['draft_id']}, message='4', now=9002)
+        self.assertEqual(denied['draft_id'], ident)
+        context = {'scope': ['owner', 'owner', 'another-session', 'other-topic'], 'message_id': '5'}
+        other = self.run_action(different, now=9000, context=context)
+        self.assertEqual(other['status'], 'prepared')
+        context['message_id'] = '6'
+        self.run_action({'action': 'confirm', 'confirmation_text': 'ПОДТВЕРЖДАЮ ' + other['draft_id']}, now=9001, context=context)
+        denied = self.run_action({'action': 'execute', 'draft_id': other['draft_id']}, now=9002, context=context)
+        self.assertEqual(denied['error'], 'other_unresolved_checkout')
         for field in ('draft_id', 'preview', 'result', 'receipt', 'status'):
-            self.assertNotIn(field, other_scope)
-        self.assertEqual(self.checkout.calls, ['prepare', 'execute'])
+            self.assertNotIn(field, denied)
+        self.assertEqual(self.checkout.calls.count('execute'), 1)
 
     def test_second_preconfirmed_draft_cannot_execute_after_first_becomes_unknown(self):
         first = self.prepared()
@@ -194,7 +202,11 @@ class EtmWorkflowTests(unittest.TestCase):
         self.run_action({'action': 'execute', 'draft_id': ident})
         from unittest.mock import patch
         with patch.object(etm_workflow, 'VERSION', etm_workflow.VERSION + 1):
-            self.assertEqual(self.run_action(self.request)['draft_id'], ident)
+            updated = self.run_action(self.request, message='3')
+            self.assertEqual(updated['status'], 'prepared')
+            self.confirm(updated['draft_id'], '4')
+            blocked = self.run_action({'action': 'execute', 'draft_id': updated['draft_id']})
+            self.assertEqual(blocked['draft_id'], ident)
         self.config['item_ids']['etm'] = 'other-account'
         other = self.run_action(self.request)
         self.assertEqual(other['status'], 'prepared')

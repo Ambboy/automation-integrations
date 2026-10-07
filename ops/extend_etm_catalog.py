@@ -47,7 +47,7 @@ def update(root=ROOT):
     cat_path = registry / 'catalog.json'
     cat = json.loads(cat_path.read_text())
     service = next(s for s in cat['services'] if s['id'] == 'etm')
-    service['summary'] = 'Товары, цены, склады, заказы с договором и оплатой, документы и доставка.'
+    service['summary'] = 'Товары, цены, склады, заказы, счета и доставка.'
     service['adapter_status'] = 'Verified regional routing: portal checkout or public iPRO document workflow.'
     service['instructions'] = (
         'Для запроса «закажи» используй order_checkout через integration_write: это полный сценарий '
@@ -82,6 +82,16 @@ def update(root=ROOT):
         'создаёт стабильный номер клиентской заявки из UUID черновика и явно показывает его в preview. '
         'Это номер нашей системы, а не штатный номер ЭТМ. '
         'Публичные операции invoice_create/invoice_order/invoice_delivery и остальные доступны отдельно. '
+        'Все 19 документированных методов доступны через реестр; обнаруживай их точные схемы. '
+        'По явному поручению владельца создание, подтверждение A, замена C, отказ D, резерв, доставка, '
+        'точка доставки, отчёты и согласование выполняются без второго согласия при confirmation_required=false. '
+        'Сообщение поставщику отправляй только если владелец поручил именно отправку. '
+        'Чтение и prepare доступны при незавершённой закупке. Известная спецификация — промежуточный '
+        'документ, не неизвестная отправка: её можно отменить, изменить или продолжить по точным ID. '
+        'Для A/C/D сохраняй исходный клиентский OrderNumber: исполнитель сверяет все связанные документы '
+        'до отправки и после ответа. D подтверждается фактической отменой; затем исходный черновик '
+        'закрывается и разрешена замена. Используй status для сверки; не удаляй состояние и не повторяй '
+        'POST с неизвестным исходом. Независимые документы не блокируют друг друга. '
         'Прямой invoice_create требует точного OrderNumber владельца или сохранённого клиентского номера коннектора; '
         'его параметры тела восстановлены из руководства ЭТМ «Работа с заказами» от 24.01.2025. '
         'DocumentFunctionCode C заменяет прежний заказ и условия, D означает отказ: это явно показывается '
@@ -126,6 +136,8 @@ def update(root=ROOT):
     version_parts.insert(1, 'etm-checkout.1')
     version_parts = [p for p in version_parts if not p.startswith('etm-region.')]
     version_parts.append('etm-region.1')
+    version_parts = [p for p in version_parts if not p.startswith('etm-lifecycle.')]
+    version_parts.append('etm-lifecycle.1')
     cat['version'] = '+'.join(version_parts)
     cat_path.write_text(json.dumps(cat, ensure_ascii=False, indent=2) + '\n')
 

@@ -142,7 +142,10 @@ class OwnerCommandCheckoutTests(unittest.TestCase):
         new_message = native_context('2', 'Доделай заказ')
         self.assertEqual(self.call('execute', ident, context=new_message)['status'], 'outcome_unknown')
         self.request['params']['items'][0]['quantity'] = 200
-        self.assertEqual(self.call('prepare', context=new_message, now=9000)['draft_id'], ident)
+        preview = self.call('prepare', context=new_message, now=9000)
+        self.assertEqual(preview['status'], 'prepared')
+        blocked = self.call('execute', preview['draft_id'], context=new_message, now=9001)
+        self.assertEqual(blocked['draft_id'], ident)
         self.assertEqual(self.checkout.calls.count('execute'), 1)
 
     def test_accepted_checkout_readback_failure_does_not_allow_replacement(self):
@@ -211,6 +214,14 @@ class OwnerCommandPublicApiTests(unittest.TestCase):
         provider_patch = patch.object(extended_api, 'call', return_value=({'status': {'code': 200}}, []))
         self.provider = provider_patch.start()
         self.addCleanup(provider_patch.stop)
+        lifecycle_patch = patch('automation_integrations.etm_lifecycle.reconcile', return_value=None)
+        lifecycle_patch.start()
+        self.addCleanup(lifecycle_patch.stop)
+        preflight_patch = patch('automation_integrations.etm_lifecycle.preflight',
+            side_effect=lambda operation, params, config, **kwargs: {
+                'target_ids': ['1-123'], 'order_number': params['body']['OrderNumber']})
+        preflight_patch.start()
+        self.addCleanup(preflight_patch.stop)
 
     def call(self, request, *, context=None, now=1000):
         return confirmed_write.process(request, self.context if context is None else context,
@@ -269,26 +280,24 @@ class OwnerCommandPublicApiTests(unittest.TestCase):
                 self.execute(ident, context=native_context('2'))
                 self.assertEqual(self.provider.call_count, previous_calls + 1)
 
-    def test_create_primary_and_confirmation_are_direct_but_refusal_replacement_keep_uuid(self):
+    def test_all_document_lifecycle_actions_follow_the_current_owner_instruction(self):
         for function in ('P', 'A', 'C', 'D'):
             with self.subTest(function=function):
                 params = {'body': {'OrderNumber': 'TEST-' + function, 'DocumentFunctionCode': function,
                     'Seller': {'ILN': '4660011519999'}, 'Order-Lines': [
                         {'LineNumber': 1, 'SupplierItemCode': '6510970', 'OrderedQuantity': 100}]}}
                 preview = self.prepare('invoice_create', params)
-                ident = preview['draft_id']
-                if function in ('P', 'A'):
-                    self.assertFalse(preview['confirmation_required'])
-                    self.assertNotIn('confirmation_command', preview)
-                    self.assertEqual(self.execute(ident)['status'], 'accepted_unverified')
-                else:
-                    self.assertTrue(preview['confirmation_required'])
-                    self.assertIn('confirmation_command', preview)
-                    previous_calls = self.provider.call_count
-                    with self.assertRaisesRegex(Failure, '^owner_confirmation_required$'):
-                        self.execute(ident)
-                    self.assertEqual(self.provider.call_count, previous_calls)
-        self.assertEqual(self.provider.call_count, 2)
+                self.assertFalse(preview['confirmation_required'])
+                self.assertNotIn('confirmation_command', preview)
+                # Give each documented action an independent target for this policy test.
+                if function != 'P':
+                    row = self.row(preview['draft_id'])
+                    row['lifecycle']['target_ids'] = ['1-' + str(ord(function))]
+                    Path(self.tmp.name, 'contract-writes', preview['draft_id'] + '.json').write_text(json.dumps(row))
+                with patch('automation_integrations.etm_lifecycle.preflight', return_value=(
+                        self.row(preview['draft_id']).get('lifecycle'))):
+                    self.assertEqual(self.execute(preview['draft_id'])['status'], 'accepted_unverified')
+        self.assertEqual(self.provider.call_count, 4)
 
     def test_other_providers_require_uuid_even_with_current_native_owner_command(self):
         with patch.object(extended_api, 'contract', return_value=Contract):
@@ -345,53 +354,53 @@ class OwnerCommandPublicApiTests(unittest.TestCase):
         self.assertEqual(replacement['draft_id'], ident)
         self.assertEqual(self.provider.call_count, 1)
 
-    def test_changed_public_params_or_document_cannot_escape_unknown_result(self):
+    def test_readonly_prepare_allows_changes_but_same_document_cannot_replay_unknown_effect(self):
         ident = self.prepare()['draft_id']
         self.provider.side_effect = Failure('request_timeout')
         self.execute(ident)
         for params in ({'path': {'id': 'fixture-document'}, 'query': {'tovzak': 'Новая пометка'}},
-                       {'path': {'id': 'fixture-document'}, 'query': {'skl': 1000}},
-                       {'path': {'id': 'another-document'}}):
-            with self.subTest(params=params):
-                replacement = self.prepare(params=params)
-                self.assertEqual(replacement['error'], 'existing_unresolved_draft')
-                self.assertEqual(replacement['draft_id'], ident)
-        self.assertEqual(self.provider.call_count, 1)
-        self.assertEqual(len(list(Path(self.tmp.name, 'contract-writes').glob('*.json'))), 1)
+                       {'path': {'id': 'fixture-document'}, 'query': {'skl': 1000}}):
+            preview = self.prepare(params=params)
+            self.assertEqual(preview['status'], 'prepared')
+            denied = self.execute(preview['draft_id'])
+            self.assertEqual(denied['draft_id'], ident)
+            self.assertEqual(denied['error'], 'existing_unresolved_draft')
+        independent = self.prepare(params={'path': {'id': 'another-document'}})
+        self.assertEqual(self.execute(independent['draft_id'])['status'], 'outcome_unknown')
+        self.assertEqual(self.provider.call_count, 2)
 
-    def test_preconfirmed_public_draft_stops_when_another_order_becomes_unknown(self):
+    def test_preconfirmed_independent_document_continues_when_another_order_becomes_unknown(self):
         first = self.prepare()['draft_id']
         second = self.prepare(params={'path': {'id': 'second-document'}})['draft_id']
-        self.call({'action': 'confirm', 'confirmation_text': 'ПОДТВЕРЖДАЮ ' + second},
-                  context=native_context('2'))
+        self.call({'action': 'confirm', 'confirmation_text': 'ПОДТВЕРЖДАЮ ' + second}, context=native_context('2'))
         self.provider.side_effect = Failure('request_timeout')
         self.execute(first)
         result = self.execute(second, context=native_context('2'))
-        self.assertEqual(result['draft_id'], first)
-        self.assertEqual(result['error'], 'existing_unresolved_draft')
-        self.assertEqual(self.row(second)['status'], 'confirmed')
-        self.assertNotIn('submitted_at', self.row(second))
-        self.assertEqual(self.provider.call_count, 1)
+        self.assertEqual(result['status'], 'outcome_unknown')
+        self.assertIn('submitted_at', self.row(second))
+        self.assertEqual(self.provider.call_count, 2)
 
-    def test_unknown_public_order_blocks_website_prepare_and_prepared_execute(self):
-        checkout_id = self.checkout_call()['draft_id']
+    def test_unknown_public_order_allows_readonly_website_prepare_but_guards_ambiguous_execute(self):
         public_id = self.prepare()['draft_id']
         self.provider.side_effect = Failure('request_timeout')
         self.execute(public_id)
-        for result in (self.checkout_call('execute', checkout_id), self.checkout_call()):
-            self.assertEqual(result['error'], 'existing_unresolved_draft')
-            self.assertEqual(result['draft_id'], public_id)
+        preview = self.checkout_call()
+        self.assertEqual(preview['status'], 'prepared')
+        denied = self.checkout_call('execute', preview['draft_id'])
+        self.assertEqual(denied['error'], 'existing_unresolved_draft')
+        self.assertEqual(denied['draft_id'], public_id)
         self.assertEqual(self.checkout.calls, ['prepare'])
         self.assertEqual(self.provider.call_count, 1)
 
-    def test_unknown_website_checkout_blocks_public_prepare_and_prepared_execute(self):
-        public_id = self.prepare()['draft_id']
+    def test_unknown_website_checkout_allows_public_preview_but_guards_ambiguous_execute(self):
         checkout_id = self.checkout_call()['draft_id']
         self.checkout.error = Failure('request_timeout')
         self.checkout_call('execute', checkout_id)
-        for result in (self.execute(public_id), self.prepare(params={'path': {'id': 'new-document'}})):
-            self.assertEqual(result['error'], 'existing_unresolved_draft')
-            self.assertEqual(result['draft_id'], checkout_id)
+        preview = self.prepare(params={'path': {'id': 'new-document'}})
+        self.assertEqual(preview['status'], 'prepared')
+        denied = self.execute(preview['draft_id'])
+        self.assertEqual(denied['error'], 'existing_unresolved_draft')
+        self.assertEqual(denied['draft_id'], checkout_id)
         self.provider.assert_not_called()
         self.assertEqual(self.checkout.calls, ['prepare', 'execute'])
 
@@ -402,15 +411,17 @@ class OwnerCommandPublicApiTests(unittest.TestCase):
         self.assertEqual(self.checkout_call()['status'], 'prepared')
         self.assertEqual(self.provider.call_count, 1)
 
-    def test_website_acceptance_blocks_other_route_until_documents_are_reconciled(self):
+    def test_website_acceptance_guards_same_document_until_reconciled(self):
         checkout_id = self.checkout_call()['draft_id']
         self.checkout.accept_first = True
         self.checkout.error = Failure('provider_unavailable')
         self.assertEqual(self.checkout_call('execute', checkout_id)['status'], 'accepted_unverified')
-        self.assertEqual(self.prepare()['draft_id'], checkout_id)
+        public = self.prepare(params={'path': {'id': 'fixture-1'}})
+        self.assertEqual(public['status'], 'prepared')
+        self.assertEqual(self.execute(public['draft_id'])['draft_id'], checkout_id)
         self.assertEqual(self.checkout_call('status', checkout_id)['status'], 'verified')
-        self.assertEqual(self.prepare()['status'], 'prepared')
-        self.provider.assert_not_called()
+        self.assertEqual(self.execute(public['draft_id'])['status'], 'accepted_unverified')
+        self.assertEqual(self.provider.call_count, 1)
 
     def test_cross_route_guard_preserves_scope_privacy_and_legacy_account_records(self):
         ident = self.prepare()['draft_id']
@@ -424,12 +435,16 @@ class OwnerCommandPublicApiTests(unittest.TestCase):
         foreign = native_context('2')
         foreign['scope'] = ['owner', 'owner', 'another-session', 'another-topic']
         foreign['owner_message']['scope'] = list(foreign['scope'])
-        result = self.checkout_call(context=foreign)
+        preview = self.checkout_call(context=foreign)
+        self.assertEqual(preview['status'], 'prepared')
+        result = self.checkout_call('execute', preview['draft_id'], context=foreign)
         self.assertEqual(result['error'], 'other_unresolved_checkout')
         for field in ('draft_id', 'preview', 'result', 'receipt', 'status'):
             self.assertNotIn(field, result)
-        self.assertEqual(self.checkout_call()['draft_id'], ident)
-        self.assertEqual(self.checkout.calls, [])
+        local = self.checkout_call()
+        self.assertEqual(local['status'], 'prepared')
+        self.assertEqual(self.checkout_call('execute', local['draft_id'])['draft_id'], ident)
+        self.assertEqual(self.checkout.calls, ['prepare', 'prepare'])
 
     def test_known_different_account_is_separate_from_unknown_public_order(self):
         ident = self.prepare()['draft_id']

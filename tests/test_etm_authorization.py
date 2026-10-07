@@ -23,7 +23,8 @@ class EtmAuthorizationTests(unittest.TestCase):
 
     def test_current_native_message_authorizes_procurement_and_has_no_plaintext(self):
         for operation in ('order_checkout', 'invoice_order', 'invoice_delivery',
-                          'delivery_point_create', 'invoice_print'):
+                          'delivery_point_create', 'invoice_print', 'catalog_job_create',
+                          'invoice_approval_update'):
             with self.subTest(operation=operation):
                 evidence = self.authorize(operation)
                 self.assertEqual(evidence, {'policy': 'owner_command',
@@ -96,12 +97,12 @@ class EtmAuthorizationTests(unittest.TestCase):
                 self.context['owner_message']['message_id'] = message
                 self.assertIsNone(self.authorize())
 
-    def test_order_creation_and_confirmation_allowed_but_replacement_refusal_not(self):
-        for action in ('P', 'A'):
+    def test_all_document_lifecycle_actions_follow_the_native_owner_command(self):
+        for action in ('P', 'A', 'C', 'D'):
             with self.subTest(action=action):
                 self.assertIsNotNone(self.authorize('invoice_create',
                     {'body': {'DocumentFunctionCode': action}}))
-        for action in ('C', 'D', None, '', 'p', True, ['P']):
+        for action in (None, '', 'p', True, ['P']):
             with self.subTest(action=action):
                 self.assertIsNone(self.authorize('invoice_create',
                     {'body': {'DocumentFunctionCode': action}}))
@@ -112,7 +113,7 @@ class EtmAuthorizationTests(unittest.TestCase):
         for service in ('tochka', 'saby', 'wirenboard', 'yandex_go', '', None, ['etm']):
             with self.subTest(service=service):
                 self.assertIsNone(self.authorize(service=service))
-        for operation in ('catalog_job_create', 'invoice_approval_update', 'goods_get',
+        for operation in ('goods_get',
                           'order_cancel', 'sample_write', None, ['order_checkout']):
             with self.subTest(operation=operation):
                 self.assertIsNone(self.authorize(operation))

@@ -74,10 +74,31 @@ def process(request, context, config, *, http=None, vault=None, clock=time.time)
         metadata = json.loads(path.read_text()) if path.exists() else {}
         procurement = is_procurement(metadata.get('service'), metadata.get('operation'))
 
+    def lifecycle_module():
+        try:
+            from . import etm_lifecycle
+        except ImportError:
+            import etm_lifecycle
+        return etm_lifecycle
+
+    def reconcile(row):
+        if row.get('service') != 'etm' or row['status'] not in ('accepted_unverified', 'outcome_unknown', 'specification'):
+            return
+        if row.get('target_hash') != target(config, row['service']):
+            raise Failure('draft_contract_or_target_changed')
+        try:
+            updates = lifecycle_module().reconcile(row, config, http=http, vault=vault)
+            if updates:
+                row.update(updates)
+        except Failure as exc:
+            row.update(last_error=exc.code, http_status=exc.status, provider_code=exc.provider_code)
+        save(path, row)
+
     def view(row):
         out = {k: row.get(k) for k in ('draft_id', 'service', 'operation', 'status', 'expires_at',
-                                      'preview', 'source', 'last_error', 'http_status', 'provider_code', 'result')}
-        out.update(ok=True, provider_accepted=row['status'] == 'accepted_unverified', mutation_verified=False,
+                                      'preview', 'source', 'last_error', 'http_status', 'provider_code', 'lifecycle', 'result')}
+        out.update(ok=True, provider_accepted=row['status'] in ('accepted_unverified', 'verified', 'canceled', 'replaced'),
+                   mutation_verified=row['status'] in ('verified', 'canceled', 'replaced'),
                    verification='Inspect the provider result and use the documented read/status operation for the returned ID. '
                                 'HTTP/RPC acceptance does not prove business completion. No automatic retry.')
         if row['status'] == 'prepared':
@@ -98,10 +119,6 @@ def process(request, context, config, *, http=None, vault=None, clock=time.time)
             'prepare.lock' if action == 'prepare' else ident + '.lock')).open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         if action == 'prepare':
-            if procurement:
-                blocker = unresolved_procurement(config, scope)
-                if blocker:
-                    return blocker
             built = extended_api.contract(service).build(service, operation, params)
             intent = digest({'service': service, 'operation': operation, 'params': params, 'target': target(config, service)})
             for candidate in root.glob('*.json'):
@@ -110,12 +127,16 @@ def process(request, context, config, *, http=None, vault=None, clock=time.time)
                 with (root / (candidate.stem + '.lock')).open('a') as candidate_lock:
                     fcntl.flock(candidate_lock, fcntl.LOCK_EX)
                     old = json.loads(candidate.read_text())
-                    if old.get('scope') != scope or old.get('intent_hash') != intent or old.get('status') == 'rejected':
+                    if old.get('scope') != scope or old.get('intent_hash') != intent or old.get('status') in ('rejected', 'canceled'):
                         continue
                     if old.get('expires_at', 0) < clock() and 'submitted_at' not in old:
                         continue
                     return {'ok': False, 'error': 'existing_unresolved_draft', 'draft_id': old['draft_id'],
                             'status': old['status'], 'instruction': 'Inspect the exact existing draft and provider object; do not replace it.'}
+            lifecycle = None
+            if (service == 'etm' and operation == 'invoice_create'
+                    and params.get('body', {}).get('DocumentFunctionCode') in ('A', 'C', 'D')):
+                lifecycle = lifecycle_module().preflight(operation, params, config, http=http, vault=vault)
             metadata = extended_api.operations(service)[operation]
             preview = {'service': service, 'operation': operation,
                        'environment': provider_environment(service, config),
@@ -128,6 +149,8 @@ def process(request, context, config, *, http=None, vault=None, clock=time.time)
                 except ImportError:
                     from etm_document import preview_details
                 preview.update(preview_details(params['body']))
+            if lifecycle:
+                preview['lifecycle'] = lifecycle
             # A native hook/tool must be able to show the entire preview. Never
             # persist a draft whose approval details would be silently truncated.
             if len(json.dumps(preview, ensure_ascii=False)) > 18000:
@@ -139,6 +162,8 @@ def process(request, context, config, *, http=None, vault=None, clock=time.time)
                    'status': 'prepared', 'preview': preview, 'source': metadata.get('source')}
             if procurement:
                 row['account_hash'] = account_hash(config)
+            if lifecycle:
+                row['lifecycle'] = lifecycle
             save(path, row)
             return view(row)
         if not path.exists():
@@ -152,6 +177,7 @@ def process(request, context, config, *, http=None, vault=None, clock=time.time)
             row.update(status='outcome_unknown', last_error='interrupted_submission')
             save(path, row)
         if action == 'status':
+            reconcile(row)
             return view(row)
         if action == 'confirm':
             if row['status'] != 'prepared':
@@ -163,7 +189,7 @@ def process(request, context, config, *, http=None, vault=None, clock=time.time)
             row.update(status='confirmed', approved_hash=row['payload_hash'], confirmed_message=message)
             save(path, row)
             return view(row)
-        if row['status'] in ('accepted_unverified', 'outcome_unknown', 'rejected'):
+        if row['status'] in ('accepted_unverified', 'outcome_unknown', 'rejected', 'verified', 'canceled', 'replaced', 'specification'):
             return view(row)
         direct = owner_command(context, config, row['service'], row['operation'], row['params'])
         if row['status'] == 'prepared' and direct:
@@ -179,9 +205,22 @@ def process(request, context, config, *, http=None, vault=None, clock=time.time)
         if row['request_hash'] != digest(built) or row['target_hash'] != target(config, service):
             raise Failure('draft_contract_or_target_changed')
         if procurement:
-            blocker = unresolved_procurement(config, scope, exclude=('contract-writes', ident))
+            blocker = unresolved_procurement(config, scope, exclude=('contract-writes', ident),
+                operation=operation, params=params, row=row)
             if blocker:
                 return blocker
+        if (service == 'etm' and operation == 'invoice_create'
+                and params.get('body', {}).get('DocumentFunctionCode') in ('A', 'C', 'D')):
+            fresh = lifecycle_module().preflight(operation, params, config, http=http, vault=vault)
+            lifecycle_module().assert_same_target(row.get('lifecycle'), fresh)
+            row['lifecycle'] = fresh
+            if fresh and fresh.get('already_complete'):
+                updates = lifecycle_module().reconcile(row, config, http=http, vault=vault)
+                if not updates or updates.get('status') not in ('verified', 'canceled', 'replaced'):
+                    raise Failure('etm_lifecycle_completion_unverified')
+                row.update(updates)
+                save(path, row)
+                return view(row)
         row.update(status='submitting', submitted_at=clock())
         save(path, row)  # fsync file AND directory before any possible business effect
         try:
@@ -198,4 +237,5 @@ def process(request, context, config, *, http=None, vault=None, clock=time.time)
                 row['status'] = 'outcome_unknown'
             row['last_error'] = 'unexpected_execution_error'
         save(path, row)
+        reconcile(row)
         return view(row)
