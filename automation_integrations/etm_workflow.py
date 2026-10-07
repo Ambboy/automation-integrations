@@ -1,5 +1,6 @@
 """Durable owner-authorized ETM checkout; an uncertain POST is never replayed."""
 import fcntl
+from contextlib import ExitStack
 import json
 from pathlib import Path
 import re
@@ -18,7 +19,7 @@ except ImportError:
     import etm_order
 
 
-VERSION = 1
+VERSION = 2
 
 
 def checkout_started(row):
@@ -83,11 +84,13 @@ def process(request, context, config, *, checkout=None, clock=time.time):
         nonlocal checkout
         if checkout is None:
             checkout = etm_order.Checkout(etm_order.WebsiteClient(config))
+            cleanup.callback(checkout.client.close)
         return checkout
 
     def view(row):
         out = {k: row.get(k) for k in ('draft_id', 'status', 'expires_at', 'preview',
-                                      'stage', 'checkout_started', 'last_error', 'http_status', 'provider_code', 'result')}
+                                      'stage', 'checkout_started', 'last_error', 'http_status', 'provider_code',
+                                      'receipt', 'result')}
         out.update(ok=True, service='etm', operation='order_checkout',
                    mutation_verified=row['status'] == 'verified',
                    verification='Final document checks establish placement only. '
@@ -113,7 +116,7 @@ def process(request, context, config, *, checkout=None, clock=time.time):
 
     # One account checkout at a time, including reads that establish its basket
     # preconditions. Generic reads cannot mutate this basket.
-    with procurement_lock(config), (root / 'checkout.lock').open('a') as lock:
+    with procurement_lock(config), (root / 'checkout.lock').open('a') as lock, ExitStack() as cleanup:
         fcntl.flock(lock, fcntl.LOCK_EX)
         if action == 'prepare':
             blocker = unresolved_checkout()
@@ -133,6 +136,10 @@ def process(request, context, config, *, checkout=None, clock=time.time):
                 return {'ok': False, 'error': 'existing_unresolved_draft',
                         'draft_id': old['draft_id'], 'status': old['status'],
                         'instruction': 'Inspect this exact draft; never replace an uncertain checkout.'}
+            # A stable number in our own ordering system, never a fabricated
+            # supplier number. It is exposed only if the public API route uses it.
+            if 'customer_order_number' not in params:
+                params['customer_order_number'] = 'AI-' + ident.replace('-', '').upper()
             prepared = client().prepare(params)
             preview = json.loads(json.dumps(prepared['preview'], ensure_ascii=False, allow_nan=False))
             if len(json.dumps(preview, ensure_ascii=False)) > 18000:

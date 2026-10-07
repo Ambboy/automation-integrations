@@ -392,10 +392,16 @@ def execute(request, config, vault=None, http=None):
     if service == 'etm' and operation == 'checkout_options':
         try:
             from .etm_order import WebsiteClient, Checkout
+            from .etm_authorization import procurement_lock
         except ImportError:
             from etm_order import WebsiteClient, Checkout
+            from etm_authorization import procurement_lock
         client = WebsiteClient(config, vault=vault)
-        result = Checkout(client).options(p)
+        with procurement_lock(config):
+            try:
+                result = Checkout(client).options(p)
+            finally:
+                client.close()
         return {'ok': True, 'service': service, 'operation': operation,
                 'data': sanitize(result, client.vault.sensitive), 'result_state': 'data',
                 'coverage': 'Live ETM checkout options. Does not place an order or change the basket.'}

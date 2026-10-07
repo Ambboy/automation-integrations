@@ -67,6 +67,7 @@ def _row_selected(row):
 def validate_params(params):
     """Offline canonicalization, before fetching credentials or making requests."""
     allowed = {'items', 'region', 'pickup_store', 'contract_id', 'payment_method', 'pay_type',
+               'customer_order_number',
                'max_total', 'note', 'continuous_cut', 'allow_supplier_order', 'currency'}
     if not isinstance(params, dict) or set(params) - allowed:
         raise Failure('invalid_etm_checkout_parameters')
@@ -103,6 +104,11 @@ def validate_params(params):
         result['contract_id'] = _identifier(params['contract_id'])
     if 'max_total' in params:
         result['max_total'] = _money(_decimal(params['max_total']))
+    if 'customer_order_number' in params:
+        reference = params['customer_order_number']
+        if not isinstance(reference, str) or not re.fullmatch(r'[0-9A-ZБ-ЯЁ./-]{1,64}', reference):
+            raise Failure('invalid_etm_customer_order_number')
+        result['customer_order_number'] = reference
     return result
 
 
@@ -158,6 +164,12 @@ class WebsiteClient:
         self.session = None
         self.region = None
         self.identity = {}
+        self.verified_region = None
+        self.requested_classification = None
+        self.original_region = None
+        self.region_switch_attempted = False
+        self.region_failure = False
+        self.public_api_ordering = False
 
     def __repr__(self):
         return f'WebsiteClient(authenticated={bool(self.session)})'
@@ -209,6 +221,11 @@ class WebsiteClient:
         if str(code) != '200':
             raise Failure('etm_portal_rejected', provider_code=str(code))
         data = payload.get('data')
+        # The site's region setter acknowledges success with status only.
+        # Other endpoints still require their normal data object.
+        if (data is None and method == 'POST' and path == '/user/set'
+                and form and form.get('param') == 'region'):
+            return {}
         if not isinstance(data, dict):
             raise Failure('etm_portal_invalid_response')
         return data
@@ -218,8 +235,14 @@ class WebsiteClient:
         if self.session:
             if region != self.region:
                 raise Failure('etm_portal_region_changed')
+            if self.region_failure or not self.verified_region:
+                raise Failure('etm_region_unverified')
             if not self.identity.get('clicode') or not self.identity.get('inn_org'):
                 raise Failure('etm_legal_entity_unverified')
+            current = self.call('GET', '/user/session/get')
+            if (str(current.get('city')) != region
+                    or current.get('rg') != self.verified_region['class17']):
+                raise Failure('etm_region_changed_during_operation')
             return self.identity
         self.region = region
         secrets = self.vault.get('etm')
@@ -247,13 +270,65 @@ class WebsiteClient:
                                              kpp_org=str(buyer.get('kpp') or ''))
         if not self.identity['clicode'] or not self.identity['inn_org']:
             raise Failure('etm_legal_entity_unverified')
+        self.region_failure = True
+        descriptor = self.call('GET', '/info/city/' + region)
+        classification = descriptor.get('class17')
+        if (not isinstance(classification, str)
+                or not re.fullmatch(r'[А-ЯЁA-Z0-9_-]{1,32}', classification)
+                or not isinstance(descriptor.get('name'), str) or not descriptor['name'].strip()):
+            raise Failure('etm_region_descriptor_invalid')
+        current = self.call('GET', '/user/session/get')
+        self.requested_classification = classification
+        self.original_region = {k: current.get(k) for k in ('city', 'rg')}
+        if (str(current.get('city')) != region or current.get('rg') != classification):
+            # This is the site's authenticated region preference, not a change
+            # to account rights. The caller serializes and restores it on exit.
+            if (not isinstance(current.get('rg'), str)
+                    or not re.fullmatch(r'[А-ЯЁA-Z0-9_-]{1,32}', current['rg'])
+                    or not re.fullmatch(r'[0-9]{1,20}', str(current.get('city', '')))):
+                raise Failure('etm_region_unverified')
+            self.region_switch_attempted = True
+            self.call('POST', '/user/set', form={'param': 'region', 'val': classification})
+            current = self.call('GET', '/user/session/get')
+        if str(current.get('city')) != region or current.get('rg') != classification:
+            raise Failure('etm_region_unverified')
+        self.verified_region = {'city': region, 'class17': classification, 'name': descriptor['name']}
+        rights = current.get('rights') or {}
+        self.public_api_ordering = rights.get('apiMakeOrder') == 'on' and rights.get('apiOrder') == 'on'
+        self.region_failure = False
         return self.identity
+
+    def close(self):
+        """Restore only the region preference changed by this operation."""
+        if not self.region_switch_attempted or not self.original_region:
+            return
+        current = self.call('GET', '/user/session/get')
+        before = self.original_region
+        if all(str(current.get(k)) == str(v) for k, v in before.items()):
+            self.region_switch_attempted = False
+            return
+        if (str(current.get('city')) != self.region
+                or current.get('rg') != self.requested_classification):
+            raise Failure('etm_region_restore_conflict')
+        self.call('POST', '/user/set', form={'param': 'region', 'val': before['rg']})
+        restored = self.call('GET', '/user/session/get')
+        if not all(str(restored.get(k)) == str(v) for k, v in before.items()):
+            raise Failure('etm_region_restore_unverified')
+        self.region_switch_attempted = False
+        self.verified_region = None
 
 
 class Checkout:
     def __init__(self, client, *, sleeper=time.sleep):
         self.client = client
         self.sleeper = sleeper
+
+    def _public(self):
+        try:
+            from .etm_public_order import PublicCheckout
+        except ImportError:
+            from etm_public_order import PublicCheckout
+        return PublicCheckout(self.client, self)
 
     def options(self, params):
         """Safe discovery; no basket rows, session, or documents cross this boundary."""
@@ -277,15 +352,27 @@ class Checkout:
             payment_rows = [{k: p.get(k) for k in ('payment_method_code', 'payment_method_name',
                 'payment_method_status', 'payment_method_text', 'paytype')}
                 for row in payment.get('rows', []) for p in row.get('pay_meth', [])]
-        return {'region': params['region'], 'pickup_stores': stores,
+        offered = any(str(s.get('code')) == chosen for s in stores) if chosen else bool(stores)
+        destination = None
+        if chosen and not offered:
+            city = self.client.call('GET', '/info/city/' + params['region'])
+            offices = [s for s in city.get('rows', []) if str(s.get('id')) == chosen]
+            if len(offices) == 1:
+                destination = {k: offices[0].get(k) for k in ('id', 'address', 'time', 'available_pick')}
+        return {'region': params['region'], 'region_verified': True, 'pickup_stores': stores,
+            'portal_pickup_offered': offered, 'requested_pickup': destination,
+            'public_api_ordering_enabled': bool(getattr(self.client, 'public_api_ordering', False)),
+            'order_route': 'portal' if offered else 'public_api',
             'default_contract_id': contract.get('defaultValue'),
             'contracts': [{'id': str(c.get('code')), 'name': c.get('name')}
                           for c in contract.get('value', [])],
             'payment_methods': payment_rows, 'legal_entity': entity,
             'source': SOURCE, 'portal_internal_api': True,
-            'instruction': 'Choose the office by its returned address. These are checkout-offered '
-                'offices, not an exhaustive city directory. Payment availability is rechecked '
-                'for the exact total during prepare and execute.'}
+            'instruction': 'The portal list is not an exhaustive destination list. Prepare order_checkout '
+                'with the exact requested city and office; if the portal does not offer that office, '
+                'the connector prepares a public API request with an explicit customer reference. '
+                'Actual contract, allocation and final documents must be verified; do not infer an '
+                'account-wide regional prohibition from this list.'}
 
     def _basket(self, params, contract_id=None):
         # group=1 matches the live frontend; fetch every page before deciding emptiness.
@@ -400,6 +487,8 @@ class Checkout:
         contract, fields = self._features(params)
         params['contract_id'] = contract['id']
         basket = self._basket(params, contract['id'])
+        if not any(str(s.get('code')) == params['pickup_store'] for s in basket.get('stores', [])):
+            return self._public().prepare(params, identity, contract, fields, basket)
         contents = self._contents(basket['rows'])
         if contents and contents != self._expected(params):
             raise Failure('etm_basket_contains_other_items')
@@ -532,6 +621,8 @@ class Checkout:
 
     def execute(self, prepared, *, on_stage):
         """Caller must durably authorize this exact prepared object and serialize account."""
+        if prepared.get('route') == 'public_api':
+            return self._public().execute(prepared, on_stage=on_stage)
         params = validate_params(prepared['params'])
         if prepared['preview'].get('can_submit') is False:
             raise Failure('etm_checkout_has_ordering_blockers')
@@ -601,6 +692,8 @@ class Checkout:
 
     def reconcile(self, prepared, receipt):
         """Read every returned final document; never re-submit an uncertain checkout."""
+        if prepared.get('route') == 'public_api':
+            return self._public().reconcile(prepared, receipt)
         params = validate_params(prepared['params'])
         if self.client.login(params['region']) != prepared['preview']['legal_entity']:
             raise Failure('etm_legal_entity_changed')

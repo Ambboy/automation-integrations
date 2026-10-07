@@ -115,6 +115,21 @@ class EtmWorkflowTests(unittest.TestCase):
         self.run_action({'action': 'execute', 'draft_id': ident}, now=9000)
         self.assertEqual(self.checkout.calls.count('execute'), 1)
 
+    def test_customer_reference_is_durable_and_does_not_defeat_intent_deduplication(self):
+        ident = self.prepared()
+        row = json.loads(Path(self.tmp.name, 'etm-writes', ident + '.json').read_text())
+        reference = row['prepared']['params']['customer_order_number']
+        self.assertEqual(reference, 'AI-' + ident.replace('-', '').upper())
+        again = self.run_action(self.request)
+        self.assertEqual(again['draft_id'], ident)
+        self.assertEqual(self.checkout.calls, ['prepare'])
+
+    def test_explicit_customer_reference_is_preserved(self):
+        self.request['params']['customer_order_number'] = 'BT-20261007-01'
+        ident = self.prepared()
+        row = json.loads(Path(self.tmp.name, 'etm-writes', ident + '.json').read_text())
+        self.assertEqual(row['prepared']['params']['customer_order_number'], 'BT-20261007-01')
+
     def test_receipt_survives_failed_readback_and_status_is_read_only(self):
         ident = self.prepared()
         self.confirm(ident)
@@ -122,6 +137,7 @@ class EtmWorkflowTests(unittest.TestCase):
         self.checkout.error = Failure('provider_unavailable')
         result = self.run_action({'action': 'execute', 'draft_id': ident})
         self.assertEqual(result['status'], 'accepted_unverified')
+        self.assertEqual(result['receipt']['ids'], ['fixture-1', 'fixture-2'])
         result = self.run_action({'action': 'status', 'draft_id': ident})
         self.assertEqual(result['status'], 'verified')
         self.assertEqual(result['result']['documents'], ['fixture-1', 'fixture-2'])
