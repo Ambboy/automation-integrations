@@ -8,7 +8,8 @@ without request schemas, so it is used only to inventory and verify routes.
 from pathlib import Path
 from copy import deepcopy
 import datetime,hashlib,json,re
-ROOT=Path('.');SNAP=ROOT/'docs/media-api-snapshots/inference';DOC=json.loads((SNAP/'openapi.json').read_text())
+ROOT=Path(__file__).resolve().parents[1];SNAP=ROOT/'docs/media-api-snapshots/2026-10-07/inference';DOC=json.loads((SNAP/'openapi.json').read_text())
+PUBLISHED_METHODS=('get','post','put','patch','delete','options','head','trace','connect','query')
 S={'type':'string','maxLength':8192};O={'type':'object','additionalProperties':True};A={'type':'array','items':{},'maxItems':1000};B={'type':'boolean'};N={'type':'number'};I={'type':'integer'}
 ID={'type':'string','minLength':1,'maxLength':256,'pattern':r'^[A-Za-z0-9_@.+-]+$'}
 REF={'type':'string','minLength':1,'maxLength':512,'pattern':r'^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+(?:@[A-Za-z0-9_.-]+)?$'}
@@ -46,6 +47,9 @@ write('app_run_alias','/apps/run',run_fields,['app','input'],scope=['apps:execut
 paged('task_list','/tasks','apps:read');read('task_get','/tasks/{id}',scope=['apps:read'])
 for tail in ['status','logs','timings','telemetry']:read('task_'+tail,'/tasks/{id}/'+tail,scope=['apps:read'])
 read('task_queue_stats','/tasks/queue-stats',scope=['apps:read'],source='https://inference.sh/docs/api/rest/tasks')
+read('task_files','/tasks/{id}/files',{'role':{'type':'string','enum':['input','output']}},scope=['apps:read'],source='https://inference.sh/docs/api/rest/tasks')
+add('task_files_delete','DELETE','/tasks/{id}/files',{'role':{'type':'string','enum':['input','output']}},query=['role'],scope=['apps:execute'],source='https://inference.sh/docs/api/rest/tasks')
+add('task_delete','DELETE','/tasks/{id}',{'files':B},query=['files'],scope=['apps:execute'],source='https://inference.sh/docs/api/rest/tasks')
 write('task_cancel','/tasks/{id}/cancel',{'force':B,'timeout':{'type':'integer','minimum':0,'maximum':60000}},scope=['apps:execute'])
 read('task_cost','/usage/tasks/{taskID}/cost',scope=['apps:read|billing:read'],source='https://inference.sh/docs/api/rest/usage')
 for op,path in [('billing_account','/billing'),('balance','/billing/balance'),('service_fee','/billing/service-fee'),('billing_settings','/billing/settings'),('billing_payments','/billing/payments'),('usage_summary','/usage/summary'),('entitlements','/entitlements'),('entitlement_usage','/entitlements/usage'),('subscription','/subscription'),('subscription_addons','/subscription/addons')]:
@@ -172,15 +176,22 @@ ops['skill_resolve']['effect']='write'
 ops['skill_resolve']['required_scopes']=['knowledge:write']
 # Only methods actually in the official route catalog are executable. Record omissions for review.
 def normalize(path):return re.sub(r'{[^}]+}','{}',path)
-route_map={(m.upper(),normalize(p)):(p,v) for p,methods in DOC['paths'].items() for m,v in methods.items() if m in ['get','post','put','patch','delete','options','head']}
+route_map={(m.upper(),normalize(p)):(p,v) for p,methods in DOC['paths'].items() for m,v in methods.items() if m in PUBLISHED_METHODS}
 missing=[]
 for name,op in list(ops.items()):
  key=(op['method'],normalize(op['path']))
  if key not in route_map:missing.append((name,op['method'],op['path']));del ops[name]
 print('Missing from official catalog:',missing)
+# A provider change must not silently remove an operation already released.
+previous_path=ROOT/'registry/contracts/inference.json'
+previous=json.loads(previous_path.read_text()) if previous_path.exists() else {'operations':{}}
+removed_operations=set(previous['operations'])-set(ops)
+if removed_operations:
+ raise ValueError('Previously executable operations require explicit retirement review: '+','.join(sorted(removed_operations)))
 # Explicit unavailable inventory. Unsupported means method is NOT callable by a passthrough escape hatch.
 supported={(r['method'],normalize(r['path'])):(n,r) for n,r in ops.items()}
 def reason(method,path):
+ if method in ('TRACE','CONNECT','QUERY'):return 'provider_route_export_method_not_supported_by_connector_transport'
  if path.startswith('/admin/') or path.startswith('/_') or path.startswith('/internal/'):return 'platform_internal_or_admin_route'
  if path.startswith(('/auth/','/oauth/','/device/','/apikeys','/secrets','/credentials','/vaults')):return 'credential_or_identity_workflow_requires_secret_safe_executor'
  if path.startswith(('/billing','/subscription')) and method!='GET':return 'payment_or_subscription_mutation_requires_billing_executor'
@@ -195,15 +206,24 @@ def reason(method,path):
 sources=json.loads((SNAP/'sources.json').read_text())
 assert any(row['url']=='https://api.inference.sh/openapi.json' and row['sha256']==hashlib.sha256((SNAP/'openapi.json').read_bytes()).hexdigest() for row in sources), 'Update source provenance when replacing the OpenAPI snapshot'
 cap=[]
-for (method,np),(path,doc) in sorted(route_map.items()):
+# Normalize path placeholders only for matching adapters. Inventory every raw
+# provider route: the OpenAPI includes aliases with different placeholder names.
+raw_routes=sorted((method.upper(),path,doc) for path,methods in DOC['paths'].items()
+                  for method,doc in methods.items() if method in PUBLISHED_METHODS)
+for method,path,doc in raw_routes:
+ np=normalize(path)
  item={'id':method+' '+path,'method':method,'path':path,'category':doc.get('tags',[]),'effect':'read' if method=='GET' else 'business_write','source':'https://api.inference.sh/openapi.json'}
  if (method,np) in supported:
   name,row=supported[(method,np)]; item.update(operation=name,summary=name.replace('_',' '),effect='read' if row['effect']=='read' else 'business_write',execution_effect=row['effect'],required_scopes=row['required_scopes'],params_schema=row['parameters'],source=row['source'],availability='implemented')
  else:item.update(availability='not_implemented',unsupported_reason=reason(method,path))
  cap.append(item)
-contract={'schema_version':1,'service':'inference','retrieved_at':'2026-10-04','base_url':'https://api.inference.sh','operations':ops}
+contract={'schema_version':1,'service':'inference','retrieved_at':'2026-10-07','source_snapshot_dir':str(SNAP.relative_to(ROOT)),'base_url':'https://api.inference.sh','operations':ops}
 (ROOT/'registry/contracts').mkdir(exist_ok=True)
 (ROOT/'registry/contracts/inference.json').write_text(json.dumps(contract,indent=2)+'\n')
-summary={'schema_version':1,'service':'inference','retrieved_at':'2026-10-04','scope':'All methods in official route catalog inventoried; reviewed JSON contracts callable. Public app discovery and execution are dynamic; no hardcoded model allowlist. Documented availability is distinct from account grants.','sources':sources,'total':len(cap),'implemented':len(ops),'capabilities':cap}
+old_doc=json.loads((ROOT/'docs/media-api-snapshots/inference/openapi.json').read_text())
+new_routes={(m,p) for m,p,_ in raw_routes}
+retired=[{'method':m.upper(),'path':p,'availability':'retired','unsupported_reason':'not_in_current_provider_openapi; replacement rules API requires separate contract review'}
+         for p,methods in old_doc['paths'].items() for m in methods if m in PUBLISHED_METHODS and (m.upper(),p) not in new_routes]
+summary={'schema_version':1,'service':'inference','retrieved_at':'2026-10-07','scope':'All methods in official route catalog inventoried; reviewed JSON contracts callable. Public app discovery and execution are dynamic; no hardcoded model allowlist. Documented availability is distinct from account grants.','sources':sources,'total':len(cap),'implemented':len(ops),'capabilities':cap,'retired_capabilities':retired}
 (ROOT/'registry/capabilities/inference.json').write_text(json.dumps(summary,indent=2)+'\n')
 print('operations',len(ops),'inventory',len(cap),'generation',[n for n,r in ops.items() if r['effect']=='generation'])

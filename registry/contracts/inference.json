@@ -1,7 +1,8 @@
 {
   "schema_version": 1,
   "service": "inference",
-  "retrieved_at": "2026-10-04",
+  "retrieved_at": "2026-10-07",
+  "source_snapshot_dir": "docs/media-api-snapshots/2026-10-07/inference",
   "base_url": "https://api.inference.sh",
   "operations": {
     "identity": {
@@ -1361,6 +1362,123 @@
       "query_parameters": [],
       "required_scopes": [
         "apps:read"
+      ],
+      "public": false,
+      "source": "https://inference.sh/docs/api/rest/tasks",
+      "raw_response": false
+    },
+    "task_files": {
+      "method": "GET",
+      "path": "/tasks/{id}/files",
+      "category": "tasks",
+      "effect": "read",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "input",
+              "output"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_@.+-]+$"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "path_parameters": [
+        "id"
+      ],
+      "query_parameters": [
+        "role",
+        "id"
+      ],
+      "required_scopes": [
+        "apps:read"
+      ],
+      "public": false,
+      "source": "https://inference.sh/docs/api/rest/tasks",
+      "raw_response": false
+    },
+    "task_files_delete": {
+      "method": "DELETE",
+      "path": "/tasks/{id}/files",
+      "category": "tasks",
+      "effect": "write",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "input",
+              "output"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_@.+-]+$"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "path_parameters": [
+        "id"
+      ],
+      "query_parameters": [
+        "role"
+      ],
+      "required_scopes": [
+        "apps:execute"
+      ],
+      "public": false,
+      "source": "https://inference.sh/docs/api/rest/tasks",
+      "raw_response": false
+    },
+    "task_delete": {
+      "method": "DELETE",
+      "path": "/tasks/{id}",
+      "category": "tasks",
+      "effect": "write",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "files": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[A-Za-z0-9_@.+-]+$"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "path_parameters": [
+        "id"
+      ],
+      "query_parameters": [
+        "files"
+      ],
+      "required_scopes": [
+        "apps:execute"
       ],
       "public": false,
       "source": "https://inference.sh/docs/api/rest/tasks",

@@ -1,0 +1,67 @@
+Workspace-level spend analytics and CEL pricing previews. Per-task charges are documented in Tasks: get task cost.
+Requires API key scope billing:read unless noted otherwise.
+→ Billing API — prepaid balance and top-ups
+→ Extend pricing — CEL formulas for store apps
+Usage breakdown
+GET /usage/breakdown
+Returns spend over time grouped by app endpoint (namespace/name). Costs come from completed billing records (refunds excluded). Use this to build dashboards or export usage for a date range.
+Query parameters
+| Parameter | Default | Values
+| range | 30d | 1h, 1d, 7d, 30d, 90d
+| team_id | — | Optional. On the organization workspace only, narrow the breakdown to one member team's spend. Omit to include every team the org pays for. Other teams cannot filter by another team's id.
+Granularity adjusts with the range: minute buckets for 1h, hourly for 1d, daily for 7d / 30d / 90d.
+Response
+| Field | Type | Description
+| timeseries | array | Time buckets with date and per_app cost map
+| per_model | array | Top apps by spend (app_endpoint, call_count, cost) — field name is historical; values are app paths
+| models | string[] | App endpoints (namespace/name) present in the series
+| total_cost | int64 | Sum of costs in microcents
+| period_start, period_end | string | ISO timestamps for the queried window
+| trend_percent | number | Optional percent change vs the previous period of equal length
+| per_team | array | Spend by member team (team_id, call_count, cost in microcents), costliest first. Populated only on an organization workspace breakdown with no team_id filter; empty on a single-team breakdown (including a member team or an org workspace filtered to one team).
+Each per_model[].cost, each value in timeseries[].per_app, and each per_team[].cost is in microcents (1 USD = 100,000,000). See Billing API — Money units.
+Example:
+bashcopy
+1curl "https://api.inference.sh/usage/breakdown?range=7d" \2  -H "Authorization: Bearer inf_your_key"
+jsoncopy
+1{2  "timeseries": [3    {4      "date": "2026-05-28",5      "per_app": {6        "myteam/flux-dev": 250000000,7        "infsh/echo": 500000008      }9    }10  ],11  "per_model": [12    {13      "app_endpoint": "myteam/flux-dev",14      "call_count": 42,15      "cost": 120000000016    }17  ],18  "models": ["myteam/flux-dev", "infsh/echo"],19  "total_cost": 1500000000,20  "period_start": "2026-05-28T00:00:00Z",21  "period_end": "2026-06-04T12:00:00Z",22  "trend_percent": 12.523}
+Usage summary
+GET /usage/summary
+Aggregates usage events for the workspace (resource-time and model usage), not dollar totals. For spend by app, use Usage breakdown or Get task cost.
+Response
+| Field | Type | Description
+| tier_usage | object | Seconds by infrastructure tier (cloud, private)
+| type_usage | object | Seconds by usage event type
+| model_usage | object | Seconds by model identifier
+| total_usage | int64 | Sum of all event quantities (seconds)
+Example:
+bashcopy
+1curl https://api.inference.sh/usage/summary \2  -H "Authorization: Bearer inf_your_key"
+jsoncopy
+1{2  "tier_usage": {3    "cloud": 3600,4    "private": 12005  },6  "type_usage": {7    "gpu": 3000,8    "cpu": 18009  },10  "model_usage": {11    "A100": 240012  },13  "total_usage": 480014}
+Evaluate CEL pricing
+POST /usage/cel/evaluate
+Preview CEL pricing expressions before publishing a store app. Pass draft AppPricing, sample output_meta, optional resources, usage_seconds, and task_inputs. The API returns evaluated fee components and any expression errors.
+Requires billing:read.
+Request body
+| Field | Type | Description
+| pricing | object | AppPricing with prices and fee expressions
+| output_meta | object | Sample inputs/outputs for usage-based formulas
+| resources | array | Resource rows with rates (for resource_expression)
+| usage_seconds | int64 | Elapsed seconds for resource pricing
+| task_inputs | object | Raw task input map for get(task_inputs, ...)
+Response
+| Field | Description
+| resource_fee, inference_fee, royalty_fee, partner_fee, total | Each has value (microcents) and optional error
+| description | Evaluated listing description (value string, optional error)
+Example:
+bashcopy
+1curl -X POST https://api.inference.sh/usage/cel/evaluate \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "pricing": {6      "prices": { "per_image": 200000 },7      "inference_expression": "image_count(output_meta.outputs) * prices.per_image"8    },9    "output_meta": {10      "inputs": [],11      "outputs": [{ "type": "image", "count": 2 }]12    },13    "usage_seconds": 4514  }'
+Per-task cost
+GET /usage/tasks/{taskID}/cost — requires apps:read or billing:read. Documented in Tasks API.
+Related
+| Guide | Topic
+| Billing API | Balance, checkout, and payment methods
+| Entitlements API | Plan limits (not dollar usage)
+| Extend pricing | Authoring CEL formulas
+| Tasks API | Run apps and per-task cost

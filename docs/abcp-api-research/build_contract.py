@@ -48,8 +48,10 @@ def table_rows(tab):
 
 def req(row):
  d=(row['description']+' '+row['required_text']).lower()
- conditional=any(s in d for s in ('если','необязательн','не обязательн','этап','при включ','в случае','для способ','для самовывоз','для доставки'))
- return not conditional and ('*' in row['name'] or 'обязательн' in d or row['required_text'].lower() in ('да','yes','true','+'))
+ conditional=any(s in d for s in ('если','необязательн','не обязательн','этап','при включ','при смене','в случае','для способ','для самовывоз','для доставки'))
+ # "Признак обязательности" describes a boolean field; it is not a required marker.
+ mandatory=re.search(r'\bобязательн(?:ый|ая|ое|ые|о)\b',d)
+ return not conditional and ('*' in row['name'] or bool(mandatory) or row['required_text'].lower() in ('да','yes','true','+'))
 
 def names(row):
  raw=row['name'].replace('*','').strip()
@@ -110,6 +112,65 @@ def add_property(schema,name,child,required=False):
 def endpoint_id(r):
  p=re.sub(r'([a-z0-9])([A-Z])',r'\1_\2',r['path']).lower()
  return re.sub(r'[^a-z0-9]+','_',r['family']+'_'+r['method'].lower()+'_'+p).strip('_')
+
+
+def apply_reviewed_bounds(operation):
+ """Reviewed limits and requirements; no guessed default page sizes."""
+ schema=operation['parameters']; path=operation['path']; method=operation['method']
+ # Repair older generated contracts as well as applying numeric limits. These
+ # phrases describe business flags or conditional TS1 requirements, not fields
+ # every request must supply; req() applies the same rule to fresh builds.
+ optional={('/cp/ts/legalPersons/list','GET'):'agreementWithIndividualsRequired',
+           ('/cp/ts/delivery/update','POST'):'isWeightRequired',
+           ('/cp/ts/orderPickings/changeStatus','POST'):'positionsStatusId'}.get((path,method))
+ if optional in schema.get('required',[]):
+  schema['required'].remove(optional)
+  if not schema['required']:schema.pop('required')
+  operation['required_fields']=schema.get('required',[])
+ def update(tokens, **bounds):
+  node=schema
+  for token in tokens.split('.'):
+   node=node['items'] if token=='items' else node['properties'][token]
+  node.update(bounds)
+ def unsigned(node):
+  if isinstance(node,dict):
+   provider_type=node.get('x-provider-type','').lower()
+   if node.get('type')=='integer' and provider_type.startswith('uint'):
+    node['minimum']=0
+   if provider_type in ('[]uint','uint[]','[]string','string[]'):
+    candidates=[node]+node.get('anyOf',[])
+    for candidate in candidates:
+     if candidate.get('type')=='array':
+      candidate.setdefault('items',{}).update({'type':'integer','minimum':0} if 'uint' in provider_type else {'type':'string'})
+   for value in node.values():unsigned(value)
+  elif isinstance(node,list):
+   for value in node:unsigned(value)
+ unsigned(schema)
+ if method=='GET' and path in (
+     '/ts/goodReceipts/get','/ts/goodReceipts/getPositions',
+     '/ts/orderPickings/get','/ts/orderPickings/getGoods',
+     '/ts/customerComplaints/get','/ts/customerComplaints/getPositions',
+     '/cp/ts/orderPickings/get','/cp/ts/orderPickings/getGoods',
+     '/cp/ts/orderPickings/markCodes/list','/cp/ts/goodReceipts/get',
+     '/cp/ts/goodReceipts/getPositions','/cp/ts/stockRemoval/list',
+     '/cp/ts/stockRemoval/getPositions','/cp/ts/logs/read','/cp/productCards/search'):
+  update('limit',type='integer',maximum=1000)
+ if method=='GET' and path=='/orders':update('limit',type='integer',minimum=1,maximum=1000)
+ if method=='GET' and path=='/cp/users/profiles':update('limit',type='integer',minimum=1,maximum=100)
+ if method=='GET' and path=='/cp/ts/legalPersons/list':update('limit',maximum=50)
+ if method=='POST' and path=='/search/batch':update('search',type='array',items={},maxItems=100)
+ if method=='POST' and path=='/cp/articles/info/batch':update('articles',maxItems=100)
+ if method=='POST' and path=='/cp/distributors/notes':update('note',maxItems=2000)
+ if method=='GET' and path=='/cp/onlinePayments':
+  for key in ('customerIds','orderIds'):update('filter.'+key,maxItems=100)
+ if method=='POST' and path=='/cp/user':update('office',minItems=1)
+ if method=='POST' and path=='/cp/finance/payments':update('payments.items.paymentNumber',type='string',maxLength=64)
+ if method=='GET' and path=='/cp/users':update('organizationName',type='string',minLength=4)
+ if method=='GET' and path=='/cp/users':update('marketType',type='integer',minimum=1,maximum=2)
+ if method=='POST' and path=='/user/new':update('business',type='integer',minimum=1,maximum=3)
+ if method=='GET' and path=='/ts/goodReceipts/getPositions':update('auto',type='string',minLength=3)
+ if method=='POST' and path=='/cp/route':update('descriptionOfDeliveryProbability',type='string',maxLength=3000)
+ if method=='POST' and path=='/cp/ts/orderPickings/fastGetOut':update('positions.items.externalId',type='string',maxLength=15)
 
 rows=split_archive(json.loads((HERE/'sections.json').read_text()))
 operations={}; details={}; notes=[]
@@ -245,6 +306,7 @@ for r in rows:
  if path in ('/user/new','/user/activation','/user/restore'):
   operation['sensitive_fields']=[x for x in ('password','passwordNew','activationCode','code') if x in schema['properties']]
  operation['schema_notes']='Only explicit types and unconditional requirements are enforced. Nested shapes remain permissive where the provider supplies prose only. Review documentation before a write.'
+ apply_reviewed_bounds(operation)
  operations[ident]=operation
  details[ident]={'request_parameter_rows':parameter_rows,'tables':parsed,'source':doc_url,'request_examples':examples}
 

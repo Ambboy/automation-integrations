@@ -1,0 +1,93 @@
+A task is what happens when you run an app.
+Every run creates a task
+Click "Run" on an app → task created.
+Agent calls a tool → task created.
+Flow executes → tasks created (one per step).
+Task status
+| Status | Meaning
+| Queued | Waiting for a worker
+| Running | Executing right now
+| Completed | Done!
+| Failed | Something went wrong
+| Cancelled | You stopped it
+Queued longer than expected?
+Queued means the scheduler has not assigned a worker yet. That is normal when all matching workers are busy or starting up. The task is retried automatically; it does not fail just because capacity is momentarily full.
+| Cause | What to check
+| Cloud backlog or maintenance | Wait a few minutes; status should move to Running
+| Private infra, no idle GPU | Engines — engine online? Workers configured?
+| App needs more VRAM or a specific GPU than any worker has | Task may stay queued until a suitable worker exists, or fail after expiring
+| Wrong infra for the app | Fails immediately (e.g. cloud-only app with infra: "private")
+| Plan concurrent-task limit reached | GET /entitlements/usage — concurrency usage vs limit; wait for other runs to finish. See Concurrent task limits
+If no matching worker exists at all, the task fails after about 10 minutes with no active workers with matching resources. If workers exist but are all busy or unavailable, the task can stay Queued for up to roughly 24 hours before failing with task expired while waiting for available capacity, please retry.
+→ Workers — how the queue interacts with cloud and private workers
+Monitor backlog programmatically with GET /tasks/queue-stats — see Queue stats.
+Failed tasks and error messages
+When status is Failed, the task's error field explains what went wrong. Messages fall into two categories:
+| Source | What you see | What to do
+| Your app | The error your app raised (validation, model errors, etc.) | Fix the input or app code; check task logs
+| Platform | Short, user-friendly messages (see table below) | Usually safe to retry; see Troubleshooting
+Platform failures intentionally omit internal details (worker reconnects, scheduler state, and similar). The full diagnostic is logged server-side.
+| Error message | Typical cause
+| task interrupted, please retry | Worker disconnected, engine reconnect, or orphaned task cleanup
+| task could not be dispatched, please retry | Scheduler could not assign a worker at submission time
+| task could not be processed after multiple attempts, please retry | Task stuck in Dispatched and exceeded retry limit
+| task expired while waiting for available capacity, please retry | Queued too long (~24 hours) with no available worker
+| no active workers with matching resources | No worker matches GPU/VRAM/infra requirements (~10 minutes)
+| no available workers — capacity reserved for higher-priority apps | Matching cloud workers exist but are reserved by another app's min_concurrency floor (~10 minutes)
+| failed to prepare secrets for this app, please check your secret configuration | Missing or invalid workspace secret for the app
+| session worker busy too long | Session worker still running a prior call (~30 seconds)
+| session worker offline | Session's leased worker is no longer available
+| session expired or not found | Session ID invalid or idle timeout elapsed
+→ Task failure messages (REST API) · Sessions
+What's in a task?
+Inputs — What you provided
+Outputs — What came back
+Logs — Real-time progress (setup, build, serve, run, and task-level streams)
+Timings — Phase durations (queue, prepare, setup, run) derived from status events
+Telemetry: time-series CPU, RAM, GPU, and volume samples (~30s intervals while the task runs; API and web app charts)
+Duration — How long it took
+Worker — Where it ran
+Execution logs
+Each task stores logs by phase. In the web app you see these in the task runner; via API use GET /tasks/:id/logs or stream updates on GET /tasks/:id/stream.
+| Phase | What it captures
+| setup | Environment and dependency initialization
+| build | Container image build output
+| serve | Model loading and serving
+| run | App runtime stdout/stderr
+| task | Platform task messages
+→ Get task logs · Stream task updates
+Finding apps to run
+Use Search or the web app's search bar to discover apps and skills before starting a task. Each run creates a new task with its own ID and status.
+Viewing tasks
+Go to Tasks to see history.
+Click any task to see full details.
+From a terminal: belt task list, belt task get <id>, belt task logs <id>. See CLI setup.
+Following progress
+In the web app, the task runner shows live status and logs. From code:
+| Approach | When to use
+| SSE stream | Long-lived connection; updates as the task runs
+| CLI follow | belt task get <id> -f or belt task logs <id> -f after --no-wait runs
+| Timings breakdown | After the task finishes — belt task timings <id> or GET /tasks/:id/timings for per-phase durations
+| Resource telemetry | After or during a run — GET /tasks/:id/telemetry or client.tasks.getTelemetry(id) (JavaScript SDK) for CPU/RAM/GPU samples
+| Poll | Simple loops or environments that block streaming
+→ Stream task updates · Get task timings · Get task telemetry · CLI setup · SDK polling
+Status values in API responses use numeric codes (for example 7 = Running, 10 = Completed). See Task status codes.
+Cancelling
+Running tasks can be cancelled from the web app or API. Status becomes Cancelled and the worker is released.
+Web app: Open the task in Tasks or the app runner and click Cancel while status is Running.
+REST API: POST /tasks/:id/cancel — see Cancel task. Pass {"force": true} to skip graceful shutdown, or timeout (milliseconds) to control how long to wait.
+CLI: belt task cancel <id> (graceful). Use belt task cancel <id> --force to end the run immediately. See CLI setup. What the app sees, and what happens if it does not stop, is in Graceful cancellation.
+MCP: The platform MCP server exposes task_cancel for the same operation.
+The platform requests a graceful stop by default. Apps with an on_cancel hook can clean up before exit; apps that do not respond within the timeout are force-terminated. See Graceful cancellation for app authors.
+Cost
+Completed tasks record a cost breakdown (total, discounts, amount charged, refunds). Amounts are in microcents (1 microcent = $0.000001). To convert to dollars: dollars = microcents / 100000000.
+Usage-based pricing uses output_meta that app authors attach to task output. That metadata is stored for billing but is not included in public task output responses.
+→ Output metadata (app authors) · Usage-based pricing (CEL formulas) · Get task cost (API)
+Cost is available after the task finishes. A 404 means no cost record exists yet (for example, the task is still running).
+Webhooks
+Pass a webhook URL when starting a run to receive a POST when the task reaches a terminal state (completed, failed, or cancelled). Use this for async workflows instead of polling task status.
+Combine with wait=false on POST /run (or wait: false in the SDK) so your client returns immediately after the task is queued.
+→ Task webhooks (REST API)
+→ Task webhooks (SDK)
+Next
+→ Flows

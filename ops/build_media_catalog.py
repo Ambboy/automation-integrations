@@ -38,7 +38,13 @@ def main():
                 'operations': {}, 'write_operations': {}}
         for write, field in ((False, 'operations'), (True, 'write_operations')):
             for operation, params in media_api.operations(service, write=write).items():
-                schema = provider.OPERATION_SCHEMAS.get(operation, {'properties': media_api.LOCAL.get(operation, media_api.UPLOAD_SCHEMA if operation == 'upload_file' else {})})
+                if operation in media_api.LOCAL:
+                    schema = {'properties': media_api.LOCAL[operation],
+                              'required': [media_api.LOCAL_REQUIRED[operation]] if operation in media_api.LOCAL_REQUIRED else []}
+                elif operation == 'upload_file':
+                    schema = {'properties': media_api.UPLOAD_SCHEMA, 'required': ['path']}
+                else:
+                    schema = provider.OPERATION_SCHEMAS.get(operation, {'properties': {}})
                 required = schema.get('required', [])
                 card[field][operation] = {
                     'effect': 'write' if write else 'read',
@@ -46,7 +52,10 @@ def main():
         catalog['services'] = [row for row in catalog['services'] if row['id'] != service] + [card]
         capabilities_path = ROOT / 'registry/capabilities' / (service + '.json')
         capabilities = json.loads(capabilities_path.read_text())
-        capabilities['capabilities'] = [row for row in capabilities['capabilities'] if row.get('category') != 'connector_runtime']
+        # Local operations shadow provider helpers in media_api.read. Publish
+        # their complete runtime contract once, with an unambiguous ID.
+        capabilities['capabilities'] = [row for row in capabilities['capabilities']
+            if row.get('category') != 'connector_runtime' and row.get('id') not in media_api.LOCAL]
         for row in capabilities['capabilities']:
             operation = row.get('operation') or row.get('adapter')
             if operation in provider.OPERATIONS and operation not in getattr(provider, 'UNSUPPORTED', {}):
@@ -57,7 +66,8 @@ def main():
         capabilities['capabilities'].extend({
             'id': operation, 'summary': 'Connector: ' + operation, 'category': 'connector_runtime',
             'effect': 'read', 'adapter': operation, 'access': 'owner_private_telegram',
-            'params_schema': {'type': 'object', 'properties': schema, 'additionalProperties': False},
+            'params_schema': {'type': 'object', 'properties': schema, 'additionalProperties': False,
+                             'required': [media_api.LOCAL_REQUIRED[operation]] if operation in media_api.LOCAL_REQUIRED else []},
             'source': 'docs/GREIF_MEDIA_CONNECTORS.md'} for operation, schema in media_api.LOCAL.items())
         capabilities['total'] = len(capabilities['capabilities'])
         capabilities_path.write_text(json.dumps(capabilities, ensure_ascii=False, indent=2) + '\n')

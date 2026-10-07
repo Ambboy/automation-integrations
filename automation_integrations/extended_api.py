@@ -11,6 +11,115 @@ import json
 import os
 from pathlib import Path
 import re
+import uuid
+
+
+def saby_cache_fingerprint(secret):
+    """Bind a cached access token to the exact configured service credentials."""
+    keys = ('SABY_APP_CLIENT_ID', 'SABY_APP_SECRET', 'SABY_SECRET_KEY')
+    return hashlib.sha256(json.dumps([secret[key] for key in keys],
+                                     ensure_ascii=False).encode()).hexdigest()
+
+
+def _valid_saby_token(token):
+    return (isinstance(token, str) and 0 < len(token) <= 16384
+            and all(32 < ord(char) < 127 for char in token))
+
+
+def saby_error_code(error):
+    """Keep only documented error identifiers, never provider messages/data."""
+    if not isinstance(error, dict):
+        return None
+    detail = error.get('data')
+    candidates = ([detail.get('error_code')] if isinstance(detail, dict) else []) + [error.get('code')]
+    for value in candidates:
+        if type(value) is int and -2147483648 <= value <= 2147483647:
+            return str(value)
+        if isinstance(value, str) and re.fullmatch(
+                r'(?:-?[0-9]{1,10}|00000000-0000-0000-0000-1[0-9A-Fa-f]{11})', value):
+            return value
+    return None
+
+
+def saby_call(request, config, *, secret, vault, http, write=False):
+    """Shared legacy/compiled RPC transport with bounded session recovery.
+
+    A malformed or credential-mismatched cache is replaceable local state.
+    Legacy tokens with no fingerprint remain unbound until explicit HTTP 401;
+    assigning them the current credentials' identity would be unjustified.
+    Only an explicit HTTP 401 may renew once for reads; writes never replay.
+    """
+    try:
+        from .api_read import Failure, atomic
+    except ImportError:
+        from api_read import Failure, atomic
+    state = Path(config['state_dir'])
+    state.mkdir(mode=0o700, parents=True, exist_ok=True)
+    cache = state / 'saby-session.json'
+    fingerprint = saby_cache_fingerprint(secret)
+    with (state / 'saby.lock').open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        try:
+            cached = json.loads(cache.read_text()) if cache.exists() else {}
+        except (ValueError, UnicodeError):
+            cached = {}
+        token = cached.get('token') if isinstance(cached, dict) else None
+        if (not _valid_saby_token(token)
+                or ('credential_fingerprint' in cached
+                    and cached['credential_fingerprint'] != fingerprint)):
+            token = None
+        for attempt in range(1 if write else 2):
+            if token is None:
+                auth = http.call('POST', '/oauth/service/', body={
+                    key: secret['SABY_' + key.upper()]
+                    for key in ('app_client_id', 'app_secret', 'secret_key')})
+                if (not isinstance(auth, dict)
+                        or ('error' in auth and auth['error'] is not None)
+                        or not _valid_saby_token(auth.get('token'))):
+                    raise Failure('saby_authentication_failed')
+                token = auth['token']
+                atomic(cache, {'token': token, 'credential_fingerprint': fingerprint})
+            vault.sensitive.append(token)
+            headers = {**request.get('headers', {}), 'X-SBISAccessToken': token}
+            try:
+                result = http.call(request['method'], request['path'], headers=headers,
+                                   query=request.get('query', {}), body=request.get('body'))
+                if not isinstance(result, dict):
+                    raise Failure('invalid_provider_json')
+                if 'error' in result and result['error'] is not None:
+                    raise Failure('saby_api_error', provider_code=saby_error_code(result['error']))
+                if ('result' not in result
+                        or ('jsonrpc' in result and result['jsonrpc'] != '2.0')
+                        or ('id' in result and result['id'] != request.get('body', {}).get('id'))):
+                    raise Failure('invalid_provider_json')
+                return result['result']
+            except Failure as exc:
+                if exc.status == 401:
+                    cache.unlink(missing_ok=True)
+                if write or exc.status != 401 or attempt:
+                    raise
+                token = None
+
+
+def validate_business_response(service, result):
+    """Do not report a documented error envelope as business acceptance."""
+    try:
+        from .api_read import Failure
+    except ImportError:
+        from api_read import Failure
+    if service not in ('tochka', 'yandex_go') or isinstance(result, bytes):
+        return result
+    if not isinstance(result, dict):
+        raise Failure('invalid_provider_json')
+    if service == 'tochka' and 'Errors' in result:
+        value = result.get('code')
+        code = value if isinstance(value, str) and re.fullmatch(r'[0-9]{3}', value) else None
+        raise Failure('tochka_api_error', provider_code=code)
+    if service == 'yandex_go' and 'code' in result and 'message' in result:
+        value = result['code']
+        code = value if isinstance(value, str) and re.fullmatch(r'[A-Z][A-Z0-9_]{0,80}', value) else None
+        raise Failure('yandex_api_error', provider_code=code)
+    return result
 
 
 def validate_etm_response(result, *, response_kind='json'):
@@ -108,14 +217,23 @@ def validate(service, operation, params, *, write=False):
         raise Failure(code) from None
 
 
-def call(service, operation, params, config, *, write=False, vault=None, http=None):
+def call(service, operation, params, config, *, write=False, vault=None, http=None,
+         idempotency_key=None):
     try:
-        from .api_read import Failure, HTTP, Vault, atomic, provider_environment
+        from .api_read import Failure, HTTP, Vault, provider_environment, tochka_read
     except ImportError:
-        from api_read import Failure, HTTP, Vault, atomic, provider_environment
+        from api_read import Failure, HTTP, Vault, provider_environment, tochka_read
     provider_environment(service, config)
     params = validate(service, operation, params, write=write)
     request = contract(service).build(service, operation, params)
+    needs_idempotency = (service == 'yandex_go'
+                        and operations(service)[operation].get('requires_idempotency_key', False))
+    if needs_idempotency:
+        try:
+            if not isinstance(idempotency_key, str) or str(uuid.UUID(idempotency_key)) != idempotency_key:
+                raise ValueError()
+        except (ValueError, TypeError, AttributeError):
+            raise Failure('idempotency_key_required') from None
     vault = vault or Vault(config)
     secret = vault.get(service)
     http = http or HTTP(service, config)
@@ -126,6 +244,8 @@ def call(service, operation, params, config, *, write=False, vault=None, http=No
         kwargs['response_kind'] = request['response_kind']
     if service == 'yandex_go':
         headers['Authorization'] = 'Bearer ' + secret['YANDEX_GO_BUSINESS_OAUTH_TOKEN']
+        if needs_idempotency:
+            headers['X-Idempotency-Token'] = idempotency_key
         if request['path'] != '/auth/list':
             headers['X-YaTaxi-Selected-Corp-Client-Id'] = config['yandex_client_id']
     elif service == 'tochka':
@@ -136,39 +256,14 @@ def call(service, operation, params, config, *, write=False, vault=None, http=No
         vault.sensitive.append(token)
         query['session-id'] = token
     else:
-        state = Path(config['state_dir'])
-        state.mkdir(mode=0o700, parents=True, exist_ok=True)
-        cache = state / 'saby-session.json'
-        with (state / 'saby.lock').open('a') as lock:
-            fcntl.flock(lock, fcntl.LOCK_EX)
-            token = json.loads(cache.read_text()).get('token') if cache.exists() else None
-            # Read requests can renew once after explicit 401. Mutations never retry.
-            for attempt in range(1 if write else 2):
-                if not token:
-                    auth = http.call('POST', '/oauth/service/', body={
-                        k: secret['SABY_' + k.upper()] for k in ('app_client_id', 'app_secret', 'secret_key')})
-                    token = auth.get('token')
-                    if not isinstance(token, str) or not token:
-                        raise Failure('saby_authentication_failed')
-                    atomic(cache, {'token': token})
-                vault.sensitive.append(token)
-                headers['X-SBISAccessToken'] = token
-                try:
-                    result = http.call(request['method'], request['path'], **kwargs)
-                    if not isinstance(result, dict) or result.get('error'):
-                        raise Failure('saby_api_error')
-                    if 'result' not in result:
-                        raise Failure('invalid_provider_json')
-                    return result['result'], vault.sensitive
-                except Failure as exc:
-                    if exc.status == 401:
-                        cache.unlink(missing_ok=True)
-                    if write or exc.status != 401 or attempt:
-                        raise
-                    token = None
-    result = http.call(request['method'], request['path'], **kwargs)
+        result = saby_call(request, config, secret=secret, vault=vault, http=http, write=write)
+        return result, vault.sensitive
+    result = (tochka_read(http, request['method'], request['path'], **kwargs)
+              if service == 'tochka' and not write
+              else http.call(request['method'], request['path'], **kwargs))
     if service == 'etm':
         validate_etm_response(result, response_kind=request.get('response_kind', 'json'))
+    validate_business_response(service, result)
     return result, vault.sensitive
 
 

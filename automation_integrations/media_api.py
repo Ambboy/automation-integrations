@@ -22,6 +22,7 @@ except ImportError:
                                ArtifactStore, account_fingerprint, sanitize)
 
 SERVICES = ('fal', 'inference')
+CHAT_SUBMISSIONS = frozenset({'agent_run', 'agent_message', 'chat_message'})
 LOCAL = {
     'operation_schema': {'operation': {'type': 'string'}},
     'jobs': {'limit': {'type': 'integer', 'minimum': 1, 'maximum': 50}},
@@ -36,14 +37,16 @@ LOCAL = {
 }
 UPLOAD_SCHEMA = {'path': {'type': 'string'}, 'filename': {'type': 'string'},
                  'content_type': {'type': 'string'}}
+LOCAL_REQUIRED = {'operation_schema': 'operation', 'job_status': 'job_id', 'job_result': 'job_id',
+                  'artifact_download': 'artifact_id', 'response_read': 'response_id'}
 
 
-def failure(code, status=None):
+def failure(code, status=None, *, retry_after=None):
     try:
         from .api_read import Failure
     except ImportError:
         from api_read import Failure
-    return Failure(code, status)
+    return Failure(code, status, retry_after=retry_after)
 
 
 def module(service):
@@ -94,8 +97,7 @@ def validate(service, operation, params, *, write=False):
                     raise failure('invalid_media_pagination')
             elif not isinstance(value, str) or len(value) > 1000:
                 raise failure('invalid_media_parameter')
-        required = {'operation_schema': 'operation', 'job_status': 'job_id', 'job_result': 'job_id',
-                    'artifact_download': 'artifact_id', 'response_read': 'response_id'}.get(operation)
+        required = LOCAL_REQUIRED.get(operation)
         if required and not params.get(required):
             raise failure('missing_media_identifier')
         return dict(params)
@@ -145,11 +147,12 @@ def root(config):
 
 def _call(service, operation, params, secret, transport=None):
     try:
-        return module(service).execute(operation, params, secret, transport=transport or MediaHTTP())
+        return module(service).execute(operation, params, secret, transport=transport)
     except Exception as exc:
         code = getattr(exc, 'code', None)
         if code:
-            raise failure(code, getattr(exc, 'status', None) or getattr(exc, 'http_status', None)) from None
+            raise failure(code, getattr(exc, 'status', None) or getattr(exc, 'http_status', None),
+                          retry_after=getattr(exc, 'retry_after', None)) from None
         if isinstance(exc, ValueError):
             raise failure(str(exc)) from None
         raise failure('media_provider_execution_failed') from None
@@ -218,6 +221,7 @@ def _job_view(row):
             'provider_job_id': row.get('provider_job_id'), 'error': row.get('error'),
             'preview': (row.get('metadata') or {}).get('preview'),
             'billing': (row.get('metadata') or {}).get('billing'),
+            'tracking': (row.get('metadata') or {}).get('tracking'),
             'confirmation_required': False,
             'instruction': 'Execute only the action requested by the owner. For submitted jobs use job_status/job_result; never create a replacement after an uncertain submission.'}
 
@@ -242,8 +246,15 @@ def _artifacts(data, config, job_id, account):
 
 def _reconcile_inference_cost(row, config, secret, transport):
     """Retry only the charge read; completed generations are never resubmitted."""
-    if row['provider'] != 'inference' or row['status'] != 'completed' or not row.get('provider_job_id'):
+    if row['provider'] != 'inference' or row['status'] not in ('completed', 'failed', 'cancelled') or not row.get('provider_job_id'):
         return row
+    if row['request']['operation'] in CHAT_SUBMISSIONS:
+        return row  # Message IDs are not billable task IDs.
+    task_id = row['provider_job_id']
+    if row['request']['operation'] == 'flow_run':
+        task_id = _task(row.get('result')).get('task_id')
+        if not task_id:
+            return row
     ledger = BudgetLedger(root(config))
     entries = ledger.snapshot(provider='inference', account=row['account'])['reservations']
     reservation = next((entry for entry in entries if entry['job_id'] == row['job_id']), None)
@@ -253,7 +264,7 @@ def _reconcile_inference_cost(row, config, secret, transport):
         billing = {'state': 'settled', 'cost_usd': reservation['actual_cost'], 'currency': 'USD'}
     else:
         try:
-            response = _call('inference', 'task_cost', {'taskID': row['provider_job_id']}, secret, transport)
+            response = _call('inference', 'task_cost', {'taskID': task_id}, secret, transport)
             value = _task(response)
             amount = value.get('charged', value.get('total'))
             refunded = value.get('refunded', 0)
@@ -274,6 +285,40 @@ def _reconcile_inference_cost(row, config, secret, transport):
                        metadata={**(current.get('metadata') or {}), 'billing': billing})
 
 
+def _refresh_chat(row, config, secret, transport):
+    """Track an accepted message without mistaking an earlier chat turn for it."""
+    jobs = JobStore(root(config))
+    tracking = dict(row['metadata']['tracking'])
+    chat_id, message_id = tracking['chat_id'], row['provider_job_id']
+    chat = _call('inference', 'chat_get', {'id': chat_id}, secret, transport)
+    page = _call('inference', 'chat_messages', {'id': chat_id, 'limit': 100}, secret, transport)
+    messages = page.get('items', []) if isinstance(page, dict) else page
+    if not isinstance(messages, list) or not isinstance(chat, dict):
+        raise failure('invalid_provider_response')
+    own = next((item for item in messages if isinstance(item, dict) and item.get('id') == message_id), {})
+    state = own.get('status')
+    if state in ('failed', 'cancelled'):
+        return jobs.save_result(row['job_id'], {'message': own, 'chat': chat}, account=row['account'], state=state)
+    order = own.get('order')
+    following = sorted((item for item in messages if isinstance(item, dict)
+                        and type(item.get('order')) is int and type(order) is int
+                        and item['order'] > order), key=lambda item: item['order'])
+    answer = []
+    for item in following:
+        if item.get('role') == 'user':
+            break  # A later user's answer cannot establish this message's completion.
+        answer.append(item)
+    if (state == 'ready' and chat.get('status') in ('idle', 'completed')
+            and any(item.get('role') == 'assistant' and item.get('status') == 'ready' for item in answer)):
+        return jobs.save_result(row['job_id'], {'user_message': own, 'messages': answer, 'chat': chat},
+                                account=row['account'], state='completed')
+    tracking.update(chat_status=chat.get('status'), message_status=state,
+        completion_verified=False, next_cursor=page.get('next_cursor') if isinstance(page, dict) else None,
+        instruction='Poll this job or inspect chat_messages for this chat and message. An idle chat alone is not proof this message completed.')
+    return jobs.update(row['job_id'], account=row['account'], state='queued' if state == 'queued' else 'running',
+                       metadata={**row['metadata'], 'tracking': tracking})
+
+
 def _refresh(row, config, secret, transport, *, result=False):
     service, params = row['provider'], row['request']['params']
     account, ident = row['account'], row['job_id']
@@ -281,14 +326,20 @@ def _refresh(row, config, secret, transport, *, result=False):
     pid = row.get('provider_job_id')
     if not pid:
         return row
+    if service == 'inference' and row['request']['operation'] in CHAT_SUBMISSIONS:
+        return _refresh_chat(row, config, secret, transport)
     if service == 'fal':
         endpoint = row.get('endpoint') or params.get('endpoint_id')
         response = _call(service, 'status', {'endpoint_id': endpoint, 'request_id': pid}, secret, transport)
+    elif row['request']['operation'] == 'flow_run':
+        response = _call(service, 'flow_run_get', {'id': pid}, secret, transport)
     else:
         response = _call(service, 'task_get', {'id': pid}, secret, transport)
     raw_state = _task(response).get('status', _task(response).get('state', ''))
     if service == 'inference' and type(raw_state) is int:
-        state = module(service).TASK_STATUS.get(raw_state, 'unknown')
+        statuses = (module(service).FLOW_RUN_STATUS if row['request']['operation'] == 'flow_run'
+                    else module(service).TASK_STATUS)
+        state = statuses.get(raw_state, 'unknown')
     else:
         state = str(raw_state).lower()
     if _task(response).get('error') or _task(response).get('error_type'):
@@ -327,7 +378,8 @@ def read(service, operation, params, config, *, vault=None, transport=None):
         if name == 'upload_file':
             schema = {'type': 'object', 'properties': UPLOAD_SCHEMA, 'required': ['path'], 'additionalProperties': False}
         elif name in LOCAL:
-            schema = {'type': 'object', 'properties': LOCAL[name], 'additionalProperties': False}
+            schema = {'type': 'object', 'properties': LOCAL[name], 'additionalProperties': False,
+                      'required': [LOCAL_REQUIRED[name]] if name in LOCAL_REQUIRED else []}
         else:
             schema = module(service).OPERATION_SCHEMAS.get(name)
         if schema is None:
@@ -523,12 +575,24 @@ def process(request, context, config, *, transport=None, vault=None, clock=time.
             prepared = row['metadata']['upload']
             data = _files().read_upload(prepared, config, service)
             response = module(service).upload_file(data, prepared['filename'], prepared['content_type'], secret,
-                                                  transport=transport or MediaHTTP())
+                                                  transport=transport)
         else:
             response = _call(service, operation, params, secret, transport)
         task_operation = (service == 'fal' and operation == 'submit') or (
-            service == 'inference' and operation in ('app_run', 'app_run_alias'))
-        provider_id = _provider_id(response) if task_operation else None
+            service == 'inference' and operation in ('app_run', 'app_run_alias', 'flow_run'))
+        provider_id = (_task(response).get('id') if operation == 'flow_run'
+                       else _provider_id(response)) if task_operation else None
+        chat_operation = service == 'inference' and operation in CHAT_SUBMISSIONS
+        if chat_operation:
+            message_result = _task(response)
+            message_result = message_result.get('user_message', message_result)
+            provider_id = message_result.get('id')
+            chat_id = message_result.get('chat_id') or params.get('chat_id') or (params.get('id') if operation == 'chat_message' else None)
+            if not provider_id or not chat_id:
+                raise failure('provider_message_id_missing_outcome_unknown')
+            row = jobs.update(row['job_id'], account=account,
+                metadata={**row['metadata'], 'tracking': {'chat_id': chat_id, 'message_id': provider_id,
+                    'completion_verified': False}})
         if task_operation and not provider_id:
             raise failure('provider_job_id_missing_outcome_unknown')
         if provider_id and operation not in ('run', 'stream'):
@@ -553,4 +617,5 @@ def process(request, context, config, *, transport=None, vault=None, clock=time.
         except Exception:
             pass
         return {'ok': False, **_job_view(row), 'error': code, 'http_status': http_status,
+                'retry_after': getattr(exc, 'retry_after', None),
                 'retry': 'Do not submit another generation. Reconcile the provider task/history first.'}

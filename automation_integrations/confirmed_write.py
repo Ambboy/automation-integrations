@@ -224,7 +224,8 @@ def process(request, context, config, *, http=None, vault=None, clock=time.time)
         row.update(status='submitting', submitted_at=clock())
         save(path, row)  # fsync file AND directory before any possible business effect
         try:
-            result, secrets = extended_api.call(service, operation, params, config, write=True, vault=vault, http=http)
+            result, secrets = extended_api.call(service, operation, params, config, write=True,
+                                                vault=vault, http=http, idempotency_key=ident)
             row.update(status='accepted_unverified', last_error=None)
             save(path, row)  # preserve acceptance even if output conversion fails
             row['result'] = extended_api.output(result, secrets, config)

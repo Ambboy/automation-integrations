@@ -1,0 +1,169 @@
+Manage knowledge entries — observations, references, preferences, and more.
+Overview
+Knowledge is the general storage layer that underpins skills. While skills have their own dedicated endpoints, knowledge entries of other types (observations, references, preferences) are managed here.
+Entries are indexed for hybrid keyword and semantic search. Use search in the web app, or call GET /suggest and GET /search with collections=knowledge (authentication required for private namespace entries).
+Discovery
+| Endpoint | Use case
+| GET /suggest?q=... | Autocomplete and unified discovery (apps, skills, knowledge, pages)
+| GET /search?q=...&collections=knowledge | Search only knowledge entries with filter control
+Authenticated requests include knowledge in your namespace. Unauthenticated /suggest returns public apps and skills only.
+→ Search concept · Search API
+Tags on version.tags are searchable. After create or update, metadata is indexed immediately; full-content semantic search may lag until embedding completes.
+Scoping
+Knowledge versions can carry scope signals — short prefix:value tags that describe the environment where an entry was captured (repository, language, module, and so on). Scope helps semantic search and POST /suggest surface knowledge that matches your current project context.
+Set scope on the version when creating or updating an entry:
+jsoncopy
+1{2  "name": "api-patterns",3  "description": "Internal API conventions",4  "type": "observation",5  "version": {6    "content": { "path": "content.md", "content": "# API patterns\n\n..." },7    "scope": ["git:github.com/acme/api", "lang:go", "module:acme/api"]8  }9}
+| Prefix | Example | Meaning
+| git | git:github.com/acme/api | Normalized git remote origin
+| module | module:acme/api | Module or package name from go.mod, package.json, and similar manifests
+| lang | lang:go | Primary language(s) detected from project marker files
+| path | path:/home/dev/acme/api | Working directory when the entry was created
+| host | host:build-01 | Machine hostname
+Scope is stored on each version (version.scope in API responses) and included in embedding text alongside tags for semantic search indexing. Keyword search still uses name, description, and tags only.
+The belt CLI auto-collects scope from your current directory on belt know upload and belt suggest. Pass your own scope array when calling the REST API directly.
+| Type | Description
+| skill | Reusable agent instructions (prefer /skills endpoints)
+| concept | Domain concepts and definitions
+| observation | Learned facts or patterns (default on create)
+| reference | Pointers to external resources
+| preference | User or workspace preferences
+| person | People and contacts
+| project | Project-scoped context
+| agent-config | Agent configuration snippets
+Python callers can use the matching enums from inferencesh.types — see Python SDK — generated types.
+Lifecycle
+Each entry has a lifecycle field that describes how the platform treats freshness:
+| Value | When to use
+| permanent | Default. Stable facts, skills, and references that stay valid until you publish a new version.
+| decay | Time-sensitive observations (runbooks, environment facts, integration notes) where confidence should decrease unless revalidated.
+Set lifecycle on create or when publishing a new version:
+jsoncopy
+1{2  "name": "staging-db-host",3  "description": "Current staging database hostname",4  "type": "observation",5  "lifecycle": "decay",6  "version": {7    "content": {8      "path": "content.md",9      "content": "# Staging DB\n\n`db.staging.example.com`"10    }11  }12}
+Version freshness: For decay entries, version objects may include last_confirmed_at (RFC 3339) when the platform has recorded a confirmation. Use it in agents and dashboards to show how recently a fact was validated. The field is read-only on API responses — it is not part of the create/update request body.
+Search: lifecycle is indexed on the knowledge collection. Scored GET /search results include knowledge fields you can filter or display in integrations; /suggest still applies its relevance score floor independently of lifecycle.
+Most published skills stay permanent. Use decay for agent-captured observations and operational notes that should be revalidated over time.
+Project scope
+Each version can carry a scope array — environment signals that tie an entry to a project or workspace. /suggest compares request scope tags with version scope to boost project-relevant knowledge in discovery results (overlap ranking). Entries without scope are global and appear everywhere.
+Tags use prefix:value format:
+| Prefix | Example | Meaning
+| git | git:github.com/inference-sh/cli | Normalized git remote origin
+| module | module:inference.sh/cli | Module or package name from go.mod, package.json, Cargo.toml, or pyproject.toml
+| lang | lang:go | Primary language detected from marker files
+| path | path:/home/user/project | Directory where the entry was created (machine-specific)
+| host | host:my-laptop | Hostname where the entry was created
+belt know upload auto-collects scope from the current working directory unless you pass --global. belt suggest sends the same signals on every suggest call. belt plugin review attaches scope when saving knowledge from agent sessions.
+Omit scope (or pass an empty array) for entries that should apply across all projects.
+List Knowledge
+GET /knowledge or POST /knowledge/list
+Returns knowledge entries with cursor-based pagination. Requires authentication.
+Request
+| Field | Type | Description
+| limit | number | Page size (default 50, max 100)
+| cursor | string | Cursor from a previous response
+| direction | string | "next" (default) or "prev"
+| filters | array | { "field", "operator", "value" }
+| sort | array | { "field", "dir" }
+| search | object | { "term", "fields" } for substring match
+Common filter fields: namespace, name, type, lifecycle, visibility, created_at, updated_at. Unknown filter or sort columns return 400. See Cursor pagination.
+Text search: use search.fields such as name, description, namespace, or type. Fields not on the knowledge model are ignored.
+Example — observations only:
+bashcopy
+1curl -X POST https://api.inference.sh/knowledge/list \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "limit": 20,6    "filters": [{ "field": "type", "operator": "eq", "value": "observation" }]7  }'
+Response
+Response:
+jsoncopy
+1{2  "items": [3    {4      "id": "know_abc123",5      "namespace": "myteam",6      "name": "api-rate-limits",7      "description": "Known rate limits for external APIs we integrate with",8      "type": "reference",9      "version_id": "ver_xyz789",10      "version": {11        "id": "ver_xyz789",12        "content": { "path": "content.md", "uri": "https://..." },13        "files": [],14        "content_hash": "a3f5c9e2b1d4...",15        "tags": ["api", "infrastructure"],16        "scope": ["git:github.com/myteam/api", "lang:go"],17        "metadata": {}18      },19      "visibility": "private",20      "created_at": "2026-01-15T10:30:00Z"21    }22  ],23  "next_cursor": "abc123",24  "has_next": true,25  "has_previous": false26}
+Get Knowledge
+GET /knowledge/{id}
+Returns a single knowledge entry by ID.
+Get Knowledge by Ref
+GET /knowledge/{namespace}/{name}
+Returns the latest version for a namespace and name (same ref format as belt know get).
+GET /knowledge/{namespace}/{name}/versions/{versionId}
+Returns a specific version. versionId is the short version id (the segment after @ in refs like acme/onboarding@abc123).
+bashcopy
+1curl https://api.inference.sh/knowledge/acme/onboarding \2  -H "Authorization: Bearer inf_your_key"34curl https://api.inference.sh/knowledge/acme/onboarding/versions/abc123 \5  -H "Authorization: Bearer inf_your_key"
+Requires read access to the entry. Permission failures return 404 or 403, consistent with other knowledge routes.
+Content hash and conditional GET
+Each version object includes a content_hash — a deterministic hash over the main content and supporting files. The hash changes when instructions or file payloads change, even if the version id stays the same.
+Use content_hash to detect unchanged versions in sync jobs, skip redundant downloads, or compare entries across namespaces.
+ETag caching
+These read endpoints set an ETag response header from version.content_hash and honor If-None-Match:
+| Endpoint | Behavior
+| GET /knowledge/{namespace}/{name} | Latest version by ref
+| GET /knowledge/{namespace}/{name}/versions/{versionId} | Specific version by ref
+| GET /knowledge/{id}/versions/{versionId} | Specific version by id
+When If-None-Match matches the current hash, the API returns 304 Not Modified with an empty body. Responses also include Cache-Control: no-cache — clients should revalidate on each request rather than treat the entry as immutable.
+Example:
+bashcopy
+1# First fetch — note the ETag header2curl -i https://api.inference.sh/knowledge/acme/onboarding \3  -H "Authorization: Bearer inf_your_key"45# Conditional retry — 304 when content is unchanged6curl -i https://api.inference.sh/knowledge/acme/onboarding \7  -H "Authorization: Bearer inf_your_key" \8  -H 'If-None-Match: "a3f5c9e2b1d4..."'
+The platform also uses content_hash internally for duplicate detection in lineage graphs and for collapsing identical skills in /suggest results.
+Get References
+GET /knowledge/{id}/references
+Returns content reference edges for a knowledge entry. Edges are created when version content is saved (mentions of other resources in markdown).
+Response
+jsoncopy
+1{2  "resource": {3    "id": "know_abc123",4    "namespace": "acme",5    "name": "onboarding",6    "type": "knowledge",7    "resource_kind": "skill",8    "description": "Onboarding checklist"9  },10  "references": [11    {12      "id": "app_xyz789",13      "namespace": "acme",14      "name": "deploy-helper",15      "type": "app",16      "resource_kind": "",17      "description": "Deployment helper app"18    }19  ],20  "referenced_by": [21    {22      "id": "know_def456",23      "namespace": "acme",24      "name": "runbook",25      "type": "knowledge",26      "resource_kind": "observation",27      "description": "Production runbook"28    }29  ]30}
+| Field | Meaning
+| resource | The entry you queried
+| references | Outgoing — knowledge, app, or agent resources mentioned in this entry's content
+| referenced_by | Incoming — resources whose content mentions this entry
+Each ResourceRef includes id, namespace, name, type (knowledge, app, or agent), resource_kind (e.g. skill, observation for knowledge entries), and description.
+Requires read access to the entry.
+Get Versions
+GET /knowledge/{id}/versions or POST /knowledge/{id}/versions/list
+Returns version history for a knowledge entry.
+Get Lineage
+GET /knowledge/{id}/lineage
+Returns fork and version relationships: parents, siblings, forks, and duplicates.
+jsoncopy
+1{2  "skill": {3    "id": "know_abc123",4    "namespace": "myteam",5    "name": "api-rate-limits",6    "version_count": 27  },8  "parents": [],9  "siblings": [],10  "forks": [],11  "duplicates": [],12  "fork_depth": 013}
+| Field | Meaning
+| skill | The entry you queried
+| parents | Entries this one was forked or derived from
+| siblings | Other entries sharing the same parent
+| forks | Entries forked from this one
+| duplicates | Detected duplicate entries
+| fork_depth | How many fork generations from the root parent
+Skills expose the same endpoint: GET /skills/{id}/lineage.
+Requires read access to the entry.
+Create Knowledge
+POST /knowledge
+Requires authentication.
+Request
+jsoncopy
+1{2  "name": "api-rate-limits",3  "description": "Known rate limits for external APIs",4  "type": "reference",5  "version": {6    "content": { "path": "content.md", "content": "# API Rate Limits\n\n..." },7    "tags": ["api", "infrastructure"],8    "metadata": { "source": "manual" }9  }10}
+| Field | Required | Description
+| name | yes | Kebab-case, immutable after creation
+| description | yes | What this knowledge contains
+| type | no | Entry type — one of the values in the table above (default: observation)
+| lifecycle | no | permanent (default) or decay
+| version.content | yes | Content with path and text
+| version.tags | no | Searchable tags
+| version.scope | no | Environment signals for project scoping (see Scoping)
+| version.metadata | no | Arbitrary key-value pairs
+Response
+Returns the created KnowledgeDTO.
+Update Knowledge
+POST /knowledge/{id}
+Creates a new version. Same request body as create.
+Delete Knowledge
+DELETE /knowledge/{id}
+Soft-deletes the entry.
+CLI: belt know delete <id or namespace/name> (alias belt knowledge delete) requires belt login. The CLI resolves namespace/name via GET /knowledge/{namespace}/{name}, then calls this endpoint with the entry ID. Destructive: prompts unless --yes / -y. Skill-type entries can also be removed with belt skill delete (same resolution and backend delete).
+Visibility
+POST /knowledge/{id}/visibility
+jsoncopy
+1{2  "visibility": "public"3}
+Transfer Ownership
+POST /knowledge/{id}/transfer
+jsoncopy
+1{2  "team_id": "team_xyz789"3}
+JavaScript SDK
+typescriptcopy
+1import { inference } from '@inferencesh/sdk';23const client = inference({ apiKey: 'inf_your_key' });45const { items } = await client.knowledge.list({ limit: 50 });6const entry = await client.knowledge.getByName('myteam', 'deployment-order');78await client.knowledge.create({9  name: 'deployment-order',10  description: 'Services must deploy in dependency order',11  type: 'observation',12  version: {13    content: {14      path: 'content.md',15      content: '# Deployment Order\n\nDeploy common-go before api.',16    },17  },18});1920await client.knowledge.update('know_abc123', { description: 'Updated notes' });21await client.knowledge.delete('know_abc123');
+→ JavaScript SDK · SDK overview
+cURL Examples
+bashcopy
+1# List knowledge entries2curl https://api.inference.sh/knowledge \3  -H "Authorization: Bearer inf_your_key"45# Create an observation6curl -X POST https://api.inference.sh/knowledge \7  -H "Authorization: Bearer inf_your_key" \8  -H "Content-Type: application/json" \9  -d '{10    "name": "deployment-order",11    "description": "Services must be deployed in dependency order",12    "type": "observation",13    "version": {14      "content": {15        "path": "content.md",16        "content": "# Deployment Order\n\nAlways deploy common-go before api."17      }18    }19  }'2021# Delete22curl -X DELETE https://api.inference.sh/knowledge/know_abc123 \23  -H "Authorization: Bearer inf_your_key"

@@ -29,10 +29,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class InferenceContractTests(unittest.TestCase):
     def test_inventory_accounts_for_every_published_method_and_provenance(self):
-        spec = json.loads((ROOT / 'docs/media-api-snapshots/inference/openapi.json').read_text())
+        spec = json.loads((ROOT / m._CONTRACT['source_snapshot_dir'] / 'openapi.json').read_text())
         cap = json.loads((ROOT / 'registry/capabilities/inference.json').read_text())
         expected = {(method.upper(), path) for path, methods in spec['paths'].items()
-                    for method in methods if method in ('get','post','put','patch','delete','head','options')}
+                    for method in methods if method in ('get','post','put','patch','delete','head','options','trace','connect','query')}
         provider_rows = [row for row in cap['capabilities'] if 'method' in row and 'path' in row]
         observed = {(row['method'], row['path']) for row in provider_rows}
         self.assertEqual(expected, observed)

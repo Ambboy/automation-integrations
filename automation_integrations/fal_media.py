@@ -107,7 +107,11 @@ def validate(operation, params):
     if operation in UNSUPPORTED:
         raise ValueError(UNSUPPORTED[operation])
     validate_schema(params, OPERATION_SCHEMAS[operation])
-    if len(json.dumps(params, ensure_ascii=False)) > 16000000:
+    try:
+        size = len(json.dumps(params, ensure_ascii=False, allow_nan=False).encode('utf-8'))
+    except (ValueError, TypeError, UnicodeError):
+        raise ValueError('invalid_parameters') from None
+    if size > 16000000:
         raise ValueError('request_too_large')
     if 'endpoint_id' in params:
         value = params['endpoint_id']
@@ -200,7 +204,7 @@ def queue_base(endpoint_id, request_id):
 def _options(params):
     options = params.get('options', {})
     headers, query = {}, {}
-    for key, target in (('start_timeout', 'X-Fal-Request-Timeout'), ('priority', 'X-Fal-Queue-Priority'),
+    for key, target in (('start_timeout', 'X-Fal-Request-Start-Timeout'), ('priority', 'X-Fal-Queue-Priority'),
                         ('hint', 'X-Fal-Runner-Hint')):
         if key in options:
             headers[target] = str(options[key])

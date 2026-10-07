@@ -1,0 +1,253 @@
+# fal
+
+> ## Agent Instructions
+> fal has two developer products. Model APIs run hosted models through an API key. fal Serverless deploys your own Python apps and models on fal GPUs.
+> To call a hosted model, start with the [Quick Start](https://fal.ai/docs/documentation/quickstart.md) and the [Model APIs overview](https://fal.ai/docs/documentation/model-apis/overview.md).
+> To deploy your own model with fal Serverless, start with these pages:
+> - [Introduction to Serverless](https://fal.ai/docs/documentation/serverless/index.md): What fal Serverless is and the three ways to deploy on it.
+> - [Installation & Setup](https://fal.ai/docs/documentation/development/getting-started/installation.md): Install the fal CLI with `pip install fal` and authenticate.
+> - [Quick Start](https://fal.ai/docs/documentation/development/getting-started/quick-start.md): Build a Hello World app, test it with `fal run`, and ship it with `fal deploy`.
+> - [App Lifecycle](https://fal.ai/docs/documentation/development/app-lifecycle.md): How a `fal.App` goes from code to running runners.
+> - [Define Your Endpoints](https://fal.ai/docs/documentation/development/endpoints-overview.md): Structure the API endpoints that your app exposes.
+> - [Deploy to Production](https://fal.ai/docs/documentation/deployment/deploy-to-production.md): Persistent URLs, authentication modes, and automatic scaling.
+> - [Machine Types](https://fal.ai/docs/documentation/deployment/machine-types.md): Available GPU and CPU machine types and how to choose one.
+> - [Pricing](https://fal.ai/docs/documentation/serverless/pricing.md): Per-second billing and the runner states that are billed.
+> - [Scaling Parameter Reference](https://fal.ai/docs/documentation/deployment/scale-your-application.md): Parameters that control runners, concurrency, and scale to zero.
+> - [Optimizing Cold Starts](https://fal.ai/docs/documentation/serverless/optimizations/optimize-cold-starts.md): Causes of cold starts and ways to make them shorter.
+> - [Examples](https://fal.ai/docs/examples/index.md): Complete Serverless apps for image, video, audio, 3D, realtime, and multi-GPU workloads.
+> - [Migrating to fal](https://fal.ai/docs/documentation/development/migrating-to-fal.md): Guides to move an existing Docker server or an app from another platform to fal.
+> fal Serverless deploys need access that the fal team approves for each account. Request access at https://fal.ai/dashboard/serverless-get-started.
+
+- [Documentation (193 pages)](https://fal.ai/docs/_llms/documentation.md): Documentation for Documentation.
+
+## Examples
+
+- [Examples](https://fal.ai/docs/examples/index.md): Step-by-step tutorials and code examples for building with fal
+
+### Model APIs
+
+- [Generate Images from Text Tutorial](https://fal.ai/docs/examples/image-generation/generate-images-from-text.md)
+- [Generate Videos from Image Tutorial](https://fal.ai/docs/examples/video-generation/generate-videos-from-image.md)
+- [Convert Speech to Text Tutorial](https://fal.ai/docs/examples/audio-speech/convert-speech-to-text.md)
+- [Use LLMs Tutorial](https://fal.ai/docs/examples/integrations/use-llms.md): fal provides an easy-to-use API for generating text using Language Models (LLMs). You can use the `fal-ai/any-llm` endpoint to generate text based on a given prompt and model.
+- [Fastest FLUX Endpoint](https://fal.ai/docs/examples/image-generation/fast-flux.md): We believe fal has the fastest FLUX endpoint in the planet. If you can find a faster one, we guarantee to beat it within one week. 🤝
+- [Fastest SDXL Endpoint](https://fal.ai/docs/examples/image-generation/fast-sdxl.md): We believe fal has the fastest SDXL endpoint in the planet. If you can find a faster one, we guarantee to beat it within one week. 🤝
+- [Custom Workflow UI Tutorial](https://fal.ai/docs/examples/integrations/custom-workflow-ui.md)
+- [Using fal within an n8n workflow](https://fal.ai/docs/examples/integrations/n8n.md): This guide will demonstrate, step-by-step, how to use fal within an n8n workflow.
+- [Add fal.ai to your Next.js app Integration](https://fal.ai/docs/examples/integrations/nextjs.md)
+- [Add fal.ai to your Next.js app Integration](https://fal.ai/docs/examples/integrations/vercel.md)
+
+### Serverless
+
+- [Deploy a Text-to-Image Model](https://fal.ai/docs/examples/image-generation/deploy-text-to-image-model.md)
+- [Deploy ComfyUI on fal - Under construction](https://fal.ai/docs/examples/image-generation/run-comfyui-visual.md): This guide is temporarily unavailable while we update it.
+- [Deploy a ComfyUI SDXL Turbo App](https://fal.ai/docs/examples/image-generation/deploy-comfyui-server.md): Build a serverless image generation API using ComfyUI and SDXL Turbo on fal.
+- [Deploy WAN LoRA Training](https://fal.ai/docs/examples/image-generation/deploy-wan-lora-training.md): Fine-tune WAN (text-to-video) with LoRA using your own short clips and images.
+- [Deploy a Text-to-Video Model](https://fal.ai/docs/examples/video-generation/deploy-text-to-video-model.md): This example demonstrates how to build a sophisticated text-to-video generation service using Wan2.1, showcasing advanced techniques including custom safety checking with multiple AI models, prompt expansion using LLMs, video tensor processing, and comprehensive integration of multiple fal services…
+- [Deploy 3D Progressive Rendering](https://fal.ai/docs/examples/video-generation/deploy-3d-progressive-rendering.md): Build a real-time text-to-3D and image-to-3D application with live voxel streaming using SAM-3D Objects.
+- [Deploy Real-time Video-to-Video Model](https://fal.ai/docs/examples/video-generation/deploy-realtime-video-to-video-model.md): Run a real-time video-to-video pipeline that returns YOLO detections on your stream.
+- [Deploy Real-time World Model](https://fal.ai/docs/examples/video-generation/deploy-realtime-world-model.md): Run a real-time world model demo powered by Matrix-Game.
+- [Deploy Multi-GPU Inference](https://fal.ai/docs/examples/video-generation/deploy-multi-gpu-inference.md): Learn how to build a multi-GPU image generation service using data parallelism with Stable Diffusion XL, including real-time streaming and distributed worker coordination.
+- [Generate video with WAN 2.2 across four GPUs](https://fal.ai/docs/examples/serverless/multi-gpu-video.md): Serve a text-to-video model too big for one GPU using fal.distributed and Ulysses sequence parallelism.
+- [Deploy a Text-to-Speech Model](https://fal.ai/docs/examples/audio-speech/deploy-text-to-speech-model.md): This example demonstrates how to build a comprehensive text-to-speech service using Kokoro, showcasing CPU-efficient deployment, multi-language support, multiple endpoints with shared logic, and advanced audio processing techniques.
+- [Deploy a Text-to-Music Model](https://fal.ai/docs/examples/audio-speech/deploy-text-to-music-model.md): This example demonstrates how to build a sophisticated text-to-music generation service using DiffRhythm, showcasing advanced fal features including custom Docker images, repository cloning, file downloading, and complex audio processing workflows.
+- [Deploy Models with Custom Containers](https://fal.ai/docs/examples/deploy-models-with-custom-containers.md): fal now supports running apps within custom Docker containers, providing greater flexibility and control over your environment.
+- [Migrate from Replicate](https://fal.ai/docs/documentation/development/migrate-from-replicate.md): A guide for migrating your Replicate Cog models to fal.
+- [Migrate an External Docker Server](https://fal.ai/docs/documentation/development/migrate-external-docker-server.md): Deploy an existing Docker-based server (ComfyUI, custom APIs) to fal's serverless platform.
+- [Migrate from Modal](https://fal.ai/docs/documentation/development/migrate-from-modal.md): A guide for migrating your Modal applications to fal.
+- [Migrate from RunPod](https://fal.ai/docs/documentation/development/migrate-from-runpod.md): A guide for migrating your RunPod Serverless workers to fal.
+- [Migrate from Baseten](https://fal.ai/docs/documentation/development/migrate-from-baseten.md): A guide for migrating your Baseten models and Chains to fal.
+- [Cut cold start times with FlashPack and compiled caches](https://fal.ai/docs/examples/serverless/cut-cold-starts.md): Serve WAN 2.1 text-to-video with weights packed on /data, FlashPack disk-to-GPU loading, and a shared torch.compile kernel cache. Measured on real deploys: steady-state cold starts drop to roughly a third of the baseline.
+- [Publish Custom Metrics with Prometheus Pushgateway](https://fal.ai/docs/examples/serverless/deploy-prometheus-pushgateway.md): Publish custom metrics on fal using Prometheus Pushgateway with direct port exposure and persistent storage.
+
+- [Model API Reference (138 pages)](https://fal.ai/docs/_llms/model-api-reference.md): Documentation for Model API Reference.
+
+## SDK Reference
+
+- [Reference](https://fal.ai/docs/api-reference/index.md): Complete API and SDK reference documentation for fal
+
+### Client Libraries
+
+- [Client Libraries](https://fal.ai/docs/api-reference/client-libraries/index.md): Libraries for calling fal AI models from your applications
+- [Swift Client](https://fal.ai/docs/api-reference/client-libraries/swift/index.md): fal client library for iOS, macOS, tvOS, and watchOS
+- [Kotlin / Java Client](https://fal.ai/docs/api-reference/client-libraries/kotlin/index.md): fal client library for Android and JVM applications
+- [Dart Client](https://fal.ai/docs/api-reference/client-libraries/dart/index.md): fal client library for Flutter applications
+
+#### Python
+
+- [Python Client](https://fal.ai/docs/api-reference/client-libraries/python/index.md): API reference for fal-client Python package
+- [fal_client](https://fal.ai/docs/api-reference/client-libraries/python/fal_client.md): API reference for fal_client
+
+#### JavaScript
+
+- [JavaScript Client](https://fal.ai/docs/api-reference/client-libraries/javascript/index.md): API reference for @fal-ai/client
+- [auth](https://fal.ai/docs/api-reference/client-libraries/javascript/auth.md): API reference for @fal-ai/client auth
+- [client](https://fal.ai/docs/api-reference/client-libraries/javascript/client.md): API reference for @fal-ai/client client
+- [config](https://fal.ai/docs/api-reference/client-libraries/javascript/config.md): API reference for @fal-ai/client config
+- [middleware](https://fal.ai/docs/api-reference/client-libraries/javascript/middleware.md): API reference for @fal-ai/client middleware
+- [queue](https://fal.ai/docs/api-reference/client-libraries/javascript/queue.md): API reference for @fal-ai/client queue
+- [realtime](https://fal.ai/docs/api-reference/client-libraries/javascript/realtime.md): API reference for @fal-ai/client realtime
+- [response](https://fal.ai/docs/api-reference/client-libraries/javascript/response.md): API reference for @fal-ai/client response
+- [retry](https://fal.ai/docs/api-reference/client-libraries/javascript/retry.md): API reference for @fal-ai/client retry
+- [storage](https://fal.ai/docs/api-reference/client-libraries/javascript/storage.md): API reference for @fal-ai/client storage
+- [streaming](https://fal.ai/docs/api-reference/client-libraries/javascript/streaming.md): API reference for @fal-ai/client streaming
+- [types.client](https://fal.ai/docs/api-reference/client-libraries/javascript/types.client.md): API reference for @fal-ai/client types.client
+- [types.common](https://fal.ai/docs/api-reference/client-libraries/javascript/types.common.md): API reference for @fal-ai/client types.common
+- [utils](https://fal.ai/docs/api-reference/client-libraries/javascript/utils.md): API reference for @fal-ai/client utils
+
+### CLI Reference
+
+- [CLI Reference](https://fal.ai/docs/api-reference/cli/index.md): Complete reference for the fal command-line interface
+- [Installation](https://fal.ai/docs/api-reference/cli/installation.md)
+- [fal auth](https://fal.ai/docs/api-reference/cli/auth.md)
+- [fal deploy](https://fal.ai/docs/api-reference/cli/deploy.md)
+- [fal environments](https://fal.ai/docs/api-reference/cli/environments.md)
+- [fal files](https://fal.ai/docs/api-reference/cli/files.md)
+- [fal run](https://fal.ai/docs/api-reference/cli/run.md)
+- [fal queue](https://fal.ai/docs/api-reference/cli/queue.md): Manage application queues.
+- [fal keys](https://fal.ai/docs/api-reference/cli/keys.md)
+- [fal profile](https://fal.ai/docs/api-reference/cli/profile.md)
+- [fal secrets](https://fal.ai/docs/api-reference/cli/secrets.md)
+- [fal doctor](https://fal.ai/docs/api-reference/cli/doctor.md)
+- [fal create](https://fal.ai/docs/api-reference/cli/create.md)
+- [fal runners](https://fal.ai/docs/api-reference/cli/runners.md)
+- [fal account](https://fal.ai/docs/api-reference/cli/teams.md)
+- [fal api](https://fal.ai/docs/api-reference/cli/api.md)
+
+#### fal apps
+
+- [fal apps list](https://fal.ai/docs/api-reference/cli/apps/list.md)
+- [fal apps list-rev](https://fal.ai/docs/api-reference/cli/apps/list-rev.md)
+- [fal apps set-rev](https://fal.ai/docs/api-reference/cli/apps/set-rev.md)
+- [fal apps rollout](https://fal.ai/docs/api-reference/cli/apps/rollout.md)
+- [fal apps scale](https://fal.ai/docs/api-reference/cli/apps/scale.md)
+- [fal apps runners](https://fal.ai/docs/api-reference/cli/apps/runners.md)
+- [fal apps gpus](https://fal.ai/docs/api-reference/cli/apps/gpus.md)
+- [fal apps delete](https://fal.ai/docs/api-reference/cli/apps/delete.md)
+- [fal apps delete-rev](https://fal.ai/docs/api-reference/cli/apps/delete-rev.md)
+
+### Python SDK
+
+- [Python SDK](https://fal.ai/docs/api-reference/python-sdk/fal-app-reference.md): API reference for the fal Python package
+- [pyproject.toml Reference](https://fal.ai/docs/api-reference/python-sdk/pyproject-toml.md): Configure fal Serverless apps in pyproject.toml for reusable app names, package entry points, runtime settings, scaling, and containers.
+- [SyncServerlessClient](https://fal.ai/docs/api-reference/python-sdk/client.md): Synchronous Python client for fal Serverless. Manage apps, runners, and deployments programmatically.
+- [fal.api](https://fal.ai/docs/api-reference/python-sdk/api-reference.md): API reference for fal.api
+- [fal](https://fal.ai/docs/api-reference/python-sdk/fal.md): API reference for fal
+- [fal.distributed](https://fal.ai/docs/api-reference/python-sdk/fal-distributed.md): API reference for fal.distributed
+- [fal.exceptions](https://fal.ai/docs/api-reference/python-sdk/fal-exceptions.md): API reference for fal.exceptions
+- [fal.toolkit](https://fal.ai/docs/api-reference/python-sdk/fal-toolkit.md): API reference for fal.toolkit
+- [fal.toolkit.image.nsfw_filter](https://fal.ai/docs/api-reference/python-sdk/fal-toolkit-image-nsfw-filter.md): API reference for fal.toolkit.image.nsfw_filter
+
+## Platform API
+
+- [Introduction to Platform APIs](https://fal.ai/docs/api-reference/platform-apis/index.md): Platform APIs provide programmatic access to platform resources including model metadata, usage tracking, analytics, and fal Assets.
+- [Authentication](https://fal.ai/docs/api-reference/platform-apis/authentication.md): Platform APIs require API keys for secure access to your user or team's data.
+- [OpenAPI Schema](https://fal.ai/docs/api-reference/platform-apis/openapi-schema.md): The fal Platform API is documented using the OpenAPI 3.1 specification format.
+
+### API Endpoints
+
+- [Platform Metadata](https://fal.ai/docs/api-reference/platform-apis/meta.md): Returns platform metadata including webhook IP ranges for allowlisting.
+- [Platform APIs for Models](https://fal.ai/docs/api-reference/platform-apis/for-models.md): Programmatic access to model metadata, pricing, usage tracking, and analytics
+- [Model search](https://fal.ai/docs/platform-apis/v1/models.md): Unified endpoint for discovering model endpoints. Supports three usage modes:
+- [Pricing](https://fal.ai/docs/platform-apis/v1/models/pricing.md): Returns unit pricing for requested endpoint IDs. Most models use **output-based** pricing (e.g., per image/video with proportional adjustments for resolution/length). Some models use **GPU-based** pricing depending on architecture. Values are expressed per model's billing unit in a given currency.
+- [Estimate cost](https://fal.ai/docs/platform-apis/v1/models/pricing/estimate.md): Computes cost estimates using one of two methods:
+- [Usage](https://fal.ai/docs/platform-apis/v1/models/usage.md): Returns paginated usage records for your workspace with filters for endpoint, user, date range, and auth method. Each item includes the billed unit quantity, the pre-discount unit price and cost_subtotal, any percentage discount applied, and the final cost_total (cost_subtotal − cost_discount).
+- [Billing Events](https://fal.ai/docs/platform-apis/v1/models/billing-events.md): Returns paginated individual billing event records with filters for endpoint and date range. Each record includes the request ID, timestamp, endpoint, output units billed, and a cost breakdown in USD (cost_subtotal, cost_discount, cost_total; cost_estimate_nano_usd carries cost_total in nano USD).
+- [Analytics](https://fal.ai/docs/platform-apis/v1/models/analytics.md): Time-bucketed metrics per model endpoint, including request counts, success/error rates, and latency percentiles. `prepare_duration` reflects queue/prepare time before execution; `duration` is request execution time. Use with the Queue/Webhooks flow to monitor SLAs.
+- [List requests by endpoint(s)](https://fal.ai/docs/platform-apis/v1/models/requests/by-endpoint.md): Lists requests for one or more endpoints (same `endpoint_id` style as usage/explore: comma-separated or repeated query params, up to 50 IDs).
+- [Delete request payloads](https://fal.ai/docs/platform-apis/v1/models/requests/payloads.md): Deletes the IO payloads and associated CDN output files for a specific request.
+- [Platform APIs for Assets](https://fal.ai/docs/api-reference/platform-apis/for-assets.md): Programmatic access to fal Assets for browsing, searching, uploading, and organizing generated media
+- [Browse assets](https://fal.ai/docs/platform-apis/v1/assets.md): Browse and semantically search fal Assets across all media, uploads, favorites, collections, tags, and character references.
+- [Upload asset](https://fal.ai/docs/platform-apis/v1/assets/uploads.md): Upload asset for the authenticated user's fal Assets library.
+- [Get asset](https://fal.ai/docs/platform-apis/v1/assets/get.md): Get an asset document by vector ID from the authenticated user's fal Assets library. The vector may exist only in Turbopuffer; in that case the response returns the Turbopuffer document with empty local state.
+- [Favorite asset](https://fal.ai/docs/platform-apis/v1/assets/favorite.md): Favorite an asset. Provide a request ID or vector ID; unresolved references are materialized before favorite state is added.
+- [Unfavorite asset](https://fal.ai/docs/platform-apis/v1/assets/unfavorite.md): Unfavorite an asset by request ID or vector ID.
+- [List asset collections](https://fal.ai/docs/platform-apis/v1/assets/collections.md): List asset collections for the authenticated user's fal Assets library.
+- [Create asset collection](https://fal.ai/docs/platform-apis/v1/assets/collections/create.md): Create asset collection for the authenticated user's fal Assets library.
+- [Get asset collection](https://fal.ai/docs/platform-apis/v1/assets/collections/get.md): Get asset collection for the authenticated user's fal Assets library.
+- [Update asset collection](https://fal.ai/docs/platform-apis/v1/assets/collections/update.md): Update asset collection for the authenticated user's fal Assets library.
+- [Delete asset collection](https://fal.ai/docs/platform-apis/v1/assets/collections/delete.md): Delete asset collection for the authenticated user's fal Assets library.
+- [Favorite asset collection](https://fal.ai/docs/platform-apis/v1/assets/collections/favorite.md): Favorite an asset collection for the authenticated user's fal Assets library.
+- [Unfavorite asset collection](https://fal.ai/docs/platform-apis/v1/assets/collections/unfavorite.md): Unfavorite an asset collection for the authenticated user's fal Assets library.
+- [Browse assets in a collection](https://fal.ai/docs/platform-apis/v1/assets/collections/assets.md): Browse assets in a collection for the authenticated user's fal Assets library.
+- [Add asset to collection](https://fal.ai/docs/platform-apis/v1/assets/collections/assets/add.md): Add an asset to a manual or character collection. Provide a request ID or vector ID; unresolved references are materialized before local collection state is added. For character collections, the asset is added by applying the character tag.
+- [Remove asset from collection](https://fal.ai/docs/platform-apis/v1/assets/collections/assets/remove.md): Remove an asset from a manual or character collection by request ID or vector ID.
+- [List asset characters](https://fal.ai/docs/platform-apis/v1/assets/characters.md): List asset characters for the authenticated user's fal Assets library.
+- [Create asset character](https://fal.ai/docs/platform-apis/v1/assets/characters/create.md): Create an asset character for the authenticated user's fal Assets library. Prefer vector IDs or request IDs in reference_images for existing fal-generated assets; use fal-hosted image URLs only for standalone images. Unresolved ID references are materialized before character state is added.
+- [Get asset character](https://fal.ai/docs/platform-apis/v1/assets/characters/get.md): Get asset character for the authenticated user's fal Assets library.
+- [Update asset character](https://fal.ai/docs/platform-apis/v1/assets/characters/update.md): Update an asset character for the authenticated user's fal Assets library. Prefer vector IDs or request IDs in reference_images for existing fal-generated assets; use fal-hosted image URLs only for standalone images. Unresolved ID references are materialized before character state is added.
+- [Delete asset character](https://fal.ai/docs/platform-apis/v1/assets/characters/delete.md): Delete asset character for the authenticated user's fal Assets library.
+- [Favorite asset character](https://fal.ai/docs/platform-apis/v1/assets/characters/favorite.md): Favorite an asset character for the authenticated user's fal Assets library.
+- [Unfavorite asset character](https://fal.ai/docs/platform-apis/v1/assets/characters/unfavorite.md): Unfavorite an asset character for the authenticated user's fal Assets library.
+- [List asset tags](https://fal.ai/docs/platform-apis/v1/assets/tags.md): List asset tags for the authenticated user's fal Assets library.
+- [Create asset tag](https://fal.ai/docs/platform-apis/v1/assets/tags/create.md): Create asset tag for the authenticated user's fal Assets library.
+- [Set tags for an asset](https://fal.ai/docs/platform-apis/v1/assets/tags/set-for-asset.md): Set tags for an asset. Provide a request ID or vector ID; unresolved references are materialized before tag state is added.
+- [Update asset tag](https://fal.ai/docs/platform-apis/v1/assets/tags/update.md): Update asset tag for the authenticated user's fal Assets library.
+- [Delete asset tag](https://fal.ai/docs/platform-apis/v1/assets/tags/delete.md): Delete asset tag for the authenticated user's fal Assets library.
+- [List tags for an asset](https://fal.ai/docs/platform-apis/v1/assets/tags/list-for-asset.md): List tags for an asset by vector ID. Vectors that have not been saved as assets return an empty tag list.
+- [Assign tag to asset](https://fal.ai/docs/platform-apis/v1/assets/tags/assign.md): Assign a tag to an asset. Provide a request ID or vector ID; unresolved references are materialized before tag state is added.
+- [Unassign tag from asset](https://fal.ai/docs/platform-apis/v1/assets/tags/unassign.md): Unassign a tag from an asset by request ID or vector ID.
+- [Platform APIs for Storage](https://fal.ai/docs/api-reference/platform-apis/for-storage.md): Manage access control, signed URLs, and lifecycle settings for fal CDN files
+- [Get file ACL](https://fal.ai/docs/platform-apis/v1/storage/files/acl/get.md): Returns the Access Control List currently applied to a fal CDN file.
+- [Set file ACL](https://fal.ai/docs/platform-apis/v1/storage/files/acl/set.md): Replaces the Access Control List of a fal CDN file.
+- [Sign file URL](https://fal.ai/docs/platform-apis/v1/storage/files/sign.md): Creates a signed URL that grants temporary access to a fal CDN file, regardless of its ACL. Useful for sharing access-restricted files.
+- [Get storage settings](https://fal.ai/docs/platform-apis/v1/storage/settings/get.md): Returns the account-level storage lifecycle settings applied to newly uploaded fal CDN files:
+- [Update storage settings](https://fal.ai/docs/platform-apis/v1/storage/settings/update.md): Replaces the account-level storage lifecycle settings applied to newly uploaded fal CDN files. Omitted or null fields are cleared (reset to the system default), so always send the full desired configuration.
+- [Platform APIs for Workflows](https://fal.ai/docs/api-reference/platform-apis/for-workflows.md): Programmatic access to workflow creation, metadata, listing, and details
+- [List user workflows](https://fal.ai/docs/platform-apis/v1/workflows.md): List workflows for the authenticated user with optional search and filtering.
+- [Create a workflow](https://fal.ai/docs/platform-apis/v1/workflows/create.md): Create a new workflow owned by the authenticated user.
+- [Get workflow details](https://fal.ai/docs/platform-apis/v1/workflows/get.md): Get detailed information about a specific workflow, including its full contents/definition.
+- [Platform APIs for Serverless](https://fal.ai/docs/api-reference/platform-apis/for-serverless.md): Programmatic access to serverless apps metadata, analytics, and billing
+- [Queue Size](https://fal.ai/docs/platform-apis/v1/serverless/apps/queue.md): Retrieves the current queue size for a specific application.
+- [Flush Application Queue](https://fal.ai/docs/platform-apis/v1/serverless/apps/flush-queue.md): Flushes all pending requests from an application's queue.
+- [Application Revisions](https://fal.ai/docs/platform-apis/v1/serverless/apps/revisions.md): Returns the revision history for an application, newest first: every deployed version with its creation time, whether it is currently serving traffic, and a deployment status derived from recent deployment events.
+- [Metrics](https://fal.ai/docs/platform-apis/v1/serverless/metrics.md): Returns Prometheus-compatible metrics in text format for integration into your observability stack
+- [Analytics](https://fal.ai/docs/platform-apis/v1/serverless/analytics.md): Time-bucketed metrics for your serverless app endpoints, including request counts, success/error rates, and latency percentiles across all inbound traffic. `prepare_duration` reflects queue/prepare time before execution; `duration` is request execution time.
+- [Usage](https://fal.ai/docs/platform-apis/v1/serverless/usage.md): Time-bucketed, aggregated serverless compute usage for **your own account** — the machine-seconds your deployed serverless apps consumed, priced with your machine prices and net of discounts. This matches the serverless portion of the dashboard usage view. Unlike `/v1/models/usage` (which reports mo…
+- [List requests by endpoint(s)](https://fal.ai/docs/platform-apis/v1/serverless/requests/by-endpoint.md): Lists requests for one or more endpoints owned by the authenticated user. Use repeated or comma-separated `endpoint_id` (same as other platform list APIs).
+- [List files (root)](https://fal.ai/docs/platform-apis/v1/serverless/files/list.md): Lists files and folders in the root of your project storage.
+- [List files (directory)](https://fal.ai/docs/platform-apis/v1/serverless/files/list/directory.md): Lists files and folders within the specified directory path.
+- [Download file](https://fal.ai/docs/platform-apis/v1/serverless/files/file/download.md): Downloads a file by its path. Proxies the underlying storage response.
+- [Upload file from URL](https://fal.ai/docs/platform-apis/v1/serverless/files/file/upload-from-url.md): Creates a new file at the target path by downloading it from the provided URL.
+- [Upload local file (multipart/form-data)](https://fal.ai/docs/platform-apis/v1/serverless/files/file/upload-local.md): Uploads a local file using multipart/form-data. The file field name must be `file_upload`.
+- [Logs history (paginated)](https://fal.ai/docs/platform-apis/v1/serverless/logs/history.md): Returns paginated historical logs that match the provided filters.
+- [Logs stream (SSE)](https://fal.ai/docs/platform-apis/v1/serverless/logs/stream.md): Streams live logs that match the provided filters using Server-Sent Events.
+- [Platform APIs for Compute](https://fal.ai/docs/api-reference/platform-apis/for-compute.md): Programmatic access to compute instance management, lifecycle control, and monitoring
+- [List Compute Instances](https://fal.ai/docs/platform-apis/v1/compute/instances/list.md): Returns a list of all compute instances belonging to the authenticated user's workspace.
+- [Get Compute Instance](https://fal.ai/docs/platform-apis/v1/compute/instances/get.md): Retrieves detailed information about a specific compute instance by its ID.
+- [Create Compute Instance](https://fal.ai/docs/platform-apis/v1/compute/instances/create.md): Creates a new compute instance with the specified configuration and SSH key.
+- [Delete Compute Instance](https://fal.ai/docs/platform-apis/v1/compute/instances/delete.md): Deletes a specific compute instance by its ID. This action is irreversible.
+- [Platform APIs for Keys](https://fal.ai/docs/api-reference/platform-apis/for-keys.md): Programmatic access to API key management, creation, and deletion
+- [List API Keys](https://fal.ai/docs/platform-apis/v1/keys/list.md): Returns a list of all API keys belonging to the authenticated user's workspace.
+- [Create API Key](https://fal.ai/docs/platform-apis/v1/keys/create.md): Creates a new API key with the specified alias.
+- [Delete API Key](https://fal.ai/docs/platform-apis/v1/keys/delete.md): Deletes an API key by its ID. This action is irreversible.
+- [Platform APIs for Accounts](https://fal.ai/docs/api-reference/platform-apis/for-accounts.md): Programmatic access to account billing information, FOCUS-compliant cost reports, and model access controls
+- [Account Billing](https://fal.ai/docs/platform-apis/v1/account/billing.md): Returns billing information for the authenticated account. Use the `expand` parameter to include additional details.
+- [FOCUS Report](https://fal.ai/docs/platform-apis/v1/account/focus.md): Returns a FOCUS compliant billing report as a CSV download.
+- [Model Access Controls Report](https://fal.ai/docs/platform-apis/v1/account/model-access-controls.md): Returns the current model access controls for your organization as a CSV download.
+- [Platform APIs for Organizations](https://fal.ai/docs/api-reference/platform-apis/for-organization.md): Programmatic access to organization-wide team listings, cross-team usage records, FOCUS billing reports, and billing events
+- [Organization Teams](https://fal.ai/docs/platform-apis/v1/organization/teams.md): Returns the list of teams in your organization with their details.
+- [Organization Usage](https://fal.ai/docs/platform-apis/v1/organization/usage.md): Returns paginated usage records across all teams and product lines in your organization, with each record attributed to a specific team via the `username` field and a product line via the `product` field.
+- [Organization FOCUS Report](https://fal.ai/docs/platform-apis/v1/organization/focus.md): Returns a FOCUS compliant billing report as a CSV download, spanning every team in your organization. Each invoiced billing customer is reported as a `BillingAccount`. Under shared (pooled) billing — one billing customer covering multiple teams — each row is additionally attributed to the calling te…
+- [Organization Billing Events](https://fal.ai/docs/platform-apis/v1/organization/billing-events.md): Returns paginated individual billing event records across all teams in your organization, with each record attributed to a specific team via the `username` field. Each record includes a per-request cost breakdown in USD (cost_subtotal, cost_discount, cost_total; cost_estimate_nano_usd carries cost_t…
+
+## Changelog
+
+- [Product Changelog](https://fal.ai/docs/changelog.md): Latest features and updates to the fal platform
+
+## OpenAPI Specs
+
+- [v1](/docs/api-reference/platform-apis/openapi/v1.json)
+
+## Optional
+
+- [Status](https://status.fal.ai/)
+- [Community](https://discord.gg/fal-ai)
+- [Blog](https://blog.fal.ai/)
+
+> The links below point to documentation indexes. Follow each `/_llms/` index recursively until you reach documentation pages.
+
+## Indexes
+
+- [Documentation (193 pages)](https://fal.ai/docs/_llms/documentation.md): Documentation for Documentation.
+- [Model API Reference (138 pages)](https://fal.ai/docs/_llms/model-api-reference.md): Documentation for Model API Reference.

@@ -3829,6 +3829,7 @@
             "q": "optional; operation_schema for details",
             "category": "optional; operation_schema for details",
             "status": "optional; operation_schema for details",
+            "sort": "optional; operation_schema for details",
             "expand": "optional; operation_schema for details"
           }
         },
@@ -4300,6 +4301,12 @@
             "entity_id": "required"
           }
         },
+        "get_compute_metrics": {
+          "effect": "read",
+          "params": {
+            "compute_cluster": "required"
+          }
+        },
         "models": {
           "effect": "read",
           "params": {
@@ -4309,6 +4316,7 @@
             "q": "optional; operation_schema for details",
             "category": "optional; operation_schema for details",
             "status": "optional; operation_schema for details",
+            "sort": "optional; operation_schema for details",
             "expand": "optional; operation_schema for details"
           }
         },
@@ -4447,19 +4455,19 @@
         "job_status": {
           "effect": "read",
           "params": {
-            "job_id": "optional; operation_schema for details"
+            "job_id": "required"
           }
         },
         "job_result": {
           "effect": "read",
           "params": {
-            "job_id": "optional; operation_schema for details"
+            "job_id": "required"
           }
         },
         "artifact_download": {
           "effect": "read",
           "params": {
-            "artifact_id": "optional; operation_schema for details"
+            "artifact_id": "required"
           }
         },
         "budget": {
@@ -4469,7 +4477,7 @@
         "response_read": {
           "effect": "read",
           "params": {
-            "response_id": "optional; operation_schema for details",
+            "response_id": "required",
             "pointer": "optional; operation_schema for details",
             "offset": "optional; operation_schema for details",
             "limit": "optional; operation_schema for details",
@@ -4782,7 +4790,7 @@
         "upload_file": {
           "effect": "write",
           "params": {
-            "path": "optional; operation_schema for details",
+            "path": "required",
             "filename": "optional; operation_schema for details",
             "content_type": "optional; operation_schema for details"
           }
@@ -5022,6 +5030,13 @@
         "task_queue_stats": {
           "effect": "read",
           "params": {}
+        },
+        "task_files": {
+          "effect": "read",
+          "params": {
+            "role": "optional; operation_schema for details",
+            "id": "required"
+          }
         },
         "task_cost": {
           "effect": "read",
@@ -6193,7 +6208,7 @@
         "operation_schema": {
           "effect": "read",
           "params": {
-            "operation": "optional; operation_schema for details"
+            "operation": "required"
           }
         },
         "jobs": {
@@ -6205,19 +6220,19 @@
         "job_status": {
           "effect": "read",
           "params": {
-            "job_id": "optional; operation_schema for details"
+            "job_id": "required"
           }
         },
         "job_result": {
           "effect": "read",
           "params": {
-            "job_id": "optional; operation_schema for details"
+            "job_id": "required"
           }
         },
         "artifact_download": {
           "effect": "read",
           "params": {
-            "artifact_id": "optional; operation_schema for details"
+            "artifact_id": "required"
           }
         },
         "budget": {
@@ -6227,7 +6242,7 @@
         "response_read": {
           "effect": "read",
           "params": {
-            "response_id": "optional; operation_schema for details",
+            "response_id": "required",
             "pointer": "optional; operation_schema for details",
             "offset": "optional; operation_schema for details",
             "limit": "optional; operation_schema for details",
@@ -6279,6 +6294,20 @@
             "session": "optional; operation_schema for details",
             "session_timeout": "optional; operation_schema for details",
             "wait": "optional; operation_schema for details"
+          }
+        },
+        "task_files_delete": {
+          "effect": "write",
+          "params": {
+            "role": "optional; operation_schema for details",
+            "id": "required"
+          }
+        },
+        "task_delete": {
+          "effect": "write",
+          "params": {
+            "files": "optional; operation_schema for details",
+            "id": "required"
           }
         },
         "task_cancel": {
@@ -6924,7 +6953,7 @@
         "upload_file": {
           "effect": "write",
           "params": {
-            "path": "optional; operation_schema for details",
+            "path": "required",
             "filename": "optional; operation_schema for details",
             "content_type": "optional; operation_schema for details"
           }

@@ -90,7 +90,10 @@ class CatalogTests(unittest.TestCase):
     def test_saby_reuses_cache_renews_once_and_only_reads(self):
         with tempfile.TemporaryDirectory() as state:
             config = {'state_dir': state, 'saby_org': {'ИНН': 'test'}}
-            Path(state, 'saby-session.json').write_text('{"token":"old"}')
+            from automation_integrations.extended_api import saby_cache_fingerprint
+            fingerprint = saby_cache_fingerprint(FakeVault().get('saby'))
+            Path(state, 'saby-session.json').write_text(json.dumps(
+                {'token': 'old', 'credential_fingerprint': fingerprint}))
             http = FakeHTTP(Failure('authorization_failed', 401), {'token': 'new'}, {'result': {'Документ': []}})
             request = {'service': 'saby', 'operation': 'documents', 'params': {'page_size': 2}}
             result = execute(request, config, FakeVault(), http)

@@ -22,6 +22,7 @@ _REMOTE_SCRIPT = r'''
 import datetime
 import email.utils
 import json
+import math
 import re
 import ssl
 import sys
@@ -161,6 +162,12 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 def reject_constant(value):
     raise ValueError()
 
+def finite_float(value):
+    number = float(value)
+    if not math.isfinite(number):
+        raise ValueError()
+    return number
+
 def perform(request):
     validate(request)
     url = ORIGIN + request['path']
@@ -186,7 +193,7 @@ def perform(request):
             if not raw and documented_empty_response(request['method'], request['path'], status):
                 return status, None
             try:
-                result = json.loads(raw.decode('utf-8'), parse_constant=reject_constant)
+                result = json.loads(raw.decode('utf-8'), parse_constant=reject_constant, parse_float=finite_float)
             except (UnicodeError, ValueError, RecursionError):
                 raise WorkerFailure('invalid_json') from None
             return status, result
@@ -269,7 +276,8 @@ def call(method, path, *, headers=None, query=None, body=None, config=None):
         raw = response.stdout
         if not isinstance(raw, bytes) or len(raw) > _MAX_OUTPUT:
             raise TransportFailure('response_too_large')
-        result = json.loads(raw.decode('utf-8'), parse_constant=_worker['reject_constant'])
+        result = json.loads(raw.decode('utf-8'), parse_constant=_worker['reject_constant'],
+                            parse_float=_worker['finite_float'])
         if not isinstance(result, dict):
             raise ValueError()
         status, delay = result.get('status'), result.get('retry_after')

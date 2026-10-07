@@ -1,163 +1,213 @@
 {
   "schema_version": 1,
   "service": "fal",
-  "retrieved_at": "2026-10-04",
+  "retrieved_at": "2026-10-07",
   "scope": "Entire documented Platform REST surface (union of live and static OpenAPI by operationId), plus dynamic model execution and lifecycle. All model categories are discovered live; no short hardcoded model list.",
   "authentication_note": "Authorization: Key FAL_KEY. Admin operations prefer optional FAL_ADMIN_KEY; API scope does not become admin.",
   "sources": [
     {
-      "file": "llms.txt",
       "url": "https://docs.fal.ai/llms.txt",
+      "final_url": "https://fal.ai/docs/llms.txt",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/llms.txt",
       "sha256": "eaf929a64bfca5905b693a546dc4f25abca6726bb5f2ae47f33e3999492c5e6a",
-      "retrieved_at": "2026-10-04T16:01:50.492756+00:00"
+      "retrieved_at": "2026-10-07T16:14:33.412441+00:00",
+      "file": "llms.txt"
     },
     {
-      "file": "platform-openapi.json",
       "url": "https://api.fal.ai/v1/openapi.json",
-      "sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
-      "retrieved_at": "2026-10-04T16:01:51.046498+00:00"
+      "final_url": "https://api.fal.ai/v1/openapi.json",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/platform-openapi.json",
+      "sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
+      "retrieved_at": "2026-10-07T16:14:34.408491+00:00",
+      "file": "platform-openapi.json"
     },
     {
-      "file": "documentation-index.md",
       "url": "https://fal.ai/docs/_llms/documentation.md",
+      "final_url": "https://fal.ai/docs/_llms/documentation.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/documentation-index.md",
       "sha256": "dd7b577c9d48932da9c12562889cc2cd3650fcd37f07ae39b3b1eafed21326d6",
-      "retrieved_at": "2026-10-04T16:02:07.544243+00:00"
+      "retrieved_at": "2026-10-07T16:14:33.900465+00:00",
+      "file": "documentation-index.md"
     },
     {
-      "file": "model-api-index.md",
       "url": "https://fal.ai/docs/_llms/model-api-reference.md",
+      "final_url": "https://fal.ai/docs/_llms/model-api-reference.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/model-api-index.md",
       "sha256": "ad931e1124eea94d17cb833a8ef9aaaa6728c23da47484ff4893b74e4a06c730",
-      "retrieved_at": "2026-10-04T16:02:08.143492+00:00"
+      "retrieved_at": "2026-10-07T16:14:34.556498+00:00",
+      "file": "model-api-index.md"
     },
     {
-      "file": "auth.md",
       "url": "https://fal.ai/docs/api-reference/platform-apis/authentication.md",
+      "final_url": "https://fal.ai/docs/api-reference/platform-apis/authentication.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/auth.md",
       "sha256": "7efdf026219009dab6a86245af684143c2c72559f3ee500b892a9cd5770a7b57",
-      "retrieved_at": "2026-10-04T16:02:08.222247+00:00"
+      "retrieved_at": "2026-10-07T16:14:33.372439+00:00",
+      "file": "auth.md"
     },
     {
-      "file": "models.md",
       "url": "https://fal.ai/docs/platform-apis/v1/models.md",
+      "final_url": "https://fal.ai/docs/platform-apis/v1/models.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/models.md",
       "sha256": "0655f30df8f3167a9e50d659c9b14f62c9daeff2840c8ba31768669a677ecf63",
-      "retrieved_at": "2026-10-04T16:02:08.349478+00:00"
+      "retrieved_at": "2026-10-07T16:14:33.524447+00:00",
+      "file": "models.md"
     },
     {
-      "file": "client-python.md",
       "url": "https://fal.ai/docs/api-reference/client-libraries/python/fal_client.md",
+      "final_url": "https://fal.ai/docs/api-reference/client-libraries/python/fal_client.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/client-python.md",
       "sha256": "057d71786e5d8385560126aba265edaf29520038b490339ebc404a9fa7dd4c16",
-      "retrieved_at": "2026-10-04T16:02:08.450417+00:00"
+      "retrieved_at": "2026-10-07T16:14:33.540447+00:00",
+      "file": "client-python.md"
     },
     {
-      "file": "queue.md",
       "url": "https://fal.ai/docs/documentation/model-apis/inference/queue.md",
-      "sha256": "cf7079a3e017944d9dd2189aa7388e57de0695daf5e68674d887b5a8e1177910",
-      "retrieved_at": "2026-10-04T16:02:46.696490+00:00"
+      "final_url": "https://fal.ai/docs/documentation/model-apis/inference/queue.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/queue.md",
+      "sha256": "092009c0176c4fd5bf8e84bac4e25d95383652ac0088f7c1ad8869932d610542",
+      "retrieved_at": "2026-10-07T16:14:33.356438+00:00",
+      "file": "queue.md"
     },
     {
-      "file": "synchronous.md",
       "url": "https://fal.ai/docs/documentation/model-apis/inference/synchronous.md",
+      "final_url": "https://fal.ai/docs/documentation/model-apis/inference/synchronous.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/synchronous.md",
       "sha256": "0a0824ca7111dd75bc71db24d12bf844471411bb2d20bebe68c0d9451f1d5043",
-      "retrieved_at": "2026-10-04T16:02:46.678349+00:00"
+      "retrieved_at": "2026-10-07T16:14:33.564449+00:00",
+      "file": "synchronous.md"
     },
     {
-      "file": "streaming.md",
       "url": "https://fal.ai/docs/documentation/model-apis/inference/streaming.md",
+      "final_url": "https://fal.ai/docs/documentation/model-apis/inference/streaming.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/streaming.md",
       "sha256": "5c2dabc7b7140d7081095509d2beca58f4be1f78685f3f7faad62576a7e50cc8",
-      "retrieved_at": "2026-10-04T16:02:46.689720+00:00"
+      "retrieved_at": "2026-10-07T16:14:33.604451+00:00",
+      "file": "streaming.md"
     },
     {
-      "file": "real-time.md",
       "url": "https://fal.ai/docs/documentation/model-apis/inference/real-time.md",
+      "final_url": "https://fal.ai/docs/documentation/model-apis/inference/real-time.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/real-time.md",
       "sha256": "203efa18576322e479708f26baa2f5033a1beb34a892c6573100f3219aa1f7de",
-      "retrieved_at": "2026-10-04T16:02:46.716762+00:00"
+      "retrieved_at": "2026-10-07T16:14:33.652453+00:00",
+      "file": "real-time.md"
     },
     {
-      "file": "websockets.md",
       "url": "https://fal.ai/docs/documentation/model-apis/inference/websockets.md",
+      "final_url": "https://fal.ai/docs/documentation/model-apis/inference/websockets.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/websockets.md",
       "sha256": "0c47ee093df5c3cee43d37b05461b0927bfe1e6b340012ceb0d4152803ad0540",
-      "retrieved_at": "2026-10-04T16:02:46.828604+00:00"
+      "retrieved_at": "2026-10-07T16:14:33.808461+00:00",
+      "file": "websockets.md"
     },
     {
-      "file": "webhooks.md",
       "url": "https://fal.ai/docs/documentation/model-apis/inference/webhooks.md",
+      "final_url": "https://fal.ai/docs/documentation/model-apis/inference/webhooks.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/webhooks.md",
       "sha256": "e8def5d04dfbdb905869644064aef5372b170857525bf534104a049ad7ea85dc",
-      "retrieved_at": "2026-10-04T16:02:46.701435+00:00"
+      "retrieved_at": "2026-10-07T16:14:33.648453+00:00",
+      "file": "webhooks.md"
     },
     {
-      "file": "common-parameters.md",
       "url": "https://fal.ai/docs/documentation/model-apis/common-parameters.md",
-      "sha256": "9e5f2ffe10ea893fa51ffb2ce0b869fd9a690fe6657fe65b05ec925892d8ecc1",
-      "retrieved_at": "2026-10-04T16:02:46.741187+00:00"
+      "final_url": "https://fal.ai/docs/documentation/model-apis/common-parameters.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/common-parameters.md",
+      "sha256": "6647d86e5c72f7660eea1c2c18d3dfd82fffb9a29d06a49bbea07d3df8bd0db8",
+      "retrieved_at": "2026-10-07T16:14:33.648453+00:00",
+      "file": "common-parameters.md"
     },
     {
-      "file": "fal-cdn.md",
       "url": "https://fal.ai/docs/documentation/model-apis/fal-cdn.md",
+      "final_url": "https://fal.ai/docs/documentation/model-apis/fal-cdn.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/fal-cdn.md",
       "sha256": "0c60d94075fbc055cb421a918095f472b804f4e6ec31a6f7d36f468c16e65547",
-      "retrieved_at": "2026-10-04T16:02:46.754581+00:00"
+      "retrieved_at": "2026-10-07T16:14:33.668454+00:00",
+      "file": "fal-cdn.md"
     },
     {
-      "file": "media-expiration.md",
       "url": "https://fal.ai/docs/documentation/model-apis/media-expiration.md",
+      "final_url": "https://fal.ai/docs/documentation/model-apis/media-expiration.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/media-expiration.md",
       "sha256": "3e45d770f4fee31bcb0ebe4eae77485b5012a294cf4b6f2a629149cb36afd383",
-      "retrieved_at": "2026-10-04T16:02:46.780642+00:00"
+      "retrieved_at": "2026-10-07T16:14:33.720456+00:00",
+      "file": "media-expiration.md"
     },
     {
-      "file": "workflows.md",
       "url": "https://fal.ai/docs/documentation/model-apis/workflows.md",
+      "final_url": "https://fal.ai/docs/documentation/model-apis/workflows.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/workflows.md",
       "sha256": "4ffe24bd5ff7f344b9c29c9a4f0b05b710c7e7b6e6b0c1035f023dd4dcf1542e",
-      "retrieved_at": "2026-10-04T16:02:46.815578+00:00"
+      "retrieved_at": "2026-10-07T16:14:33.924467+00:00",
+      "file": "workflows.md"
     },
     {
-      "file": "agent-surfaces.md",
       "url": "https://fal.ai/docs/documentation/setting-up/agent-surfaces.md",
+      "final_url": "https://fal.ai/docs/documentation/setting-up/agent-surfaces.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/agent-surfaces.md",
       "sha256": "45d2ac88971f49991a6f11d1761e34e83c0878678bce6af357b1aad0fe73dc7a",
-      "retrieved_at": "2026-10-04T16:02:46.954736+00:00"
+      "retrieved_at": "2026-10-07T16:14:34.156478+00:00",
+      "file": "agent-surfaces.md"
     },
     {
-      "file": "key-based.md",
       "url": "https://fal.ai/docs/documentation/model-apis/authentication/key-based.md",
+      "final_url": "https://fal.ai/docs/documentation/model-apis/authentication/key-based.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/key-based.md",
       "sha256": "9193cdb3cdb31fe426d99ceb89487584ae6c2f17ecb125d84994f57d846fbfbe",
-      "retrieved_at": "2026-10-04T16:02:46.806764+00:00"
+      "retrieved_at": "2026-10-07T16:14:33.744458+00:00",
+      "file": "key-based.md"
     },
     {
-      "file": "mcp.md",
       "url": "https://fal.ai/docs/documentation/setting-up/mcp.md",
+      "final_url": "https://fal.ai/docs/documentation/setting-up/mcp.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/mcp.md",
       "sha256": "9400e0ca9a8e76599441f79e08f39b1c96bf7268f3db59b82c2ed1347aacf447",
-      "retrieved_at": "2026-10-04T16:02:46.825499+00:00"
+      "retrieved_at": "2026-10-07T16:14:33.812461+00:00",
+      "file": "mcp.md"
     },
     {
-      "file": "platform-mcp.md",
       "url": "https://fal.ai/docs/documentation/setting-up/platform-mcp.md",
+      "final_url": "https://fal.ai/docs/documentation/setting-up/platform-mcp.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/platform-mcp.md",
       "sha256": "3998ffadf2eb836172f312fd32aa4e4af973a91af8218a9df68b559375d3e07c",
-      "retrieved_at": "2026-10-04T16:02:46.878756+00:00"
+      "retrieved_at": "2026-10-07T16:14:33.960468+00:00",
+      "file": "platform-mcp.md"
     },
     {
-      "file": "create.md",
       "url": "https://fal.ai/docs/platform-apis/v1/compute/instances/create.md",
+      "final_url": "https://fal.ai/docs/platform-apis/v1/compute/instances/create.md",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/create.md",
       "sha256": "eb821f4ebaaef6419d055b4391f73342896d2a1224c15a44ff083a002d0b458c",
-      "retrieved_at": "2026-10-04T16:02:47.027734+00:00"
+      "retrieved_at": "2026-10-07T16:14:34.088475+00:00",
+      "file": "create.md"
     },
     {
-      "file": "sdk-client.py",
       "url": "https://raw.githubusercontent.com/fal-ai/fal/main/projects/fal_client/src/fal_client/client.py",
+      "final_url": "https://raw.githubusercontent.com/fal-ai/fal/main/projects/fal_client/src/fal_client/client.py",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/sdk-client.py",
       "sha256": "b3722b1e7e7a8349ea2c6f25fa35ddddc6d061006ca0e8b82b649fe64f27316e",
-      "retrieved_at": "2026-10-04T16:03:11.297384+00:00"
+      "retrieved_at": "2026-10-07T16:14:34.028472+00:00",
+      "file": "sdk-client.py"
     },
     {
-      "file": "platform-doc-openapi.json",
       "url": "https://fal.ai/docs/api-reference/platform-apis/openapi/v1.json",
+      "final_url": "https://fal.ai/docs/api-reference/platform-apis/openapi/v1.json",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/platform-doc-openapi.json",
       "sha256": "ecb1deaf7155562b89f4626ac15434d4fe293748a260f81496cd08da5580ea47",
-      "retrieved_at": "2026-10-04T16:03:11.942872+00:00"
+      "retrieved_at": "2026-10-07T16:14:34.516496+00:00",
+      "file": "platform-doc-openapi.json"
     },
     {
-      "file": "sdk-headers.py",
       "url": "https://raw.githubusercontent.com/fal-ai/fal/main/projects/fal_client/src/fal_client/_headers.py",
-      "sha256": "613ffaa0766336645c52ccde85f2148739ecb84e6a127e4475b98d3e95f286ed",
-      "retrieved_at": "2026-10-04T16:07:48.427477+00:00"
+      "final_url": "https://raw.githubusercontent.com/fal-ai/fal/main/projects/fal_client/src/fal_client/_headers.py",
+      "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/sdk-headers.py",
+      "sha256": "b1882a08b173e0cecca1463ea3f8930227d85e272f930ad918444ada07e744bf",
+      "retrieved_at": "2026-10-07T16:14:34.148478+00:00",
+      "file": "sdk-headers.py"
     }
   ],
   "total": 112,
-  "platform_total": 88,
+  "platform_total": 89,
   "capabilities": [
     {
       "id": "get_models",
@@ -165,7 +215,7 @@
       "method": "GET",
       "path": "/v1/models",
       "summary": "Model search",
-      "description": "Unified endpoint for discovering model endpoints. Supports three usage modes:\n\n**1. List Mode** (no parameters):\nPaginated list of all available model endpoints with minimal metadata.\n\n**2. Find Mode** (`endpoint_id` parameter):\nRetrieve specific model endpoint(s) by ID. Supports single or multiple IDs.\n\n**3. Search Mode** (search parameters):\nFilter models by free-text query, category, or status.\n\n**Expansion:**\nUse `expand` to include additional data in each model object:\n- `openapi-3.0` — full OpenAPI 3.0 schema in the `openapi` field\n- `enterprise_status` — enterprise readiness status (`ready` or `pending`) in the `enterprise_status` field\n\n**Examples of `endpoint_id` values:**\n- `fal-ai/flux/dev`\n- `fal-ai/wan/v2.2-a14b/text-to-video`\n- `fal-ai/minimax/video-01/image-to-video`\n- `fal-ai/hunyuan3d-v21`\n\nSee [fal.ai Model APIs](https://fal.ai/docs/documentation/model-apis/overview) for more details.\n\n**Authentication:** Optional. Providing an API key grants higher rate limits.\n\n**Common Use Cases:**\n- Browse available models for integration\n- Retrieve metadata for specific endpoints\n- Search for models by category or keywords\n- Get OpenAPI schemas for code generation\n- Build model selection interfaces",
+      "description": "Unified endpoint for discovering model endpoints. Supports three usage modes:\n\n**1. List Mode** (no parameters):\nPaginated list of all available model endpoints with minimal metadata.\n\n**2. Find Mode** (`endpoint_id` parameter):\nRetrieve specific model endpoint(s) by ID. Supports single or multiple IDs.\n\n**3. Search Mode** (search parameters):\nFilter models by free-text query, category, or status.\n\n**Ordering (list/search):**\n- `sort=relevant` uses Explore's shared Trending browse order without keywords and relevance order with keywords. Trending data can fall back to publication dates when unavailable.\n- `sort=recent` sorts the complete filtered set by publication date (creation date when the publication date is missing), before pagination.\n- An explicit sort is acknowledged by `ordering.sort`. Omitting sort preserves the default response. Find mode always preserves the supplied endpoint ID order and has no ordering acknowledgement.\n- Keep sort, filters and limit unchanged when following `next_cursor`; cursors are page positions, not snapshots, and catalog/ranking updates can change later pages.\n\n**Expansion:**\nUse `expand` to include additional data in each model object:\n- `openapi-3.0` — full OpenAPI 3.0 schema in the `openapi` field\n- `enterprise_status` — enterprise readiness status (`ready` or `pending`) in the `enterprise_status` field\n\n**Examples of `endpoint_id` values:**\n- `fal-ai/flux/dev`\n- `fal-ai/wan/v2.2-a14b/text-to-video`\n- `fal-ai/minimax/video-01/image-to-video`\n- `fal-ai/hunyuan3d-v21`\n\nSee [fal.ai Model APIs](https://fal.ai/docs/documentation/model-apis/overview) for more details.\n\n**Authentication:** Optional. Providing an API key grants higher rate limits.\n\n**Common Use Cases:**\n- Browse available models for integration\n- Retrieve metadata for specific endpoints\n- Search for models by category or keywords\n- Get OpenAPI schemas for code generation\n- Build model selection interfaces",
       "category": [
         "Models"
       ],
@@ -220,6 +270,15 @@
             ],
             "description": "Filter models by status - omit to include all statuses",
             "example": "active"
+          },
+          "sort": {
+            "type": "string",
+            "enum": [
+              "relevant",
+              "recent"
+            ],
+            "description": "List/search ordering: relevant uses Explore's shared Trending browse order or keyword relevance; recent sorts by publication date (creation date when the publication date is missing). Defaults to relevant. Ignored in endpoint_id find mode, which preserves input order. Keep sort, filters and limit unchanged when following a cursor.",
+            "example": "recent"
           },
           "expand": {
             "anyOf": [
@@ -332,6 +391,21 @@
         },
         {
           "schema": {
+            "type": "string",
+            "enum": [
+              "relevant",
+              "recent"
+            ],
+            "description": "List/search ordering: relevant uses Explore's shared Trending browse order or keyword relevance; recent sorts by publication date (creation date when the publication date is missing). Defaults to relevant. Ignored in endpoint_id find mode, which preserves input order. Keep sort, filters and limit unchanged when following a cursor.",
+            "example": "recent"
+          },
+          "required": false,
+          "description": "List/search ordering: relevant uses Explore's shared Trending browse order or keyword relevance; recent sorts by publication date (creation date when the publication date is missing). Defaults to relevant. Ignored in endpoint_id find mode, which preserves input order. Keep sort, filters and limit unchanged when following a cursor.",
+          "name": "sort",
+          "in": "query"
+        },
+        {
+          "schema": {
             "anyOf": [
               {
                 "type": "string"
@@ -363,7 +437,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/models",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_models",
       "implemented": true,
       "unsupported_reason": null,
@@ -421,6 +495,15 @@
             ],
             "description": "Filter models by status - omit to include all statuses",
             "example": "active"
+          },
+          "sort": {
+            "type": "string",
+            "enum": [
+              "relevant",
+              "recent"
+            ],
+            "description": "List/search ordering: relevant uses Explore's shared Trending browse order or keyword relevance; recent sorts by publication date (creation date when the publication date is missing). Defaults to relevant. Ignored in endpoint_id find mode, which preserves input order. Keep sort, filters and limit unchanged when following a cursor.",
+            "example": "recent"
           },
           "expand": {
             "anyOf": [
@@ -516,7 +599,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/models/pricing",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_pricing",
       "implemented": true,
       "unsupported_reason": null,
@@ -662,7 +745,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/models/pricing/estimate",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "estimate_pricing",
       "implemented": true,
       "unsupported_reason": null,
@@ -1210,7 +1293,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/models/usage",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_usage",
       "implemented": true,
       "unsupported_reason": null,
@@ -1691,7 +1774,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/models/analytics",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_analytics",
       "implemented": true,
       "unsupported_reason": null,
@@ -2218,7 +2301,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/models/billing-events",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_billing_events",
       "implemented": true,
       "unsupported_reason": null,
@@ -2446,7 +2529,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/models/requests/payloads",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "delete_request_payloads",
       "implemented": true,
       "unsupported_reason": null,
@@ -2762,7 +2845,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/models/requests/by-endpoint",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "list_requests_by_endpoint",
       "implemented": true,
       "unsupported_reason": null,
@@ -3108,7 +3191,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/models/requests/search",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "search_requests",
       "implemented": true,
       "unsupported_reason": null,
@@ -3309,7 +3392,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/workflows",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "list_workflows",
       "implemented": true,
       "unsupported_reason": null,
@@ -3513,7 +3596,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/workflows/create",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "create_workflow",
       "implemented": true,
       "unsupported_reason": null,
@@ -3728,7 +3811,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/workflows/get",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_workflow",
       "implemented": true,
       "unsupported_reason": null,
@@ -4107,7 +4190,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "list_assets",
       "implemented": true,
       "unsupported_reason": null,
@@ -4320,7 +4403,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/collections",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "list_asset_collections",
       "implemented": true,
       "unsupported_reason": null,
@@ -4450,7 +4533,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/collections/create",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "create_asset_collection",
       "implemented": true,
       "unsupported_reason": null,
@@ -4571,7 +4654,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/collections/get",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_asset_collection",
       "implemented": true,
       "unsupported_reason": null,
@@ -4699,7 +4782,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/collections/update",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "update_asset_collection",
       "implemented": true,
       "unsupported_reason": null,
@@ -4832,7 +4915,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/collections/delete",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "delete_asset_collection",
       "implemented": true,
       "unsupported_reason": null,
@@ -4905,7 +4988,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/collections/hierarchy",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_asset_collection_hierarchy",
       "implemented": true,
       "unsupported_reason": null,
@@ -4989,7 +5072,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/collections/favorite",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "favorite_asset_collection",
       "implemented": true,
       "unsupported_reason": null,
@@ -5078,7 +5161,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/collections/unfavorite",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "unfavorite_asset_collection",
       "implemented": true,
       "unsupported_reason": null,
@@ -5184,7 +5267,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/collections/move",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "move_asset_collection",
       "implemented": true,
       "unsupported_reason": null,
@@ -5580,7 +5663,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/collections/assets",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "list_asset_collection_assets",
       "implemented": true,
       "unsupported_reason": null,
@@ -5805,7 +5888,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/collections/assets/add",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "add_asset_to_collection",
       "implemented": true,
       "unsupported_reason": null,
@@ -5936,7 +6019,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/collections/assets/remove",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "remove_asset_from_collection",
       "implemented": true,
       "unsupported_reason": null,
@@ -6058,7 +6141,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/characters",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "list_asset_characters",
       "implemented": true,
       "unsupported_reason": null,
@@ -6182,7 +6265,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/characters/create",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "create_asset_character",
       "implemented": true,
       "unsupported_reason": null,
@@ -6349,7 +6432,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/characters/update",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "update_asset_character",
       "implemented": true,
       "unsupported_reason": null,
@@ -6458,7 +6541,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/characters/get",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_asset_character",
       "implemented": true,
       "unsupported_reason": null,
@@ -6542,7 +6625,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/characters/delete",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "delete_asset_character",
       "implemented": true,
       "unsupported_reason": null,
@@ -6631,7 +6714,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/characters/favorite",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "favorite_asset_character",
       "implemented": true,
       "unsupported_reason": null,
@@ -6720,7 +6803,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/characters/unfavorite",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "unfavorite_asset_character",
       "implemented": true,
       "unsupported_reason": null,
@@ -6771,7 +6854,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/tags",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "list_asset_tags",
       "implemented": true,
       "unsupported_reason": null,
@@ -6842,7 +6925,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/tags/create",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "create_asset_tag",
       "implemented": true,
       "unsupported_reason": null,
@@ -6951,7 +7034,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/tags/set-for-asset",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "set_asset_tags_for_asset",
       "implemented": true,
       "unsupported_reason": null,
@@ -7076,7 +7159,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/tags/update",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "update_asset_tag",
       "implemented": true,
       "unsupported_reason": null,
@@ -7177,7 +7260,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/tags/delete",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "delete_asset_tag",
       "implemented": true,
       "unsupported_reason": null,
@@ -7301,7 +7384,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/uploads",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "upload_asset",
       "implemented": true,
       "unsupported_reason": null,
@@ -7421,7 +7504,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/get",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_asset",
       "implemented": true,
       "unsupported_reason": null,
@@ -7511,7 +7594,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/lineage",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_asset_lineage",
       "implemented": true,
       "unsupported_reason": null,
@@ -7605,7 +7688,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/favorite",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "favorite_asset",
       "implemented": true,
       "unsupported_reason": null,
@@ -7710,7 +7793,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/unfavorite",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "unfavorite_asset",
       "implemented": true,
       "unsupported_reason": null,
@@ -7797,7 +7880,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/tags/list-for-asset",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "list_asset_tags_for_asset",
       "implemented": true,
       "unsupported_reason": null,
@@ -7902,7 +7985,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/tags/assign",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "assign_asset_tag",
       "implemented": true,
       "unsupported_reason": null,
@@ -8033,7 +8116,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/tags/unassign",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "unassign_asset_tag",
       "implemented": true,
       "unsupported_reason": null,
@@ -8127,7 +8210,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/storage/files/acl/get",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_storage_file_acl",
       "implemented": true,
       "unsupported_reason": null,
@@ -8248,7 +8331,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/storage/files/acl/set",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "set_storage_file_acl",
       "implemented": true,
       "unsupported_reason": null,
@@ -8387,7 +8470,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/storage/files/sign",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "sign_storage_file_url",
       "implemented": true,
       "unsupported_reason": null,
@@ -8451,7 +8534,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/storage/settings/get",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_storage_settings",
       "implemented": true,
       "unsupported_reason": null,
@@ -8562,7 +8645,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/storage/settings/update",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "update_storage_settings",
       "implemented": true,
       "unsupported_reason": null,
@@ -8948,7 +9031,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/serverless/analytics",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "serverless_get_analytics",
       "implemented": true,
       "unsupported_reason": null,
@@ -9171,7 +9254,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/serverless/apps/list",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "serverless_list_apps",
       "implemented": true,
       "unsupported_reason": null,
@@ -9274,7 +9357,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/serverless/apps/queue",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "serverless_get_app_queue_info",
       "implemented": true,
       "unsupported_reason": null,
@@ -9379,7 +9462,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/serverless/apps/flush-queue",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "serverless_flush_app_queue",
       "implemented": true,
       "unsupported_reason": null,
@@ -9597,7 +9680,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/serverless/apps/runner-history",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "serverless_get_runner_history",
       "implemented": true,
       "unsupported_reason": null,
@@ -9960,7 +10043,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/serverless/apps/events",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "serverless_list_app_events",
       "implemented": true,
       "unsupported_reason": null,
@@ -10183,7 +10266,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/serverless/apps/revisions",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "serverless_list_app_revisions",
       "implemented": true,
       "unsupported_reason": null,
@@ -10248,7 +10331,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/serverless/files/list",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "serverless_list_root",
       "implemented": true,
       "unsupported_reason": null,
@@ -10306,7 +10389,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/serverless/files/list/directory",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "serverless_list_directory",
       "implemented": true,
       "unsupported_reason": null,
@@ -10372,7 +10455,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/serverless/files/file/download",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "serverless_download_file",
       "implemented": true,
       "unsupported_reason": null,
@@ -10454,7 +10537,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/serverless/files/file/upload-from-url",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "serverless_upload_from_url",
       "implemented": true,
       "unsupported_reason": null,
@@ -10586,7 +10669,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/serverless/files/file/upload-local",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "serverless_upload_local_file",
       "implemented": true,
       "unsupported_reason": null,
@@ -10668,7 +10751,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/serverless/metrics",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "serverless_get_metrics",
       "implemented": true,
       "unsupported_reason": null,
@@ -11028,7 +11111,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/serverless/logs/history",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "serverless_logs_history",
       "implemented": true,
       "unsupported_reason": null,
@@ -11497,7 +11580,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/serverless/logs/stream",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "serverless_logs_stream",
       "implemented": true,
       "unsupported_reason": null,
@@ -11934,7 +12017,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/serverless/requests/by-endpoint",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "serverless_list_requests_by_endpoint",
       "implemented": true,
       "unsupported_reason": null,
@@ -12363,7 +12446,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/serverless/usage",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "serverless_get_usage",
       "implemented": true,
       "unsupported_reason": null,
@@ -12547,7 +12630,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/compute/instances/list",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "list_compute_instances",
       "implemented": true,
       "unsupported_reason": null,
@@ -12753,7 +12836,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/compute/instances/get",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_compute_instance",
       "implemented": true,
       "unsupported_reason": null,
@@ -12821,7 +12904,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/compute/instances/delete",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "delete_compute_instance",
       "implemented": true,
       "unsupported_reason": null,
@@ -12945,7 +13028,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/keys/list",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "list_api_keys",
       "implemented": true,
       "unsupported_reason": null,
@@ -13030,7 +13113,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/keys/create",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "unsupported_reason": "secure_generated_credential_sink_required",
       "adapter": "create_api_key",
       "implemented": false,
@@ -13099,7 +13182,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/keys/delete",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "delete_api_key",
       "implemented": true,
       "unsupported_reason": null,
@@ -13190,7 +13273,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/account/billing",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_account_billing",
       "implemented": true,
       "unsupported_reason": null,
@@ -13475,7 +13558,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/account/focus",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_focus_report",
       "implemented": true,
       "unsupported_reason": null,
@@ -13601,7 +13684,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/account/model-access-controls",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_model_access_controls",
       "implemented": true,
       "unsupported_reason": null,
@@ -13948,7 +14031,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/organization/billing-events",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_organization_billing_events",
       "implemented": true,
       "unsupported_reason": null,
@@ -14332,7 +14415,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/organization/focus",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_organization_focus_report",
       "implemented": true,
       "unsupported_reason": null,
@@ -14455,7 +14538,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/organization/teams",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_organization_teams",
       "implemented": true,
       "unsupported_reason": null,
@@ -14890,7 +14973,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/organization/usage",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_organization_usage",
       "implemented": true,
       "unsupported_reason": null,
@@ -15085,7 +15168,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/meta",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_meta",
       "implemented": true,
       "unsupported_reason": null,
@@ -15224,7 +15307,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/models/insights",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_model_insights",
       "implemented": true,
       "unsupported_reason": null,
@@ -15404,7 +15487,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/entities",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "list_asset_entities",
       "implemented": true,
       "unsupported_reason": null,
@@ -15564,7 +15647,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/entities/create",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "create_asset_entity",
       "implemented": true,
       "unsupported_reason": null,
@@ -15690,7 +15773,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/entities/get",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "get_asset_entity",
       "implemented": true,
       "unsupported_reason": null,
@@ -15816,7 +15899,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/entities/update",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "update_asset_entity",
       "implemented": true,
       "unsupported_reason": null,
@@ -15947,7 +16030,7 @@
       "source": "https://api.fal.ai/v1/openapi.json",
       "documentation_url": "https://fal.ai/docs/platform-apis/v1/assets/entities/delete",
       "source_file": "platform-openapi.json",
-      "source_sha256": "f458dd367b3a368c07e6f0cc36cbcafeded2f6a9f695909eb77291d66a983321",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
       "adapter": "delete_asset_entity",
       "implemented": true,
       "unsupported_reason": null,
@@ -15969,6 +16052,76 @@
         },
         "required": [
           "entity_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "get_compute_metrics",
+      "provider_operation_id": "getComputeMetrics",
+      "method": "GET",
+      "path": "/v1/compute/metrics",
+      "summary": "Compute Metrics",
+      "description": "Returns Prometheus-compatible metrics for an active compute cluster owned by the authenticated caller. Requires compute access and compute:instances:read permission. Use the compute_cluster query parameter to select the cluster by label.",
+      "category": [
+        "Compute",
+        "Metrics",
+        "Observability"
+      ],
+      "effect": "read",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "compute_cluster": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The label of the compute cluster owned by the caller",
+            "example": "my-cluster"
+          }
+        },
+        "required": [
+          "compute_cluster"
+        ],
+        "additionalProperties": false
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The label of the compute cluster owned by the caller",
+            "example": "my-cluster"
+          },
+          "required": true,
+          "description": "The label of the compute cluster owned by the caller",
+          "name": "compute_cluster",
+          "in": "query"
+        }
+      ],
+      "body_type": null,
+      "response_kind": "text",
+      "admin_required": false,
+      "source": "https://api.fal.ai/v1/openapi.json",
+      "documentation_url": "https://fal.ai/docs/platform-apis/v1/compute/metrics",
+      "source_file": "platform-openapi.json",
+      "source_sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
+      "adapter": "get_compute_metrics",
+      "implemented": true,
+      "unsupported_reason": null,
+      "aliases": [],
+      "live_verification": "See live_check receipt; operations without a receipt remain unverified.",
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "compute_cluster": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The label of the compute cluster owned by the caller",
+            "example": "my-cluster"
+          }
+        },
+        "required": [
+          "compute_cluster"
         ],
         "additionalProperties": false
       }
@@ -15997,45 +16150,6 @@
         "type": "object",
         "properties": {},
         "required": [],
-        "additionalProperties": false
-      }
-    },
-    {
-      "id": "operation_schema",
-      "summary": "Inspect exact parameters of any connector operation",
-      "description": "Inspect exact parameters of any connector operation",
-      "source": "local",
-      "category": [
-        "Model inference"
-      ],
-      "schema": {
-        "type": "object",
-        "properties": {
-          "operation": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "operation"
-        ],
-        "additionalProperties": false
-      },
-      "effect": "read",
-      "adapter": "operation_schema",
-      "implemented": true,
-      "unsupported_reason": null,
-      "aliases": [],
-      "live_verification": "See live_check receipt; operations without a receipt remain unverified.",
-      "params_schema": {
-        "type": "object",
-        "properties": {
-          "operation": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "operation"
-        ],
         "additionalProperties": false
       }
     },
@@ -17638,7 +17752,10 @@
             "type": "string"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "operation"
+        ]
       },
       "source": "docs/GREIF_MEDIA_CONNECTORS.md"
     },
@@ -17658,7 +17775,8 @@
             "maximum": 50
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": []
       },
       "source": "docs/GREIF_MEDIA_CONNECTORS.md"
     },
@@ -17676,7 +17794,10 @@
             "type": "string"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "job_id"
+        ]
       },
       "source": "docs/GREIF_MEDIA_CONNECTORS.md"
     },
@@ -17694,7 +17815,10 @@
             "type": "string"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "job_id"
+        ]
       },
       "source": "docs/GREIF_MEDIA_CONNECTORS.md"
     },
@@ -17712,7 +17836,10 @@
             "type": "string"
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "artifact_id"
+        ]
       },
       "source": "docs/GREIF_MEDIA_CONNECTORS.md"
     },
@@ -17726,7 +17853,8 @@
       "params_schema": {
         "type": "object",
         "properties": {},
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": []
       },
       "source": "docs/GREIF_MEDIA_CONNECTORS.md"
     },
@@ -17762,7 +17890,10 @@
             "maximum": 12000
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "required": [
+          "response_id"
+        ]
       },
       "source": "docs/GREIF_MEDIA_CONNECTORS.md"
     }

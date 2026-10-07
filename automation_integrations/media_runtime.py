@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from decimal import Decimal, InvalidOperation, ROUND_CEILING
+from email.utils import parsedate_to_datetime
 import fcntl
 import hashlib
 import http.client
@@ -156,7 +157,12 @@ def _status(response):
         raise MediaError('redirect_refused', status)
     if status >= 400:
         retry = response.getheader('Retry-After')
-        retry = min(int(retry), 86400) if retry and retry.isdigit() else None
+        try:
+            retry = retry.strip() if retry else ''
+            retry = (min(int(retry), 86400) if retry.isdigit() else
+                     min(86400, max(0, math.ceil(parsedate_to_datetime(retry).timestamp() - time.time()))))
+        except (ValueError, TypeError, OverflowError):
+            retry = None
         code = {401: 'authentication_failed', 402: 'insufficient_credits', 403: 'access_denied',
                 404: 'resource_not_found', 409: 'state_conflict', 429: 'rate_limited'}.get(
                     status, 'provider_unavailable' if status >= 500 else 'provider_http_error')
@@ -207,7 +213,14 @@ class MediaHTTP:
             request_headers[key] = value
         if query:
             try:
-                encoded = urlencode(query, doseq=True)
+                def query_value(value):
+                    if type(value) is bool:
+                        return 'true' if value else 'false'
+                    if isinstance(value, (list, tuple)):
+                        return [query_value(item) for item in value]
+                    return value
+                items = query.items() if isinstance(query, dict) else query
+                encoded = urlencode([(key, query_value(value)) for key, value in items], doseq=True)
             except (TypeError, ValueError):
                 raise MediaError('invalid_query') from None
             absolute_url = urlunsplit(parsed._replace(query=parsed.query + ('&' if parsed.query else '') + encoded))
@@ -249,6 +262,12 @@ class MediaHTTP:
             raw = b''.join(chunks)
             if len(raw) > maximum:
                 raise MediaError('response_too_large')
+            # HTTPResponse.read1() does not raise IncompleteRead when a server
+            # closes before Content-Length. Never cache a partial media file
+            # (or accept a coincidentally valid prefix of a JSON response).
+            if (method != 'HEAD' and response.status not in (204, 304)
+                    and length and length.isdigit() and len(raw) != int(length)):
+                raise MediaError('incomplete_provider_response')
             if response_kind == 'binary':
                 return raw
             if not raw:

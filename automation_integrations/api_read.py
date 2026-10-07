@@ -13,6 +13,7 @@ import ssl
 import subprocess
 import sys
 import time
+import tempfile
 import email.utils
 import urllib.error
 import urllib.parse
@@ -153,14 +154,69 @@ def provider_environment(service, config):
 
 def atomic(path, data):
     path = Path(path)
-    tmp = path.with_name(path.name + f'.{os.getpid()}.tmp')
+    fd, name = tempfile.mkstemp(prefix='.' + path.name + '.', suffix='.tmp', dir=path.parent)
+    tmp = Path(name)
     try:
-        fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
         with os.fdopen(fd, 'w') as f:
             json.dump(data, f, ensure_ascii=False); f.flush(); os.fsync(f.fileno())
         os.replace(tmp, path)
+        directory = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
     finally:
         tmp.unlink(missing_ok=True)
+
+
+def retry_after_seconds(value, default=60):
+    """Interpret the two HTTP Retry-After formats without exposing provider text."""
+    try:
+        value = str(value).strip()
+        delay = int(value) if value.isdigit() else int(
+            email.utils.parsedate_to_datetime(value).timestamp() - time.time())
+    except (TypeError, ValueError, OverflowError, AttributeError):
+        delay = default
+    return max(1, min(delay, 86400))
+
+
+def provider_error_code(service, payload):
+    """Only machine identifiers may cross the error boundary; never error prose."""
+    if not isinstance(payload, dict):
+        return None
+    candidates = [payload.get('code')]
+    if service == 'saby' and isinstance(payload.get('error'), dict):
+        error = payload['error']
+        detail = error.get('data')
+        candidates = ([detail.get('error_code')] if isinstance(detail, dict) else []) + [error.get('code')]
+    elif service == 'tochka':
+        errors = payload.get('Errors')
+        if isinstance(errors, list):
+            candidates += [r.get('errorCode') for r in errors if isinstance(r, dict)]
+    for candidate in candidates:
+        if type(candidate) is int:
+            return str(candidate) if len(str(candidate)) <= 20 else None
+        if isinstance(candidate, str) and re.fullmatch(r'[A-Za-z0-9_][A-Za-z0-9_.-]{0,100}', candidate):
+            return candidate
+    return None
+
+
+def tochka_read(http, method, path, **kwargs):
+    """Retry one transient failure of an already classified bank read.
+
+    Callers must have validated the operation as a read. Writes never enter
+    here; even a read using POST is sent only once. Each socket operation has
+    its existing timeout; the native runner enforces the overall 100 seconds.
+    """
+    for attempt in range(2):
+        try:
+            return http.call(method, path, **kwargs)
+        except Failure as exc:
+            transient = exc.code in ('request_timeout', 'network_unavailable', 'provider_connection_interrupted')
+            transient = transient or exc.code == 'provider_http_error' and exc.status in (502, 503, 504)
+            if attempt or method != 'GET' or not transient:
+                raise
+            time.sleep(0.25)
 
 
 class Vault:
@@ -291,6 +347,9 @@ class HTTP:
                 raw = response.read(maximum + 1)
                 if len(raw) > maximum:
                     raise Failure('response_too_large')
+                length = response.headers.get('Content-Length')
+                if isinstance(length, str) and length.isdigit() and int(length) != len(raw):
+                    raise Failure('provider_connection_interrupted')
                 return self.decode(raw, response_kind)
         except Failure:
             raise
@@ -298,23 +357,20 @@ class HTTP:
             # Never echo exception URL or provider body (ETM URLs contain credentials).
             code = 'authorization_failed' if exc.code in (401, 403) else 'provider_http_error'
             provider_code = retry_after = None
+            try:
+                provider_code = provider_error_code(self.service, json.loads(exc.read(8192)))
+            except (ValueError, UnicodeError, OSError, http.client.HTTPException):
+                pass
+            finally:
+                exc.close()
+            if exc.code == 429:
+                code = 'rate_limited'
+                retry_after = retry_after_seconds(exc.headers.get('Retry-After', '60') if exc.headers else '60')
             if self.service == 'yandex_go':
                 code = {401: 'authentication_failed', 403: 'access_denied', 404: 'resource_not_found',
                         406: 'offer_expired_or_price_changed', 409: 'state_conflict', 429: 'rate_limited'}.get(exc.code,
                         'provider_unavailable' if exc.code >= 500 else 'provider_http_error')
-                try:
-                    candidate = json.loads(exc.read(8192)).get('code')
-                    if isinstance(candidate, str) and re.fullmatch(r'[A-Z][A-Z0-9_]{0,80}', candidate):
-                        provider_code = candidate
-                except Exception:
-                    pass
                 if exc.code == 429:
-                    try:
-                        raw = exc.headers.get('Retry-After', '60')
-                        retry_after = int(raw) if raw.isdigit() else int(email.utils.parsedate_to_datetime(raw).timestamp()-time.time())
-                    except Exception:
-                        retry_after = 60
-                    retry_after = max(1, min(retry_after, 86400))
                     self.rate_gate(cooldown=retry_after)
             raise Failure(code, exc.code, provider_code=provider_code, retry_after=retry_after) from None
         except TimeoutError:
@@ -342,7 +398,10 @@ class HTTP:
             return raw
         if response_kind == 'pdf_or_json' and raw.startswith(b'%PDF-'):
             return raw
-        return json.loads(raw)
+        try:
+            return json.loads(raw)
+        except (ValueError, UnicodeError):
+            raise Failure('invalid_provider_json') from None
 
     def rate_gate(self, cooldown=None):
         # Local conservative policy (1 request/sec), not a claim about provider quota.
@@ -350,7 +409,13 @@ class HTTP:
         path = state / 'yandex-rate.json'
         with (state / 'yandex-rate.lock').open('a') as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
-            row = json.loads(path.read_text()) if path.exists() else {}
+            try:
+                row = json.loads(path.read_text()) if path.exists() else {}
+                if not isinstance(row, dict) or any(type(row.get(key, 0)) not in (int, float)
+                        or not 0 <= row.get(key, 0) < float('inf') for key in ('blocked_until', 'next_at')):
+                    raise ValueError()
+            except (ValueError, UnicodeError):
+                raise Failure('rate_limit_state_invalid') from None
             now = time.time()
             if cooldown is not None:
                 row['blocked_until'] = max(row.get('blocked_until', 0), now+cooldown)
@@ -439,7 +504,8 @@ def execute(request, config, vault=None, http=None):
             query['customerCode'] = p['customer_code']
         if operation in ('acquiring_payments', 'subscriptions', 'sbp_payments'):
             query.update(page=1, perPage=1)
-        result = http.call('GET', other.get(operation, path), headers={'Authorization': 'Bearer ' + secret['jwt']}, query=query)
+        result = tochka_read(http, 'GET', other.get(operation, path),
+                             headers={'Authorization': 'Bearer ' + secret['jwt']}, query=query)
     elif service == 'etm':
         auth = http.call('POST', '/user/login', query={'log': secret['ETM_LOGIN'], 'pwd': secret['ETM_PASSWORD']})
         session = extended_api.etm_session(auth)
@@ -465,40 +531,19 @@ def execute(request, config, vault=None, http=None):
             result = http.call('GET', path, query=query)
             extended_api.validate_etm_response(result)
     else:
-        state = Path(config['state_dir']); state.mkdir(mode=0o700, parents=True, exist_ok=True)
-        cache = state / 'saby-session.json'
-        # Serialize cache renewal as well as request; no concurrent session stampede.
-        with (state / 'saby.lock').open('a') as lock:
-            fcntl.flock(lock, fcntl.LOCK_EX)
-            token = json.loads(cache.read_text()).get('token') if cache.exists() else None
-            params = ({'Документ': {'Идентификатор': p['id']}} if operation == 'document' else {
-                'Фильтр': {'Тип': p.get('type', 'ДокОтгрВх'), 'НашаОрганизация': {'СвЮЛ': config['saby_org']},
-                           'Навигация': {'РазмерСтраницы': str(p.get('page_size', 10)),
-                                        'Страница': str(p.get('page', 0))}}})
-            if operation in ('version', 'organizations'):
-                params = {'Параметр': {}} if operation == 'version' else {'Фильтр': {}}
-            methods = {'document': 'ПрочитатьДокумент', 'documents': 'СписокДокументов',
-                       'version': 'ИнформацияОВерсии', 'organizations': 'СписокНашихОрганизаций'}
-            payload = {'jsonrpc': '2.0', 'id': 1, 'method': 'СБИС.' + methods[operation], 'params': params}
-            for attempt in range(2):
-                if not token:
-                    auth = http.call('POST', '/oauth/service/', body={
-                        k: secret['SABY_' + k.upper()] for k in ('app_client_id', 'app_secret', 'secret_key')})
-                    token = auth.get('token')
-                    if not isinstance(token, str) or not token:
-                        raise Failure('saby_authentication_failed')
-                    atomic(cache, {'token': token})
-                vault.sensitive.append(token)
-                try:
-                    response = http.call('POST', '/service/?srv=1', body=payload,
-                                         headers={'X-SBISAccessToken': token})
-                    if response.get('error'):
-                        raise Failure('saby_api_error')
-                    result = response['result']; break
-                except Failure as exc:
-                    if exc.status != 401 or attempt:
-                        raise
-                    token = None
+        params = ({'Документ': {'Идентификатор': p['id']}} if operation == 'document' else {
+            'Фильтр': {'Тип': p.get('type', 'ДокОтгрВх'), 'НашаОрганизация': {'СвЮЛ': config['saby_org']},
+                       'Навигация': {'РазмерСтраницы': str(p.get('page_size', 10)),
+                                    'Страница': str(p.get('page', 0))}}})
+        if operation in ('version', 'organizations'):
+            params = {'Параметр': {}} if operation == 'version' else {'Фильтр': {}}
+        methods = {'document': 'ПрочитатьДокумент', 'documents': 'СписокДокументов',
+                   'version': 'ИнформацияОВерсии', 'organizations': 'СписокНашихОрганизаций'}
+        payload = {'jsonrpc': '2.0', 'id': 1, 'method': 'СБИС.' + methods[operation], 'params': params}
+        result = extended_api.saby_call({'method': 'POST', 'path': '/service/?srv=1', 'body': payload},
+                                        config, secret=secret, vault=vault, http=http)
+    if service in ('yandex_go', 'tochka'):
+        extended_api.validate_business_response(service, result)
     cleaned = sanitize(result, vault.sensitive)
     if len(json.dumps(cleaned, ensure_ascii=False).encode()) > 60000:
         raise Failure('result_too_large_use_smaller_page')

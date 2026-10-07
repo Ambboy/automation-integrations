@@ -51,10 +51,10 @@ capabilities.extend([
      'effect': 'business_write', 'implemented': False, 'adapter': None, 'unsupported_reason': 'large_file_streaming_upload_required',
      'source': base + 'fal-cdn'},
 ])
-p = {'schema_version': 1, 'service': 'fal', 'retrieved_at': '2026-10-04',
+p = {'schema_version': 1, 'service': 'fal', 'retrieved_at': fal.DOCUMENTED['retrieved_at'],
      'scope': 'Entire documented Platform REST surface (union of live and static OpenAPI by operationId), plus dynamic model execution and lifecycle. All model categories are discovered live; no short hardcoded model list.',
      'authentication_note': 'Authorization: Key FAL_KEY. Admin operations prefer optional FAL_ADMIN_KEY; API scope does not become admin.',
-     'sources': json.loads((Path(__file__).parent / 'provenance.json').read_text()),
+     'sources': json.loads((ROOT / fal.DOCUMENTED['source_snapshot_dir'] / 'provenance.json').read_text()),
      'total': len(capabilities), 'platform_total': len(fal.PLATFORM_OPERATIONS),
      'capabilities': capabilities, 'limits': fal.execute('capabilities', {}, {})['limits']}
 (ROOT / 'registry/capabilities/fal.json').write_text(json.dumps(p, ensure_ascii=False, indent=2) + '\n')

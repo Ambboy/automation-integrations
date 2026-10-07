@@ -1,0 +1,121 @@
+Execute saved flows programmatically and track multi-step orchestration runs.
+Requires API key scopes flows:read (list, get, stream), flows:execute (create, cancel), or flows:write (update, visibility, clone). Create keys in settings → workspace → api keys.
+→ Flows concept — how flows chain apps and relate to tasks
+Create flow run
+POST /flowruns
+Starts a new run of a saved flow. Requires flows:execute.
+Version selection
+The server picks which flow version to run:
+The published version, when the flow has one (published_version_id is set on GET /flows/{id})
+The draft version otherwise
+The run's flow_version_id is the ID of the version that ran. Compare it with published_version_id and draft_version_id on the flow.
+Graph edits made with POST /flows/{id}/actions apply to the draft. When a published version exists, POST /flowruns and belt flow run run it and ignore unpublished draft edits.
+→ Flows API: Get flow
+Request
+| Field | Type | Required | Description
+| flow | string | Yes | Flow ID
+| input | object | Yes | Flow inputs (shape depends on the flow definition)
+Example:
+jsoncopy
+1{2  "flow": "flow_abc123",3  "input": {4    "prompt": "A mountain landscape"5  }6}
+Response
+Returns a FlowRun object. Key fields:
+| Field | Type | Description
+| id | string | Flow run ID
+| flow_id | string | Source flow ID
+| flow_version_id | string | Flow version used for this run (see Version selection)
+| task_id | string | Parent task ID (tracks the full run in Tasks)
+| status | number | Flow run status code (see below)
+| input | object | Inputs passed to the run
+| output | object | Final output when complete
+| node_tasks | object | Per-node task references for app nodes (task_id, nested task)
+| node_statuses | object | Per-node graph status, keyed by flow node ID. Only on GET /flowruns/{id} (see Per-node progress)
+| node_outputs | object | Results of utility nodes, keyed by flow node ID (see Per-node progress)
+| error | string | Error message when failed
+| flow_run_started | string | ISO timestamp when execution began
+| flow_run_finished | string | ISO timestamp when execution completed
+Example:
+bashcopy
+1curl -X POST https://api.inference.sh/flowruns \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"flow":"flow_abc123","input":{"prompt":"A mountain landscape"}}'
+JavaScript SDK
+typescriptcopy
+1const run = await client.flowRuns.create('flow_abc123', { prompt: 'A mountain landscape' });2console.log(run.task_id, run.status);
+CLI equivalent: belt flow run <flow-id> --input '{"prompt":"A mountain landscape"}' (add -f to stream progress until complete).
+The Python SDK does not yet expose flowRuns; use the REST call above.
+Get flow run
+GET /flowruns/{id}
+Returns a single flow run by ID. Same fields as the create response, plus node_statuses (see Per-node progress).
+bashcopy
+1curl https://api.inference.sh/flowruns/flowrun_abc123 \2  -H "Authorization: Bearer inf_your_key"
+CLI equivalent: belt flow run-get <run-id> (add -f to follow until complete).
+List flow runs
+POST /flowruns/list
+Cursor-paginated list. Requires flows:read.
+GET /flowruns is also available with the same scope.
+| Field | Type | Description
+| limit | number | Page size
+| cursor | string | Cursor from a previous response
+| filters | array | Filter objects (field, operator, value)
+| sort | array | Sort objects (field, dir)
+Cancel flow run
+POST /flowruns/{id}/cancel
+Stops an in-progress flow run. Requires flows:execute.
+bashcopy
+1curl -X POST https://api.inference.sh/flowruns/flowrun_abc123/cancel \2  -H "Authorization: Bearer inf_your_key"
+Clone flow from a run
+POST /flowruns/{id}/clone
+Creates a new flow definition copied from the flow version used in this run. Returns a Flow object (not a new run). Requires flows:write.
+Use this to fork a flow after iterating in the editor or from a successful run.
+Update flow run
+POST /flowruns/{id}
+Patch flow run metadata. Requires flows:write.
+POST /flowruns/{id}/visibility updates sharing visibility.
+Stream updates
+Real-time SSE for flow run state and per-step tasks.
+| Endpoint | Scope | Description
+| GET /flowruns/{id}/stream | flows:read | Flow run status and output updates
+| GET /flowruns/{id}/tasks/stream | flows:read | Task updates for nodes in this run
+Send Accept: text/event-stream. Event format matches Task streaming.
+JavaScript SDK
+typescriptcopy
+1const source = client.flowRuns.stream('flowrun_abc123');2const taskSource = client.flowRuns.streamTasks('flowrun_abc123');
+→ Streaming API
+Per-node progress
+A flow run reports step progress in three fields:
+| Field | Covers | Use it for
+| node_tasks | App nodes, which run as tasks | Task IDs, logs, cost, nested task payloads
+| node_statuses | Every node in the run's execution graph, including utility nodes that create no task | One map of all node states, including failed gates and blocked nodes
+| node_outputs | Utility nodes (gate, selector, merge, constant, utility) | The value a utility node produced
+node_statuses is filled in only by GET /flowruns/{id}. It is omitted from create and list responses. node_outputs is stored on the flow run and is null until a utility node stores a result. Keys in all three maps are flow node IDs from the flow definition.
+Each node_outputs entry is an object with a value field.
+Example fragment:
+jsoncopy
+1{2  "node_tasks": {3    "generate": { "task_id": "task_abc123" }4  },5  "node_statuses": {6    "input": "completed",7    "generate": "running",8    "gate_1": "failed",9    "selector_1": "completed",10    "upscale": "blocked"11  },12  "node_outputs": {13    "selector_1": { "value": "first_item" },14    "constant_1": { "value": "hello" }15  }16}
+Graph node status values
+| Status | Description
+| pending | Waiting for upstream dependencies
+| ready | Dependencies satisfied; not yet started
+| running | Executing
+| completed | Finished successfully
+| failed | Error during execution, or a gate whose condition was false
+| cancelled | Cancelled
+| skipped | Part of the enum. The flow runtime does not set it; a false gate is failed
+| blocked | An upstream dependency failed
+A gate whose condition is false is reported as failed, and the nodes that depend on it as blocked. A failed gate does not fail the run. See Flows API: Gate nodes.
+JavaScript SDK
+typescriptcopy
+1import { GraphNodeStatusFailed, GraphNodeStatusRunning } from '@inferencesh/sdk';23const { data: run } = await client.flowRuns.get('flowrun_abc123');45if (run.node_statuses?.gate_1 === GraphNodeStatusFailed) {6  console.log('Gate condition was false');7}8if (run.node_statuses?.generate === GraphNodeStatusRunning) {9  console.log('Still running:', run.node_tasks.generate?.task_id);10}11console.log(run.node_outputs?.selector_1?.value);
+Flow run status codes
+Flow runs use a separate status enum from task status codes.
+| Status | Code | Description
+| Unknown | 0 | Unrecognized status
+| Pending | 1 | Starting
+| Running | 2 | Executing steps
+| Completed | 3 | Done
+| Failed | 4 | Error occurred
+| Cancelled | 5 | Cancelled
+The parent task_id on the flow run tracks overall progress in the Tasks API and the web app.
+Related
+→ Tasks API — parent task status, logs, cost, cancellation
+→ Flows — visual editor, deploying flows as apps
+→ REST overview — authentication and response format

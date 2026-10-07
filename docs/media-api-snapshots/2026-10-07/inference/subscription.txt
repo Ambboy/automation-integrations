@@ -1,0 +1,149 @@
+Manage workspace subscriptions and browse self-serve plans.
+Subscription endpoints require billing:read (view) or billing:write (create, change, cancel, portal). Plan listing is public.
+→ Billing API — balance top-ups and saved payment methods
+List plans
+GET /plans
+Returns active plans. No authentication required.
+By default the endpoint returns base tier plans (Starter, Pro, Team, Enterprise, and any custom plans). Filter with the type query parameter:
+| type | Returns
+| base (default) | Tier plans for POST /subscription signup
+| addon | Add-on plans for POST /subscription/addon checkout
+| all | Both base and add-on plans
+Use the self_serve field to see which plans support Stripe Checkout signup. The default Starter tier is included for limits reference but is not subscribable: every workspace receives an active Starter team_plan row at creation, which syncs tier entitlements (no Stripe checkout required).
+In the web app, browse base plans at Pricing with a comparison table and monthly/yearly toggle. Logged-in users can start Stripe Checkout from that page; existing subscribers are routed to settings → workspace → subscription. Browse and purchase add-ons at settings → workspace → add-ons.
+Provider price IDs are stripped from the public response.
+Response
+Array of plan objects:
+| Field | Type | Description
+| id | string | Plan ID (use in subscription requests)
+| name | string | Display name
+| description | string | Plan description
+| plan_type | string | base or addon
+| price_monthly | int | Monthly price in cents (nullable)
+| price_yearly | int | Yearly price in cents (nullable)
+| credits_monthly | int64 | Included credits per period (microcents)
+| limits | object | Plan limit definitions (maps to entitlement resources)
+| required_plan_ids | string[] | Add-on plans only. Base plan IDs the workspace must have an active primary subscription on before checkout. Omitted or empty means any workspace can purchase the add-on.
+| required_plan_names | string[] | Add-on plans only. Display names resolved from required_plan_ids (same order) on GET /plans. Use for UI labels; compare the workspace's plan_id against required_plan_ids to check eligibility. Omitted on embedded PlanDTO objects from subscription endpoints.
+| stackable | boolean | Add-on plans only. When true, the workspace can purchase multiple subscriptions to the same add-on plan (each checkout adds another instance). When false, POST /subscription/addon rejects checkout if the add-on is already active. Base tier plans return false.
+| self_serve | boolean | Whether users can subscribe via checkout
+Example:
+bashcopy
+1curl https://api.inference.sh/plans23curl "https://api.inference.sh/plans?type=addon"
+Get subscription
+GET /subscription
+Returns the current workspace's paid subscription, or null when no Stripe subscription is active.
+Workspaces with null still run on the Starter tier: an active Starter team_plan row syncs tier entitlements for the workspace (see GET /entitlements and GET /entitlements/usage). GET /subscription reports Stripe billing state only; use GET /entitlements to inspect effective plan limits.
+Requires billing:read.
+Response
+| Field | Type | Description
+| plan_id | string | Subscribed plan ID
+| plan | object | Embedded PlanDTO when loaded
+| interval | string | monthly or yearly
+| status | string | trialing, active, past_due, canceled, or paused
+| current_period_start | string | ISO timestamp
+| current_period_end | string | ISO timestamp
+| trial_end | string | ISO timestamp (optional)
+| cancel_at_period_end | boolean | Subscription ends at period end if true
+| credits_per_period | int64 | Credits granted each period (microcents)
+Stripe subscription IDs are omitted from public responses.
+Example:
+bashcopy
+1curl https://api.inference.sh/subscription \2  -H "Authorization: Bearer inf_your_key"
+Create subscription
+POST /subscription
+Creates a Stripe Checkout session for subscription signup. Requires billing:write.
+Body:
+| Field | Type | Required | Description
+| plan_id | string | Yes | Plan ID from GET /plans
+| interval | string | No | monthly (default) or yearly
+| success_url | string | No | Redirect after success (defaults to {origin}/settings/team/billing/subscription?success=1)
+| cancel_url | string | No | Redirect if canceled (defaults to {origin}/settings/team/billing/subscription)
+Response:
+jsoncopy
+1{2  "url": "https://checkout.stripe.com/..."3}
+Redirect the user to url to complete signup. After Stripe Checkout, the web app reads ?success=1 on the subscription settings page, refreshes subscription state, and shows a confirmation toast.
+When checkout starts from the workspace (for example Pricing or settings), the app sends a success_url on the current page with success=1 and #settings/team/billing/subscription in the fragment — not only the API default path above. Cancel returns to the exact URL checkout started from. See Billing API — Workspace settings URLs.
+Change plan
+PUT /subscription
+Upgrade or downgrade the active subscription. Requires billing:write.
+Body:
+jsoncopy
+1{2  "plan_id": "plan_pro"3}
+Returns the updated SubscriptionDTO.
+Cancel subscription
+DELETE /subscription
+Cancel the workspace's subscription. Requires billing:write.
+Body (optional):
+jsoncopy
+1{2  "at_period_end": true3}
+Defaults to at_period_end: true (cancel at end of billing period). Set false for immediate cancellation.
+Resume subscription
+POST /subscription/resume
+Resume a subscription that was set to cancel at period end. Requires billing:write.
+Billing portal
+POST /subscription/portal
+Creates a Stripe Customer Portal session for managing payment methods and invoices. Requires billing:write.
+Body:
+| Field | Type | Required | Description
+| return_url | string | Yes | URL to return to after the portal session
+Response:
+jsoncopy
+1{2  "url": "https://billing.stripe.com/..."3}
+Add-on subscriptions
+Add-on plans extend a workspace with extra features or capacity (for example a store-app feature gate like feature:seedance). They are billed as separate Stripe subscriptions and grant entitlements with source: "addon". Tier and add-on limits for the same resource are merged: boolean features use OR, numeric limits are summed (see Entitlements API).
+By default, add-on checkout does not require a paid base subscription: workspaces on Starter can purchase self-serve add-ons directly. When an add-on plan sets required_plan_ids, checkout succeeds only if the workspace has an active primary subscription (active, trialing, or complimentary) on one of those base plans. Inspect required_plan_ids and required_plan_names on GET /plans?type=addon before starting checkout. Names are resolved server-side so clients do not need a separate ID-to-name lookup.
+List active add-ons
+GET /subscription/addons
+Returns the workspace's active add-on subscriptions. Requires billing:read.
+Response: array of TeamPlanDTO objects:
+| Field | Type | Description
+| id | string | Subscription row ID (team_plan in the API; use when canceling)
+| plan_id | string | Add-on plan ID
+| status | string | active, canceled, or complimentary
+| is_primary | boolean | Always false for add-ons
+| plan | object | Embedded PlanDTO when loaded
+| created_at | string | ISO timestamp when the add-on was activated
+Example:
+bashcopy
+1curl https://api.inference.sh/subscription/addons \2  -H "Authorization: Bearer inf_your_key"
+Purchase add-on
+POST /subscription/addon
+Creates a Stripe Checkout session for an add-on purchase. Requires billing:write.
+Body:
+| Field | Type | Required | Description
+| plan_id | string | Yes | Add-on plan ID from GET /plans?type=addon
+| interval | string | No | monthly (default) or yearly
+| success_url | string | No | Redirect after success (defaults to {origin}/settings/team/billing/addons?addon_success=1)
+| cancel_url | string | No | Redirect if canceled (defaults to {origin}/settings/team/billing/addons)
+Response:
+jsoncopy
+1{2  "url": "https://checkout.stripe.com/..."3}
+Redirect the user to url to complete checkout. In the web app, the settings → workspace → add-ons page reads ?addon_success=1, refreshes add-on state, and shows a confirmation toast. The API's default success_url already lands there. Any /settings/... URL opens settings in the web app, and its query string survives, so a custom success_url keeps working.
+Errors (400, code subscription_error):
+| Message | Cause
+| plan {id} is not an addon | plan_id is a base tier plan
+| invalid plan | Unknown plan ID
+| this add-on requires a qualifying base plan. upgrade your subscription first | Workspace is not on any plan listed in the add-on's required_plan_ids
+| this add-on is already active on your team | Add-on has stackable: false and the workspace already has an active subscription to that plan
+Cancel add-on
+DELETE /subscription/addon/{teamPlanId}
+Cancels an add-on immediately and revokes its entitlements. Requires billing:write. Use the id from GET /subscription/addons, not the plan ID.
+Returns an empty success body on completion.
+Example:
+bashcopy
+1curl -X DELETE "https://api.inference.sh/subscription/addon/tp_abc123" \2  -H "Authorization: Bearer inf_your_key"
+Add-ons page
+The settings → workspace → add-ons page lists active add-ons (with cancel confirmation) and, when any exist, an available add-ons section for active self-serve plans (self_serve not false). Each card shows monthly price, included limits, and a subscribe button with the price in the CTA (for example subscribe - $14/mo). When stackable is true, an active add-on shows add another so the workspace can purchase another instance. Non-stackable add-ons (stackable: false) show a disabled active button instead.
+When an add-on sets required_plan_ids and the workspace's current base plan_id is not one of them, the card shows a lock icon with a requirement line (for example requires pro or team plan) built from required_plan_names, and the CTA becomes upgrade to {plans} (for example upgrade to pro or team). It opens the upgrade modal with the first required plan marked recommended. When the base plan qualifies, the card shows the normal subscribe CTA.
+When a blocked store app returns addon_plan_id in an entitlement error, the web app opens an add-on purchase modal with the plan name, price, and a subscribe CTA that routes to this add-ons page, using the same POST /subscription/addon checkout flow as the cards above.
+Plan limits
+Plan limits define caps enforced at runtime: concurrency, request rate, storage, workspace seats, triggers, data retention, BYOK, and more. When a limit is exceeded, the API returns 402 (limit_exceeded) or 403 (feature_not_available) with structured error metadata.
+Each limit in GET /plans responses includes a label field with a human-readable name (for example concurrent tasks, triggers), an optional unit field for display formatting (for example mb, days for retention_days), and an optional enforcement field (block or warn). The Starter tier sets enforcement: block on concurrency, rate_per_min, and triggers; paid tiers omit enforcement on most limits (defaults to warn on synced entitlement rows). See Entitlements — enforcement and Concurrent task limits.
+Use GET /entitlements/usage (requires authentication) to inspect current usage vs limits. Use GET /entitlements to list entitlement rows without usage counts.
+In the web app, entitlement errors open an upgrade modal that lists higher tiers and marks the recommended plan, the cheapest option that resolves the blocked resource. When the error includes addon_plan_id, the modal switches to an add-on purchase flow instead (see Add-on subscriptions). The subscription settings page shows live resource usage from GET /entitlements/usage with progress bars (warning at 80%, highlighted at the cap) and a manage link to the add-ons page when the workspace has active add-ons. Manage subscriptions at settings → workspace → subscription. See REST overview: web app modals.
+→ Entitlements API — Get usage
+Related
+Billing API — pay-as-you-go balance and top-ups
+REST overview — authentication and response format
+Extend pricing — usage-based pricing for published apps

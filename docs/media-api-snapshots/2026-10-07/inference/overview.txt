@@ -1,0 +1,138 @@
+Direct HTTP access to inference shell.
+Base URL
+codecopy
+1https://api.inference.sh
+Path prefix
+There is none. Routes live at the root of the API host:
+bashcopy
+1curl https://api.inference.sh/tasks/task_abc123 -H "Authorization: Bearer inf_your_key"
+Authentication
+All requests require an API key in the Authorization header:
+codecopy
+1Authorization: Bearer inf_your_api_key
+Content Type
+codecopy
+1Content-Type: application/json
+Response format
+Every JSON response is an envelope: the resource under data, and messages for any notices the
+server attached (level, code, message, optional meta). Errors are
+RFC 9457 application/problem+json. Streams (SSE, NDJSON)
+carry bare DTOs per event. The official SDKs unwrap data and surface messages through a callback.
+Success example (task from POST /run):
+jsoncopy
+1{2  "data": {3    "id": "task_abc123",4    "status": 10,5    "output": { "image": { "uri": "https://..." } }6  },7  "messages": []8}
+Error example (401):
+jsoncopy
+1{2  "type": "https://api.inference.sh/errors/unauthorized",3  "title": "Unauthorized",4  "status": 401,5  "detail": "Invalid or missing API key"6}
+Older examples on other pages show the resource without the data wrapper; read it from data.
+bashcopy
+1curl https://api.inference.sh/tasks/task_abc123 \2  -H "Authorization: Bearer inf_your_key"
+Error Responses
+Errors use Content-Type: application/problem+json with the type, title, status, and detail fields shown above. The type URI ends with the error code (for example .../errors/not_found).
+Some errors include an optional meta extension member with structured context — for example entitlement errors (limit_exceeded, feature_not_available) attach resource, limit, current, upgrade_available, and optional addon plan fields. See Entitlements API — Error metadata.
+Error Codes
+| Code | HTTP | Description
+| unauthorized | 401 | Invalid or missing API key
+| forbidden | 403 | Insufficient permissions
+| not_found | 404 | Resource not found
+| invalid_request | 400 | Malformed request
+| rate_limited | 429 | Too many requests
+| entitlement_unavailable | 500 | The entitlement lookup failed, so plan limits could not be verified. Retriable.
+| internal_error | 500 | Server error
+Pre-authentication access controls
+Some requests are rejected before authentication. These responses do not use the problem+json format above:
+| Condition | HTTP | Response
+| IP blocked for abuse | 403 | { "message": "Access denied. This attempt has been logged. If you believe this is a mistake, please disconnect any VPN or proxy and try again, or contact [email protected]." }
+| Region blocked (sanctions) | 451 | service not available in your region (plain text)
+Both checks apply to almost every route. Some health and status endpoints stay reachable. They are separate from the permission 403 errors (forbidden, feature_not_available) returned after authentication.
+Regional blocking uses the request's country and, for some countries, its subdivision. Blocked countries are Cuba, Iran, North Korea, Russia, and Syria. Within Ukraine, Crimea, Sevastopol, Donetsk, and Luhansk are blocked. VPN or proxy exit nodes in a blocked region get the same response.
+Signup email restrictions
+New accounts cannot use temporary or disposable email domains. The check runs when a new user record would be created, so every sign-up path enforces it:
+| Auth path | When the check runs | Error for new signups
+| Magic link (POST /auth/magic-link/send) | Before the email is sent | disposable_email (400)
+| OAuth sign-in | After the provider redirects back | disposable_email (400)
+| SAML SSO | On first login for a new email | user_creation_failed (500). Use a permanent address and retry.
+Existing accounts are not affected. An account registered on such a domain before the restriction can still sign in.
+Magic link sign-in also rejects email aliases with + in the local part (for example [email protected]) at send time with invalid_email (400). OAuth and SAML do not apply the alias rule.
+Billing and plan limits
+These billing and plan errors can block API calls:
+| Kind | Typical codes | What to check
+| Plan limits | limit_exceeded (402), feature_not_available (403) | Subscription tier caps — API keys, storage, concurrent tasks, feature flags
+| Entitlement lookup failure | entitlement_unavailable (500) | Transient server error while reading plan limits. Retry. Not a tier cap.
+| Prepaid balance | payment_required (402) | Credits for task and agent runs
+Inspect current usage programmatically with GET /entitlements/usage. List entitlement rows (limits and sources) with GET /entitlements. See Entitlements API for response formats and error metadata.
+Web app modals
+In the inference shell app, entitlement errors with upgrade_available: true open an upgrade modal instead of only surfacing a toast:
+| API error | Modal
+| limit_exceeded or feature_not_available (tier cap) | Upgrade modal — lists self-serve plans above your current tier
+| feature_not_available with addon_plan_id | Add-on purchase modal — shows addon name, price, and subscribe - $X/mo CTA that routes to the add-ons page
+| payment_required (402 without upgrade_available) | Top-up modal — add prepaid credits
+For payment_required, credits always go to whoever pays for the selected workspace (the team itself, or the organization workspace for an org member team). If you manage organization billing while switched into a member team, checkout runs against the organization balance and returns to that workspace's billing settings. If the organization pays and you cannot manage its billing, the modal shows the org notice instead of checkout — the same rule as inline add credits controls elsewhere in the app.
+The upgrade modal shows the API detail message (or which resource requires a higher plan). For limit_exceeded, it also shows current usage / plan cap (for example 3 / 5) when the cap is greater than zero. A 0 cap means the feature is disabled on your tier — the modal omits a usage line instead of showing 0 / 0.
+Each listed plan shows monthly price, included credits, and key limits. The recommended badge marks the cheapest plan that resolves the blocked resource (unlimited, a higher numeric cap, or an enabled boolean feature). Select a plan or View all plans to open settings → workspace → subscription.
+When the error includes addon_plan_id, the modal shows a single add-on card with a subscribe - $X/mo button that routes to settings → workspace → add-ons, the same purchase flow as the add-ons page (Stripe Checkout via POST /subscription/addon). Most add-ons do not require a base subscription; some set required_plan_ids on the plan.
+Direct links: Pricing (browse plans) · settings → workspace → billing (credits) · settings → workspace → subscription (manage plan) · settings → workspace → add-ons (purchase add-ons)
+Rate Limits
+| Endpoint | Limit
+| Run task | 100/minute
+| Get task | 1000/minute
+| Upload file | 50/minute
+Response headers:
+codecopy
+1X-RateLimit-Remaining: 952X-RateLimit-Reset: 16400000003Retry-After: 60
+Some endpoints (for example magic link send when throttled by IP) return HTTP 429 with a Retry-After header (whole seconds). Browser clients can read it — the API exposes Retry-After in CORS Access-Control-Expose-Headers.
+OpenAPI
+Download the generated route catalog:
+codecopy
+1GET https://api.inference.sh/openapi.json
+OpenAPI 3.1 document listing public paths, methods, and schemas. Useful for client generation and discovering routes not yet covered in these guides. No authentication required.
+Cursor pagination
+Most list endpoints (GET /tasks, GET /skills, POST /apps/list, GET /chats/:id/messages, and others) use the same cursor-list shape. Send parameters as query strings on GET or in a JSON body on POST …/list.
+| Field | Type | Description
+| limit | integer | Page size (default varies by endpoint — often 10 or 50). Pass -1 to return all matching items in one response without pagination.
+| cursor | string | Opaque cursor from next_cursor or prev_cursor (ignored when limit=-1)
+| direction | string | forward (default) or backward (ignored when limit=-1)
+| sort | array | Sort orders, for example [{ "field": "created_at", "dir": "desc" }]
+| filters | array | Filter expressions (field, operator, value)
+| search | object | Full-text search (term, fields, …) where supported
+| include_others | boolean | Include other users' items in the response, where the endpoint supports it
+| include_private | boolean | Workspace owners and admins only. Include every row the selected workspace owns, including members' private resources. Ignored for other roles. Each use is audited. See Workspace admin visibility.
+Workspace admin visibility
+By default, list endpoints hide a member's private resources from everyone except the creator. Workspace owners and admins can widen a listing by passing include_private: true (include_private=true in the query string on GET, a JSON body field on POST …/list).
+When set, the response includes every row owned by the workspace in the request context: your own private items, other members' private items, and team-visible items. The flag has no effect for the member role, which always gets the standard listing.
+Use this when cleaning up a workspace after someone leaves, for example to transfer or delete their private apps, flows, or knowledge. Each include_private list request is audited as team_admin.list_private.
+Workspace owners and admins can also read or write an individual member's private resource when the normal permission check would deny access, for example GET /apps/{id} on a departed member's private app. The bypass does not cover running the resource. Each access is audited as team_admin.permission_bypass. Org admins get the same bypass for resources in workspaces attached to their org. Person-owned identity data (exports, sessions, and similar) is never reachable this way.
+Response shape
+| Field | Type | Description
+| items | array | Resources for this page (or all matches when limit=-1)
+| next_cursor | string | Cursor for the next page
+| prev_cursor | string | Cursor for the previous page
+| has_next | boolean | More results after this page
+| has_previous | boolean | Results before this page
+| items_per_page | number | Items in this response
+| total_items | number | Total matching items
+Responses may include RFC 8288 Link headers (rel="next", rel="prev") with the same cursors.
+Full dumps (limit=-1)
+Pass limit=-1 on any cursor-paginated list endpoint to skip pagination and return matching rows in one response (capped at 10,000 rows). Sort and filters still apply; cursor and direction are ignored. has_next is false — treat items as the complete result set when the match count is under the cap.
+Use this for exports, migrations, or debugging on smaller datasets. Prefer normal cursor pagination for UI scroll-back and tables that may exceed 10,000 rows.
+bashcopy
+1curl "https://api.inference.sh/tasks?limit=-1&filters=%5B%7B%22field%22%3A%22status%22%2C%22operator%22%3A%22eq%22%2C%22value%22%3A10%7D%5D" \2  -H "Authorization: Bearer inf_your_key"
+Endpoints
+Tasks — Run apps, status, logs, timings, telemetry, cancellation, webhooks, cost
+Remotes — Register machines that connect as outbound daemons
+Exec runs — Dispatch commands to remotes and stream output
+Engines — Private engine list, drain, update, stop
+Files — Upload files
+Agents — Agent chat API
+Publications — Publish agents for embedding (POST /publications)
+Embed — Anonymous chat API for published agents
+Triggers — Cron and webhook automation (run agents, apps, flows)
+Skills — Manage and access skills
+Knowledge — Manage knowledge entries
+Artifacts — Publish versioned HTML and Markdown pages to a shareable URL
+Pages — Read CMS pages (docs, blog, landing pages)
+Search — Search apps, skills, knowledge, and pages
+Entitlements — Plan limits, usage, and feature flags
+Streaming — SSE endpoints
+Billing · Subscription — Credits and plan management
+Magic link sign-in · Device authorization: web app and CLI login

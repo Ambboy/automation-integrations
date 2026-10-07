@@ -1,0 +1,113 @@
+Point any OpenAI client at inference.sh and call every chat model on the platform. The official SDKs, and the tools built on them (Cursor, Continue, LangChain, LlamaIndex, coding-agent harnesses), work unchanged — only the base URL and the model name differ.
+codecopy
+1base_url = https://api.inference.sh/models/openai
+The path names the resource first and the dialect second: /models/openai is the model catalogue spoken OpenAI-style. One app or one agent has the same dialect under its own path — see One app by URL and Agents.
+Authentication is your API key as a bearer token, the same key as the rest of the API. POST /models/openai/chat/completions requires scope apps:execute; GET /models/openai/models requires apps:read.
+→ Authentication — creating keys and scopes
+→ Tasks API — the native interface, with setup, sessions, webhooks and files
+Quickstart
+pythoncopy
+1from openai import OpenAI23client = OpenAI(4    base_url="https://api.inference.sh/models/openai",5    api_key="<your inference.sh API key>",6)78completion = client.chat.completions.create(9    model="openrouter/claude-sonnet-5",10    messages=[{"role": "user", "content": "Say hello in five words"}],11)12print(completion.choices[0].message.content)
+bashcopy
+1curl https://api.inference.sh/models/openai/chat/completions \2  -H "Authorization: Bearer $INFERENCE_API_KEY" \3  -H "Content-Type: application/json" \4  -d '{5    "model": "openrouter/claude-sonnet-5",6    "messages": [{"role": "user", "content": "Say hello in five words"}]7  }'
+The model name is an app reference
+There is no separate model catalogue. model is the app reference you already use elsewhere on the platform:
+codecopy
+1namespace/name            openrouter/claude-sonnet-52namespace/name@version    openrouter/claude-sonnet-5@3gpaneb7
+Unversioned references resolve to the app's current version. The response's model field echoes the version that actually ran, so a request for openrouter/claude-sonnet-5 comes back as openrouter/claude-sonnet-5@3gpaneb7 — record it if you need to reproduce a result.
+Bare names are not aliased. gpt-5 is not a model here; openai/gpt-6-astra is.
+List models
+GET /models/openai/models
+Every chat app visible to you, in OpenAI's model-list shape.
+jsoncopy
+1{2  "object": "list",3  "data": [4    {5      "id": "anthropic/claude-opus-5",6      "object": "model",7      "created": 1788554836,8      "owned_by": "anthropic"9    }10  ]11}
+| Field | Description
+| id | App reference — pass this back as model
+| owned_by | The app's namespace
+| created | When the app's current version was published
+The list contains apps whose run function speaks the platform's LLM contract, which the engine determines from the function's declared types at deploy time. Private apps appear only for workspaces that can see them, so two keys can legitimately get different lists. Image, video and audio apps are not in this list; reach those through the Tasks API.
+Chat completions
+POST /models/openai/chat/completions
+Supported
+| Parameter | Notes
+| messages | system, developer, user, assistant, tool. Multiple system/developer messages are concatenated
+| content | A string, or an array of text, image_url and file parts
+| stream | Server-sent events, terminated by data: [DONE]
+| stream_options.include_usage | Adds the trailing usage-only chunk
+| tools, tool_choice | "none", "auto", "required", or {"type":"function","function":{"name":"…"}}
+| response_format | text, json_object, json_schema
+| temperature, top_p |
+| frequency_penalty, presence_penalty |
+| seed, stop | stop takes a string or an array
+| max_completion_tokens, max_tokens | max_completion_tokens wins when both are sent
+| reasoning_effort | none, minimal, low, medium, high, xhigh
+| functions, function_call | Deprecated; lifted into tools / tool_choice
+Omitted parameters keep the app's own defaults rather than being forced to a gateway default.
+Extensions
+message.reasoning and delta.reasoning carry a reasoning model's thinking. It is an addition to the spec, so clients that do not know the field ignore it.
+Rejected
+These return 400 with the offending parameter named, before any work is dispatched or billed:
+n (values other than 1), logprobs, top_logprobs, logit_bias, audio, modalities (anything but ["text"]), prediction, web_search_options, moderation, functions combined with tools, and file.file_id content parts — pass file.file_data as a URL or data URI instead.
+Ignored
+Accepted and discarded, so clients that always send them still work: user, metadata, store, service_tier, parallel_tool_calls, prompt_cache_key, safety_identifier, verbosity.
+Streaming
+pythoncopy
+1stream = client.chat.completions.create(2    model="openrouter/claude-sonnet-5",3    messages=[{"role": "user", "content": "Count from one to five"}],4    stream=True,5    stream_options={"include_usage": True},6)7for chunk in stream:8    if chunk.choices:9        print(chunk.choices[0].delta.content or "", end="")
+Chunks are chat.completion.chunk objects; the first carries role: "assistant", the last carries finish_reason, and the stream ends with data: [DONE]. Tool calls arrive as indexed fragments whose function.arguments you concatenate per index, exactly as with OpenAI.
+Prefer streaming for anything slow. A non-streaming request holds the connection until the task finishes, and an app that has to cold-start a large model can exceed the edge's request ceiling, surfacing as a 524. Streaming sends bytes immediately and is unaffected.
+Tool calling
+pythoncopy
+1tools = [{2    "type": "function",3    "function": {4        "name": "get_weather",5        "parameters": {6            "type": "object",7            "properties": {"city": {"type": "string"}},8            "required": ["city"],9        },10    },11}]1213first = client.chat.completions.create(14    model="openrouter/claude-sonnet-5",15    messages=[{"role": "user", "content": "What is the weather in Paris?"}],16    tools=tools,17    tool_choice="required",18)19call = first.choices[0].message.tool_calls[0]2021second = client.chat.completions.create(22    model="openrouter/claude-sonnet-5",23    messages=[24        {"role": "user", "content": "What is the weather in Paris?"},25        first.choices[0].message,26        {"role": "tool", "tool_call_id": call.id, "content": "22C and sunny"},27    ],28)
+Tool schemas are forwarded to the provider untouched, so keywords beyond OpenAI's documented subset — enum, format, nested objects — reach the model as written.
+Not every model can call tools, and not every one that can supports every tool_choice mode. A model that cannot honour what you asked for fails the request rather than silently answering in prose.
+Structured output
+pythoncopy
+1completion = client.chat.completions.create(2    model="openrouter/claude-sonnet-5",3    messages=[{"role": "user", "content": "Give me three primary colors"}],4    response_format={5        "type": "json_schema",6        "json_schema": {7            "name": "colors",8            "strict": True,9            "schema": {10                "type": "object",11                "properties": {"colors": {"type": "array", "items": {"type": "string"}}},12                "required": ["colors"],13                "additionalProperties": False,14            },15        },16    },17)
+json_object and json_schema map onto whatever the provider offers — OpenAI's structured outputs, Anthropic's output format, Gemini's response schema. Providers with no equivalent reject the request instead of returning unconstrained text.
+One app by URL
+A client that is pinned to one model can name it in the URL instead of the body:
+codecopy
+1POST /apps/{namespace}/{name}/openai/chat/completions2base_url = https://api.inference.sh/apps/{namespace}/{name}/openai
+model in the body is ignored. Everything else — streaming, tools, structured output, errors — is identical to the catalogue endpoint.
+Agents
+The same protocol is available as a dialect of a single agent. The agent is the resource; the OpenAI surface hangs off it:
+codecopy
+1POST /agents/{namespace}/{name}/openai/chat/completions2base_url = https://api.inference.sh/agents/{namespace}/{name}/openai
+Requires scope agents:execute. The body is a normal chat completion request; model is ignored, since the path names the agent. Only the last user message is sent to the agent — it owns its system prompt, tools and history — and the reply is the agent's final text. Streaming works the same way as for models.
+bashcopy
+1curl "https://api.inference.sh/agents/acme/chief/openai/chat/completions?channel=glasses&continue=10m&wait=25s&max_chars=400" \2  -H "Authorization: Bearer $INFERENCE_API_KEY" \3  -H "Content-Type: application/json" \4  -d '{"messages": [{"role": "user", "content": "what is on my calendar today?"}]}'
+The query parameters exist for clients that send only their latest utterance and cannot hold a connection for long — voice assistants, wearables such as Even Realities G2, chat bridges:
+| Parameter | Meaning
+| channel | A tag (a-z0-9_-, up to 32 chars) recorded on every chat this client creates. It separates this client's conversations from web chats and from other channels with the same agent.
+| continue | Append to your latest chat with this agent on this channel if it was active within the window (10m, 2h, bare seconds; up to 24h). Otherwise a new chat starts. Requires channel.
+| wait | How long to hold the request (25s, up to 10m). If the agent is still working when it expires, the response carries the text written so far (or, when there is none yet, "Still working on it. Ask again in a moment for the answer.") with finish_reason: "length" and the header X-Inference-Turn: pending; the run continues, and the next request with continue lands in the same chat.
+| max_chars | Truncate the returned text to this many characters. A cap for small displays, not an instruction to the agent — put length guidance in the agent's prompt.
+message.content on agent completions: The field is a JSON string for every text reply. If wait expires before the agent has written anything, content is the "Still working on it" sentence above, never empty, so thin clients and voice assistants always have text to show. content is omitted (null) only when the assistant message includes tool_calls, matching OpenAI.
+If the chat already has a run in progress, your prompt is queued for the next run. The endpoint waits for that turn to finish (or until wait expires) and does not treat idle signals from an earlier run as the end of your turn.
+Without continue every request is a fresh chat. Conversations created this way appear in the agent's chat list like any other.
+Two more error codes apply to agents: 404 agent_not_found, and 409 input_required when the agent stopped for a tool approval or authorization that only the inference.sh app can provide.
+Errors
+OpenAI's error envelope, so SDK exception handling works as written:
+jsoncopy
+1{2  "error": {3    "message": "unsupported parameter: n (only n=1 is supported)",4    "type": "invalid_request_error",5    "param": "n",6    "code": "unsupported_parameter"7  }8}
+| Status | code | Cause
+| 400 | missing_required_parameter | No model
+| 400 | unsupported_parameter | A parameter the platform does not support
+| 400 | invalid_parameter | A supported parameter with an unusable value
+| 402 | insufficient_quota | Balance too low
+| 403 | — | No access to that app
+| 404 | model_not_found | Unknown app reference, or not visible to your key
+| 409 | task_cancelled | The run was cancelled
+| 410 | model_retired | The app has been retired
+| 500 | model_error | The model or provider failed (type: server_error)
+| 503 | model_maintenance | The app is temporarily unavailable
+On a stream, a failure after the response has begun arrives as an error object in the SSE body, followed by data: [DONE].
+What this surface does not cover
+The gateway exposes chat completions and nothing else. Use the platform's own API for:
+| Need | Where
+| Image, video, audio, 3D apps | Tasks API
+| App setup parameters, sessions, webhooks | Tasks API
+| Uploading files and getting references | Files API
+| Agent tools, approvals, chat history | Agents API
+| Embeddings | Not available on this surface
+Billing is identical either way — a completion is a task, and it appears in usage and task cost like any other run.

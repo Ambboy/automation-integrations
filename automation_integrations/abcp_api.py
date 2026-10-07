@@ -8,6 +8,7 @@ from __future__ import annotations
 import base64
 import datetime as dt
 import hashlib
+import http.client
 import json
 import math
 import os
@@ -296,6 +297,17 @@ def _business(data, write):
     return 'accepted_unverified' if write else 'read'
 
 
+def _reject_constant(value):
+    raise ValueError('nonfinite_json_number')
+
+
+def _finite_float(value):
+    parsed = float(value)
+    if not math.isfinite(parsed):
+        raise ValueError('nonfinite_json_number')
+    return parsed
+
+
 def _result_dir(config):
     root = Path(config['state_dir']) / 'results'
     root.mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -426,16 +438,19 @@ def execute(config, ident, params, *, write=False, opener=None):
                 and b'messages not found' in raw.lower()):
             return {'ok': True, 'data': [], 'business_status': 'read', 'http_status': 404,
                     'provider_called': True, 'note': 'Documented empty VINQU chat window; at most last 15 minutes.'}
-    except (urllib.error.URLError, TimeoutError, socket.timeout, ssl.SSLError, OSError):
+    except (urllib.error.URLError, TimeoutError, socket.timeout, ssl.SSLError, OSError,
+            http.client.HTTPException):
         raise AbcpError('transport_outcome_unknown' if write else 'transport_unavailable') from None
     if len(raw) > MAX_RESPONSE:
         raise AbcpError('response_too_large_outcome_unknown' if write else 'response_too_large')
     try:
-        data = None if not raw.strip() and row.get('response_kind') == 'empty_or_json' and status < 400 else json.loads(raw)
-    except (ValueError, UnicodeError):
+        data = (None if not raw.strip() and row.get('response_kind') == 'empty_or_json' and status < 400
+                else json.loads(raw, parse_constant=_reject_constant, parse_float=_finite_float))
+    except (ValueError, UnicodeError, RecursionError):
         if status >= 400:
             raise AbcpError('provider_http_error', status) from None
-        if row.get('response_kind') in ('binary', 'file', 'binary_or_json', 'pdf_or_json'):
+        if (('json' not in content_type.lower() or raw.startswith((b'%PDF-', b'PK\x03\x04')))
+                and row.get('response_kind') in ('binary', 'file', 'binary_or_json', 'pdf_or_json')):
             if not raw or 'text/html' in content_type.lower():
                 raise AbcpError('invalid_provider_response') from None
             root = _result_dir(config)
@@ -450,6 +465,17 @@ def execute(config, ident, params, *, write=False, opener=None):
             raise AbcpError('invalid_provider_json_outcome_unknown' if write else 'invalid_provider_json') from None
     data = sanitize(data, [*values.values(), *request_secrets])
     business = _business(data, write)
+    if write and row['path'].strip('/') == 'basket/add' and isinstance(data, dict):
+        positions = data.get('positions')
+        if isinstance(positions, list):
+            states = [_business(position, True) for position in positions if isinstance(position, dict)]
+            # status=0 means at least one failed item, not an atomic rollback.
+            # Retain accepted items so the write workflow cannot repeat them.
+            if 'accepted_unverified' in states and (business == 'provider_rejected'
+                                                    or 'provider_rejected' in states):
+                business = 'partial'
+            elif states and all(state == 'provider_rejected' for state in states):
+                business = 'provider_rejected'
     if write and row['path'].strip('/') == 'cp/orders/online' and isinstance(data, list):
         sent = [position.get('confirmSend') for order in data if isinstance(order, dict)
                 for position in order.get('positions', []) if isinstance(position, dict)]

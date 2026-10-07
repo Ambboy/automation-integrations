@@ -226,7 +226,7 @@ def _validate_response(operation, result):
         invalid = (type(result.get('count')) is not int or result['count'] < 0
                    or not isinstance(result.get('results'), list)
                    or any(not isinstance(row, dict) for row in result['results'])
-                   or any(key not in result or result[key] is not None and not isinstance(result[key], str)
+                   or any(result.get(key) is not None and not isinstance(result[key], str)
                           for key in ('next', 'previous')))
     if not invalid and operation == 'counters':
         invalid = any(type(result.get(key)) is not int or result[key] < 0 for key in ('count', 'countAgentNotOk'))
@@ -238,7 +238,10 @@ def _validate_response(operation, result):
 def pagination(result, params):
     """Expose usable page numbers without following or returning remote URLs."""
     page, size = params.get('page', 1), params.get('page_size', 20)
-    more = result.get('next') is not None
+    # next/previous are optional in PaginatedControllerList. If omitted, use
+    # the documented count rather than silently declaring the first page final.
+    more = (result['next'] is not None if 'next' in result
+            else (page - 1) * size + len(result['results']) < result['count'])
     return {'page': page, 'page_size': size, 'count': result['count'],
             'returned': len(result['results']), 'has_more': more,
             'next_page': page + 1 if more and page < 10000 else None}

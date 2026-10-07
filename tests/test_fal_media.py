@@ -22,14 +22,14 @@ class Transport:
 
 class FalMediaTests(unittest.TestCase):
     def test_documented_surface_covers_both_specs_by_operation_id(self):
-        root = Path(__file__).resolve().parents[1] / 'docs/media-api-snapshots/fal'
+        root = Path(__file__).resolve().parents[1] / fal.DOCUMENTED['source_snapshot_dir']
         expected = set()
         for name in ('platform-openapi.json', 'platform-doc-openapi.json'):
             spec = json.loads((root / name).read_text())
             expected.update(row['operationId'] for ops in spec['paths'].values() for method, row in ops.items()
                             if method in ('get', 'put', 'post', 'delete', 'patch'))
         self.assertEqual({row['provider_operation_id'] for row in fal.PLATFORM_OPERATIONS.values()}, expected)
-        self.assertEqual(len(expected), 88)
+        self.assertEqual(len(expected), 89)
         for source in json.loads((root / 'provenance.json').read_text()):
             self.assertEqual(hashlib.sha256((root / source['file']).read_bytes()).hexdigest(), source['sha256'])
 
@@ -181,7 +181,7 @@ class FalMediaTests(unittest.TestCase):
 
     def test_unsupported_capabilities_are_visible_but_fail_before_secret_or_network(self):
         capabilities = fal.execute('capabilities', {}, {})
-        self.assertEqual(capabilities['platform_operations'], 88)
+        self.assertEqual(capabilities['platform_operations'], 89)
         for op, params in [('realtime', {'endpoint_id': 'owner/model'}), ('http_websocket', {'endpoint_id': 'owner/model'}),
                            ('create_api_key', {'body': {'alias': 'greif'}})]:
             self.assertTrue(capabilities['operations'][op]['unsupported_reason'])

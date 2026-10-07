@@ -6,6 +6,20 @@ import re
 from pathlib import Path
 
 
+def verification_receipt(path, service, operation):
+    """A damaged diagnostic receipt must not disable discovery for every API."""
+    try:
+        value = json.loads(path.read_text())
+        if (not isinstance(value, dict) or type(value.get('ok')) is not bool
+                or value.get('service', service) != service
+                or value.get('operation', operation) != operation):
+            raise ValueError('invalid_receipt')
+        return {k: value.get(k) for k in ('ok', 'error', 'http_status', 'checked_at')}
+    except (OSError, ValueError, UnicodeError):
+        return {'ok': False, 'error': 'verification_receipt_invalid',
+                'http_status': None, 'checked_at': None}
+
+
 class Catalog:
     def __init__(self, path, state_dir=None):
         self.path = Path(path)
@@ -29,9 +43,7 @@ class Catalog:
                 if self.state_dir:
                     receipt = self.state_dir / f'{ident}.{operation}.json'
                     if receipt.exists():
-                        value = json.loads(receipt.read_text())
-                        spec['last_check'] = {k: value.get(k) for k in
-                            ('ok', 'error', 'http_status', 'checked_at')}
+                        spec['last_check'] = verification_receipt(receipt, ident, operation)
             if any('last_check' in spec for spec in item['operations'].values()):
                 item['verification'] = 'See operations.last_check; operations without a receipt remain unverified.'
         return data
@@ -52,7 +64,7 @@ class Catalog:
             adapter = row.get('adapter')
             receipt = self.state_dir / f'{service}.{adapter}.json' if self.state_dir and adapter else None
             if receipt and receipt.exists():
-                row['live_check'] = json.loads(receipt.read_text())
+                row['live_check'] = verification_receipt(receipt, service, adapter)
                 row['access'] = 'observed_success' if row['live_check'].get('ok') else 'probe_failed'
         # A single detailed schema can be large. Lists return concise metadata;
         # exact capability_id returns that operation's parameter/body contract.

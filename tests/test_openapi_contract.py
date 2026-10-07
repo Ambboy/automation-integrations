@@ -33,7 +33,13 @@ class ContractTests(unittest.TestCase):
                 inventory = json.loads((ROOT / 'registry/capabilities' / (service + '.json')).read_text())
                 rows = operations(service)
                 self.assertEqual(len(rows), count)
-                self.assertEqual({r['id'] for r in rows.values()}, {r['id'] for r in inventory['capabilities']})
+                supplemental = inventory.get('supplemental_operations', {})
+                official = [r for r in inventory['capabilities'] if r['id'] not in supplemental]
+                self.assertEqual({r['id'] for r in rows.values()}, {r['id'] for r in official})
+                for row in inventory['capabilities']:
+                    if row['id'] in supplemental:
+                        self.assertEqual(supplemental[row['id']]['execution'], 'integration_read')
+                        self.assertTrue(row['source'].startswith('https://www.etm.ru/api/ipro/'))
                 for name, row in rows.items():
                     self.assertRegex(name, r'^[a-z][a-z0-9_]{0,79}$')
                     self.assertFalse(row['live_verified'])

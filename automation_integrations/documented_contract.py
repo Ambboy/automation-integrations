@@ -19,6 +19,10 @@ except ImportError:
     from openapi_contract import validate_schema
 
 
+YANDEX_IDEMPOTENT_WRITES = frozenset({
+    'promocodes_create', 'vehicles_bulk_create', 'vehicles_bulk_update', 'vehicles_bulk_archive'})
+
+
 @lru_cache(maxsize=2)
 def _contract(service):
     if service not in ('yandex_go', 'saby'):
@@ -36,10 +40,12 @@ def _contract(service):
 def operations(service):
     """Return isolated metadata so callers cannot mutate the trusted registry."""
     result = deepcopy(_contract(service)['operations'])
-    for row in result.values():
+    for operation, row in result.items():
         row['params_schema'] = deepcopy(row['parameters'])
         if row['effect'] == 'write':
             row['effect'] = 'business_write'
+        if service == 'yandex_go' and operation in YANDEX_IDEMPOTENT_WRITES:
+            row['requires_idempotency_key'] = True
     return result
 
 

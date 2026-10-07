@@ -5,7 +5,7 @@ import json
 import re
 
 ROOT = Path(__file__).resolve().parents[3]
-HERE = Path(__file__).parent
+HERE = ROOT / 'docs/media-api-snapshots/2026-10-07/fal'
 rows = {}
 for file, url in [('platform-doc-openapi.json', 'https://fal.ai/docs/api-reference/platform-apis/openapi/v1.json'),
                   ('platform-openapi.json', 'https://api.fal.ai/v1/openapi.json')]:
@@ -49,7 +49,8 @@ for file, url in [('platform-doc-openapi.json', 'https://fal.ai/docs/api-referen
                 'source_file': file, 'source_sha256': hashlib.sha256((HERE / file).read_bytes()).hexdigest()}
             if name == 'create_api_key':
                 rows[name]['unsupported_reason'] = 'secure_generated_credential_sink_required'
-contract = {'schema_version': 1, 'service': 'fal', 'retrieved_at': '2026-10-04', 'operations': rows,
+contract = {'schema_version': 1, 'service': 'fal', 'retrieved_at': '2026-10-07', 'operations': rows,
+    'source_snapshot_dir': str(HERE.relative_to(ROOT)),
     'source_resolution': 'Union by operationId. Live schema takes precedence; createComputeInstance appears only in static documentation.'}
 (ROOT / 'registry/contracts/fal.json').write_text(json.dumps(contract, ensure_ascii=False, indent=2) + '\n')
 print('Compiled', len(rows), 'documented platform operations')
