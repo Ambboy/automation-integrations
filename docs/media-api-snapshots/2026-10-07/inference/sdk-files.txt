@@ -1,0 +1,36 @@
+Upload and download files programmatically.
+Automatic Upload
+Local file paths and data URIs are uploaded automatically:
+PythonJavaScript
+1result = client.tasks.run({2    "app": "image-processor",3    "input": {4        "image": "/path/to/image.png"  # Uploaded automatically5    }6})
+Manual Upload
+PythonPythonJavaScriptSwift
+1from inferencesh import UploadFileOptions23# Upload from path4file_obj = client.files.upload("/path/to/image.png")5print(f"URI: {file_obj['uri']}")67# Upload from bytes8file_obj = client.files.upload(9    b"raw bytes data",10    UploadFileOptions(11        filename="data.bin",12        content_type="application/octet-stream"13    )14)1516# Upload with options17file_obj = client.files.upload(18    "/path/to/image.png",19    UploadFileOptions(20        filename="custom_name.png",21        content_type="image/png",22        public=True  # Make publicly accessible23    )24)
+Data URI formats (JavaScript)
+client.files.upload() and automatic upload in client.run() accept standard data URIs:
+| Format | Example | Notes
+| Base64 | data:image/png;base64,iVBORw0KGgo= | Default for binary payloads
+| URL-encoded | data:text/plain,Hello%20World | Decoded with decodeURIComponent before upload
+| URL-safe base64 | data:text/plain;base64,SGVsbG8 | - and _ are normalized to + and /
+| Omitted media type | data:;base64,SGVsbG8= | Defaults to text/plain
+Invalid data URIs throw Invalid data URI format. If the API does not return upload_url for a created file record, or the PUT to that URL fails, upload rejects with a clear error.
+When processInput walks task input, it uploads data: strings anywhere in nested objects and replaces them with inf://files/... URIs. Short plain strings (for example "hello" or API keys under 64 characters) are left unchanged — only data: URIs or long base64-looking strings are treated as file content.
+Upload Options
+PythonJavaScript
+1from inferencesh import UploadFileOptions23UploadFileOptions(4    filename="custom.png",     # File name5    content_type="image/png",  # MIME type6    path="/custom/path",       # Custom storage path7    public=True                # Make publicly accessible8)
+Use Uploaded Files
+PythonJavaScriptSwift
+1file = client.files.upload("/path/to/image.png")23result = client.tasks.run({4    "app": "image-processor",5    "input": {"image": file["uri"]}6})
+Agent file attachments
+When chatting with agents, attach files on send_message / sendMessage:
+PythonJavaScript
+1response = agent.send_message(2    "Describe this image",3    files=[open("image.png", "rb").read()],4)56# upload_file on the agent returns a FileRef (uri, filename, content_type)7ref = agent.upload_file(open("doc.pdf", "rb").read(), filename="doc.pdf")8response = agent.send_message("Summarize", files=[open("doc.pdf", "rb").read()])
+Files are uploaded via the Files API and referenced in the message input.attachments field (Python) or input.images / input.files (JavaScript).
+→ Template agents · Python SDK · JavaScript SDK
+Download Results
+PythonJavaScriptSwift
+1import requests23result = client.tasks.run(params)4output_url = result["output"]["image"]["uri"]56# Download7response = requests.get(output_url)8with open("output.png", "wb") as f:9    f.write(response.content)
+File Class (App Development)
+When building apps in Python, use the File class:
+pythoncopy
+1from inferencesh import File23# From path4file = File(path="/path/to/file.png")56# With metadata7file = File(8    path="/path/to/file.png",9    content_type="image/png",10    filename="custom.png"11)1213# Check existence14if file.exists():15    print(f"Size: {file.size} bytes")

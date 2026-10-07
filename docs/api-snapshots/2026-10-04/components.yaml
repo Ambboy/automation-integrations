@@ -1,0 +1,64 @@
+openapi: 3.0.1
+info:
+  title: общие компоненты api
+  version: '1'
+
+components:
+
+  securitySchemes:
+    userAuth:
+      description: Ключ пользователя (может передаваться в cookie,header,query)
+      type: apiKey
+      in: query  #header,cookie
+      name: session-id
+
+  parameters:
+    page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        format: int32
+      description: Номер страницы с данными
+    rows:    
+      name: rows
+      in: query
+      schema:
+        type: integer
+        format: int32
+      description: Строк данных на странице
+    sidx:    
+      name: sidx
+      in: query
+      schema:
+        type: string
+      description: Поле сортировки
+    sord:    
+      name: sord
+      in: query
+      schema:
+        type: string
+        enum: ['asc', 'desc']
+      description: >
+        Порядок сортировки:
+         * `asc` - по возрастанию
+         * `desc` - по убыванию
+
+  schemas:
+    Status:
+      type: object
+      properties:
+        code:
+          description: >
+            Статус ответа:
+             * `200` - Ок
+             * `400` - Ошибка
+             * `403` - Ошибка проверки сессии пользователя
+             * `404` - Объект не найден                          
+          type: integer
+          format: int32
+          example: 200
+        message:
+          description: Сообщение об ошибке или информационное
+          type: string
+          example: ''

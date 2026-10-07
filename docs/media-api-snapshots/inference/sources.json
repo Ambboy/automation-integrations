@@ -1,0 +1,281 @@
+[
+  {
+    "url": "https://inference.sh/docs/api/rest/agents",
+    "raw_html_sha256": "2d67b7ade9e1930c70cfc096aa872539bb2a5d95b19af1a8e1a00dee94cc73fe",
+    "local_snapshot": "docs/media-api-snapshots/inference/agents.txt",
+    "sha256": "863ba498a61110130cee1e0302408ac5b493a1d8358d18376dac05a7d9dffba0",
+    "retrieved_at": "2026-10-04T16:03:05.645594+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/api-keys",
+    "raw_html_sha256": "42ddd7b20116a466dfbac2a07b8867c9502a5c39d0c1830f83205f8ed544f016",
+    "local_snapshot": "docs/media-api-snapshots/inference/api-keys.txt",
+    "sha256": "0c151106c7e7c52fcdf9c2df7ec51fc1925c7733441d58236a0bc376f1bdf0f9",
+    "retrieved_at": "2026-10-04T16:03:05.569914+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/apps",
+    "raw_html_sha256": "51a0e08463f4c72d2e381c3a6757500a6a82e16ed5d24f91ca78fbf18cf0b67c",
+    "local_snapshot": "docs/media-api-snapshots/inference/apps.txt",
+    "sha256": "78922df165ee3e71c841129ded373fee330469aaab32314143996615066814c9",
+    "retrieved_at": "2026-10-04T16:03:05.510772+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/artifacts",
+    "raw_html_sha256": "69384666b54467126123a9ed7a2a9e4aef70ce351979fe55bbe68e0829ebdaaa",
+    "local_snapshot": "docs/media-api-snapshots/inference/artifacts.txt",
+    "sha256": "f5072e263240cb8ff890e5b17d40733e479ac066ec2f893f78fca0cb704fe471",
+    "retrieved_at": "2026-10-04T16:03:05.621237+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/billing",
+    "raw_html_sha256": "6f3498a9dc59288b310768327c35540b3056b1475029a9be02421505f5bbacd4",
+    "local_snapshot": "docs/media-api-snapshots/inference/billing.txt",
+    "sha256": "79013829b6193a1a64dfa73b1afae9bcc5668b4abbc74b4f8809113a1ac18eab",
+    "retrieved_at": "2026-10-04T16:03:05.548138+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/credentials",
+    "raw_html_sha256": "eb28b4321a952aaa3727d45c7f7a97817c55ae567b8076ab445d84a65398dcf3",
+    "local_snapshot": "docs/media-api-snapshots/inference/credentials.txt",
+    "sha256": "513c3babd766546dae6800210026b7b22a5a3e50c5b611a159710c01b7d8b13b",
+    "retrieved_at": "2026-10-04T16:03:05.945005+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/device-auth",
+    "raw_html_sha256": "53dd0881e0de5f5797f4215fb5e73dd494b8d4615785d680c6f76895078eea9f",
+    "local_snapshot": "docs/media-api-snapshots/inference/device-auth.txt",
+    "sha256": "8af8be2b37ff9b8372ab39b11631296ba8c9d473423a310d2a6079dd5b0c0fa7",
+    "retrieved_at": "2026-10-04T16:03:05.676792+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/embed",
+    "raw_html_sha256": "459e8bd9a659a9265c37977971498bb772038f4f9a805e14367af4c590e12e7c",
+    "local_snapshot": "docs/media-api-snapshots/inference/embed.txt",
+    "sha256": "d057cd2184ea804c4f6446b66742c440682f3604204409ca8ba339759d1de146",
+    "retrieved_at": "2026-10-04T16:03:06.085211+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/engines",
+    "raw_html_sha256": "cbd57918c148e99e6a347ce93a27ce38b99eb880fc8d9fe83d68b8ac253daf10",
+    "local_snapshot": "docs/media-api-snapshots/inference/engines.txt",
+    "sha256": "9b1c2ab3dea4d3c9aadd3fb5bb635bae27f32e63ca4590609ca41f7d49ecfadb",
+    "retrieved_at": "2026-10-04T16:03:06.222136+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/entitlements",
+    "raw_html_sha256": "2a61504c8d688132d1ddeac215f5c9121b0e13e6e8db73f2ac78569747b7d6b1",
+    "local_snapshot": "docs/media-api-snapshots/inference/entitlements.txt",
+    "sha256": "156f2daa04252785502f17840f84424be3201bd8e389ee5038172467574cd5bf",
+    "retrieved_at": "2026-10-04T16:03:05.775247+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/exec-runs",
+    "raw_html_sha256": "2aaf549c5a5f361c428ba8fc92893c8d855a5586c7cc98acb8b713df80916b01",
+    "local_snapshot": "docs/media-api-snapshots/inference/exec-runs.txt",
+    "sha256": "86d3a22c23791d1b463347b3a9b6fbe47b50cb5821c958b1e617a7d331dbcdf3",
+    "retrieved_at": "2026-10-04T16:03:05.742731+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/files",
+    "raw_html_sha256": "264aa35dc371e8d376f49a964f59a0c6044b8ef6246889628007a79c0a4c42ea",
+    "local_snapshot": "docs/media-api-snapshots/inference/files.txt",
+    "sha256": "0002993f170335704e10fad9fcd66ec172d7a6e6df83f9a4e2cc266a7547363c",
+    "retrieved_at": "2026-10-04T16:03:05.810894+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/flow-runs",
+    "raw_html_sha256": "0072def63a804d6d707effdf06551a49b38fc06c3240f394eceea8a5a932f1cf",
+    "local_snapshot": "docs/media-api-snapshots/inference/flow-runs.txt",
+    "sha256": "fecf367c0df3d626aa16908595b5dfa616f6b40dba5aa3e25fcda420fd08067b",
+    "retrieved_at": "2026-10-04T16:03:05.843982+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/flows",
+    "raw_html_sha256": "1dc7ecb92c121d9a1ae3124d4cdceb2312b92e77b8242b631dd0575d54fbcfaa",
+    "local_snapshot": "docs/media-api-snapshots/inference/flows.txt",
+    "sha256": "e61205fe39080500626f446cf585d9c595eee3a9e5ee6969c39bd2cb0e11f051",
+    "retrieved_at": "2026-10-04T16:03:06.439061+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/instances",
+    "raw_html_sha256": "5ba69149d4f7604ea9c924cb4c9435b43d1dbccea7f129aef4c1bd74feef735f",
+    "local_snapshot": "docs/media-api-snapshots/inference/instances.txt",
+    "sha256": "a32f34758ea038d0ae03861943a56f732314b205031ac533510bc71e47a1f0e6",
+    "retrieved_at": "2026-10-04T16:03:05.890093+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/knowledge",
+    "raw_html_sha256": "4a856fe892343202e6dbc8fdb3a6e5f887422cd5ead0c9df11272aa773a2760e",
+    "local_snapshot": "docs/media-api-snapshots/inference/knowledge.txt",
+    "sha256": "e6d210fbb96596b9e1b735f2fdf1a18e063e4af05c127909add90f5bdb66696d",
+    "retrieved_at": "2026-10-04T16:03:06.338233+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/magic-link",
+    "raw_html_sha256": "a91418065acc76c0e68054afcc4e922b74ac7f2c14ddb27f0e7da00f5fe2c376",
+    "local_snapshot": "docs/media-api-snapshots/inference/magic-link.txt",
+    "sha256": "9c277917405a3a99b714777df0cb0a0eb94650cdd9fc94337899da81ac61f2e2",
+    "retrieved_at": "2026-10-04T16:03:05.976375+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/mcp-servers",
+    "raw_html_sha256": "64e69d27d5e888106170606f4bb9f8b563b5b918221800943ceff11e0a94efaf",
+    "local_snapshot": "docs/media-api-snapshots/inference/mcp-servers.txt",
+    "sha256": "1e6619a1e8727233388fb8405e00221786a57db51802f473ba87abc8d19de5a2",
+    "retrieved_at": "2026-10-04T16:03:06.039369+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/openai",
+    "raw_html_sha256": "cbfa8543b800637c1ce05d5a8622c79666240b41fb3f24c7cf0d394777a876aa",
+    "local_snapshot": "docs/media-api-snapshots/inference/openai.txt",
+    "sha256": "126eb578ee472afbdc949f05b9564ef3df6d986aae739475441039a5989ad9dc",
+    "retrieved_at": "2026-10-04T16:03:06.477090+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/overview",
+    "raw_html_sha256": "2b1e36625d90d694fe67f47088df5b428eb5ad0a3df731f4660607db1f9d72cf",
+    "local_snapshot": "docs/media-api-snapshots/inference/overview.txt",
+    "sha256": "a85d11408c15a44f45dc9b52d065bc03507b9c4526158b3289130b3d9604491a",
+    "retrieved_at": "2026-10-04T16:03:06.518733+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/pages",
+    "raw_html_sha256": "ac70ac4dc232b05badcd4cf9304b205a975899c7008b5df55bf58d2cc0a570e4",
+    "local_snapshot": "docs/media-api-snapshots/inference/pages.txt",
+    "sha256": "ea8bf1520adce2848ab8688e42c44089ca622758dccbcfe328f3dd6efcd3f389",
+    "retrieved_at": "2026-10-04T16:03:06.491297+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/publications",
+    "raw_html_sha256": "8b7feb9109d391357cb1218739a6d5438a7f191edc60385a3a6df65b4f809b63",
+    "local_snapshot": "docs/media-api-snapshots/inference/publications.txt",
+    "sha256": "6f280e9fce6b2f1133c1e6c357eba066ca3c75743ea3b8238073b836abf80673",
+    "retrieved_at": "2026-10-04T16:03:06.299316+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/remotes",
+    "raw_html_sha256": "a24db22b502967be0237030d97a4e7712c73e50198c4584e1f462ba580c3ee39",
+    "local_snapshot": "docs/media-api-snapshots/inference/remotes.txt",
+    "sha256": "b3551add6963bbb296f19dfd6128e38026b116e42ef1ae92647e9fd67f72d66e",
+    "retrieved_at": "2026-10-04T16:03:06.887248+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/search",
+    "raw_html_sha256": "0ea95e0a59494810b0ab113385e853381b1ae972786bdc8a79592d457c0c4c15",
+    "local_snapshot": "docs/media-api-snapshots/inference/search.txt",
+    "sha256": "002878d3a7fb3fda1ee2e09a316836fea765ee55fd63bde9e1f5605fbb1bf41c",
+    "retrieved_at": "2026-10-04T16:03:06.478153+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/secrets",
+    "raw_html_sha256": "25ef68fa84f6e879e0ea77cdba3f2c6c8dd0832fa6969c46d8d19bb3277eecee",
+    "local_snapshot": "docs/media-api-snapshots/inference/secrets.txt",
+    "sha256": "84b9b5370f9fd87b2427ebed07eae2312b70f602a49149622ce106569205c2b0",
+    "retrieved_at": "2026-10-04T16:03:06.547057+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/sessions",
+    "raw_html_sha256": "cc1e68ee85f49cf4a93b8a40cbe51fd3c0165a49b6881b293a1548c4ca674615",
+    "local_snapshot": "docs/media-api-snapshots/inference/sessions.txt",
+    "sha256": "b630050dbf7dd66171b640caa8bc25561f8cb280d95597104286ff1e9d2751f8",
+    "retrieved_at": "2026-10-04T16:03:06.591312+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/skills",
+    "raw_html_sha256": "3ae5e2afe44421ed551021f794103ee3f4442a95ba509e7633d64f42c4fa649b",
+    "local_snapshot": "docs/media-api-snapshots/inference/skills.txt",
+    "sha256": "05829df3512e3a0d6cdb447a435a13c967ea6fc1538339218d18bd68644e5c04",
+    "retrieved_at": "2026-10-04T16:03:06.583318+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/store",
+    "raw_html_sha256": "576a78ce3ea92ddff4ca02067612e4c72b80c963de9ed24f8bf46b7a25601516",
+    "local_snapshot": "docs/media-api-snapshots/inference/store.txt",
+    "sha256": "e49b2f9681385b20f643ec939d5602fdad99e4ec6c356e34c8fd0c5bf1d16d06",
+    "retrieved_at": "2026-10-04T16:03:06.960269+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/streaming",
+    "raw_html_sha256": "05101b5f7417410388e5db587448d9c95025b1b6f193d697d676cfd825718b22",
+    "local_snapshot": "docs/media-api-snapshots/inference/streaming.txt",
+    "sha256": "42b93ea78ad1f90901bdb817c15643312b2ee52cefd96d889773063f0f847a48",
+    "retrieved_at": "2026-10-04T16:03:06.660089+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/subscription",
+    "raw_html_sha256": "f851de9ec2576647b60a5570291c8afad7a463ab32a2c1bebec136bd0107c029",
+    "local_snapshot": "docs/media-api-snapshots/inference/subscription.txt",
+    "sha256": "de0564fc150f15e7d33dc82e14797e417e784f5e6148b13a15daa45aad9b735f",
+    "retrieved_at": "2026-10-04T16:03:06.623968+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/tasks",
+    "raw_html_sha256": "be27777da3ee3c4dcf408a6b81ab29f0ad9d266a214d24c3fa959b21cb65c456",
+    "local_snapshot": "docs/media-api-snapshots/inference/tasks.txt",
+    "sha256": "5bce6fc0b9c3269308f9d8bf459508aa6164f8dc039a375714b0041308974cd2",
+    "retrieved_at": "2026-10-04T16:03:06.750489+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/teams",
+    "raw_html_sha256": "2b7fd35a7f8d49d3bfa2ecea9afb8f09adda443fc87826af2973e4b8974846cc",
+    "local_snapshot": "docs/media-api-snapshots/inference/teams.txt",
+    "sha256": "15b596c3a55bbd2583bbb2dbc8ce688fef6f9a5665869de3ecbc0b7d51181eb3",
+    "retrieved_at": "2026-10-04T16:03:07.204014+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/triggers",
+    "raw_html_sha256": "17a80653dc9954e604fa048491aa867db13b2198a37e0799f0442e32e523796d",
+    "local_snapshot": "docs/media-api-snapshots/inference/triggers.txt",
+    "sha256": "f6de37b133419d436c3b96fbd7788595ea8db211bfc490e35bd2d5bdc28199af",
+    "retrieved_at": "2026-10-04T16:03:07.063392+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/usage",
+    "raw_html_sha256": "55270ed0cbbcb300057ec68024d75635aae495438954806ca096fc4a58d0067e",
+    "local_snapshot": "docs/media-api-snapshots/inference/usage.txt",
+    "sha256": "bf2ca34c330a33dadbd1bdf2011d1d0db8278140380e105b63be11ecdb47fe79",
+    "retrieved_at": "2026-10-04T16:03:07.083522+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/vaults",
+    "raw_html_sha256": "bc433df9eb3c73f3109da0879626f0c8074e8104d9dfe6b0c394ddf983e24fc5",
+    "local_snapshot": "docs/media-api-snapshots/inference/vaults.txt",
+    "sha256": "12066959a830f6c17ec09e046dfebf68be71d3ba14a30ee31ae1008479dc93a2",
+    "retrieved_at": "2026-10-04T16:03:07.203422+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/authentication",
+    "raw_html_sha256": "7d01c563156d1a872432e64bbd9c820ffa2f5f5dbc8a572318e2ab2ab3bbf19c",
+    "local_snapshot": "docs/media-api-snapshots/inference/authentication.txt",
+    "sha256": "6947874d64f4dd0c5d0b30ca1657dc20c530ec82baf7bc38e530b581528af269",
+    "retrieved_at": "2026-10-04T16:03:07.278849+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/concepts/tasks",
+    "raw_html_sha256": "af4180bb5dbf06489b8c98596b8957449516248cc70793814a2741cc1de37944",
+    "local_snapshot": "docs/media-api-snapshots/inference/concepts-tasks.txt",
+    "sha256": "72c3674fafb21c560d4260d4a50b500e2d1d69bce4fedb0b73a7675f78ef19e3",
+    "retrieved_at": "2026-10-04T16:03:07.083268+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/api/sdk/files",
+    "raw_html_sha256": "5e3de7957bc8997208913d6055af738f129d6aa450143539dfd476ba1c158b1d",
+    "local_snapshot": "docs/media-api-snapshots/inference/sdk-files.txt",
+    "sha256": "5fd0430ef0a317324c98ef95affe28b9d52d31bcf0c6cc810392d7ef4f8b27f5",
+    "retrieved_at": "2026-10-04T16:03:07.319908+00:00"
+  },
+  {
+    "url": "https://inference.sh/docs/extend/multi-function-apps",
+    "raw_html_sha256": "9980aa47dd597c5fcab1bdd905a2a151998ee24b572a4e6b560027fcfc71718d",
+    "local_snapshot": "docs/media-api-snapshots/inference/multi-function-apps.txt",
+    "sha256": "9ffc294cf29df6a553f6c6976fb98ed8e4a77ac2117e15780bbd4d8d4617b9de",
+    "retrieved_at": "2026-10-04T16:03:07.540945+00:00"
+  },
+  {
+    "url": "https://api.inference.sh/openapi.json",
+    "local_snapshot": "docs/media-api-snapshots/inference/openapi.json",
+    "sha256": "41f0f78236f0c092985ff27380859be73b309199b7a2b7ebf025935705891981",
+    "retrieved_at": "2026-10-04T16:14:11.071859+00:00"
+  }
+]

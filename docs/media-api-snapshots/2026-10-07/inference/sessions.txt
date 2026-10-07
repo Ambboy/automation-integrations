@@ -1,0 +1,45 @@
+Manage stateful app sessions outside of POST /run.
+→ Sessions concept · Sessions developer guide
+Sessions are created automatically when you pass "session": "new" to Run Task. Use this API to list active sessions, inspect state, extend idle timeouts, or end sessions explicitly.
+Authentication
+Requires the apps:read scope for read endpoints and apps:execute for ending sessions or keepalive.
+List Sessions
+GET /sessions
+Returns all active sessions for your workspace.
+bashcopy
+1curl https://api.inference.sh/sessions \2  -H "Authorization: Bearer inf_your_key"
+Get Session
+GET /sessions/{id}
+| Field | Description
+| id | Session ID
+| app_id | Bound app
+| app_version_id | Pinned version
+| worker_id | Worker holding the session lease
+| status | active, ended, or expired
+| expires_at | Idle expiration time (sliding window resets on each call)
+| idle_timeout | Configured idle timeout in seconds
+| call_count | Number of runs in this session
+| task_id | Current or last task, if any
+Keepalive
+POST /sessions/{id}/keepalive
+Resets the idle timer without running the app. Returns the updated session object.
+Requires apps:execute.
+bashcopy
+1curl -X POST "https://api.inference.sh/sessions/sess_abc123/keepalive" \2  -H "Authorization: Bearer inf_your_key"
+End Session
+DELETE /sessions/{id}
+Releases the worker lease and marks the session ended. Returns 204 No Content.
+Requires apps:execute.
+From the CLI: belt session end <id> (see CLI setup).
+Errors
+| Code | HTTP | Description
+| SESSION_NOT_FOUND | 404 | Unknown session ID
+| SESSION_EXPIRED | 410 | Idle timeout elapsed
+| SESSION_ENDED | 410 | Session was ended
+| WORKER_LEASED | 409 | Worker bound to another session
+| APP_MISMATCH | 400 | session used with a different app (409 on POST /run and POST /apps/run)
+| VERSION_MISMATCH | 400 | App version changed since session creation (409 on POST /run and POST /apps/run)
+Full handling examples: Sessions developer guide — Error handling.
+Next
+Tasks API — session and session_timeout on POST /run
+Stateful sessions example

@@ -1,0 +1,271 @@
+Manage workspace balance, credit top-ups, saved payment methods, and billing settings.
+
+All endpoints require authentication. Use API key scopes billing:read (view balance and settings) and billing:write (checkout, charges, and settings updates).
+
+Transactional emails (balance alerts, invoices, subscription notices) link to team billing pages under /settings/team/billing/.... To manage product email preferences, use Settings → Notifications (welcome and onboarding emails include an unsubscribe link to this page).
+
+→ Subscription — plan signup and Stripe subscription management
+
+Workspace settings URLs
+
+In the web app, settings opens as a dialog over whichever page you're on. The active page is addressed by the URL fragment (#settings/team/billing, #settings/team/keys, …). Navigating inside settings changes only the fragment.
+
+Use path-style entry URLs in docs, emails, and success_url / cancel_url fields: https://app.inference.sh/settings/team/billing?session_id={CHECKOUT_SESSION_ID}. The app redirects to https://app.inference.sh/?session_id=…#settings/team/billing, reads one-time query flags (session_id, setup_session_id, success=1, addon_success=1), then removes them from the URL while keeping the fragment. Legacy /settings/billing and /settings/keys shortcuts redirect to the team paths.
+
+Checkout started in the workspace (top-up, subscription, add-on, saved card setup) returns to the page where checkout began: success adds the flag to that page's query and opens settings on the handler page; cancel returns to the exact starting URL (fragment included). The workspace always passes its own redirect URLs — API defaults such as {origin}/settings/team/billing/subscription?success=1 still work through the /settings/<path> entry redirect.
+
+Organization billing: When the selected team is billed by an organization, credit top-ups in the web app call POST /billing/checkout and POST /billing/charge as the paying team (the organization workspace) when the signed-in user may manage that workspace's billing. Success redirects target that payer's billing settings (#settings/team/billing). Users who can see member-team usage but cannot manage organization billing do not get a checkout session from these flows. See Organizations — Billing.
+
+On the API, write endpoints in this document and in Subscription require the manage_billing capability: team owner on a standalone team, or team owner on the org workspace when the org pays. Calling checkout, charge, subscription, or payment-method routes with an org member team in context returns 403, even if you are an org admin on that member team — switch X-Team-ID (or your SDK team context) to the organization workspace (its team id matches org_id on member teams). Read endpoints (GET /billing, balance, settings, payment history) still work for member-team admins.
+
+Money units
+
+ | Context | Unit | Example
+
+ | GET /billing, GET /billing/balance | Microcents (1 USD = 100,000,000) | 250000000 = $2.50
+
+ | POST /billing/checkout, POST /billing/charge body amount | Cents (1 USD = 100) | 500 = $5.00 minimum top-up
+
+Get billing account
+
+GET /billing
+
+Returns the workspace's billing account with cached balance.
+
+Response
+
+ | Field | Type | Description
+
+ | balance | int64 | Current balance in microcents
+
+ | currency | string | Currency code (for example usd)
+
+ | status | string | Account status
+
+Example:
+
+bashcopy
+
+1curl https://api.inference.sh/billing \2  -H "Authorization: Bearer inf_your_key"
+
+Get balance
+
+GET /billing/balance
+
+Recalculates balance from grants and usage, then returns the current value. Use this after checkout when status is processing, or when you need an authoritative balance.
+
+Response
+
+jsoncopy
+
+1{2  "balance": 2500000003}
+
+balance is in microcents.
+
+Service fee
+
+GET /billing/service-fee
+
+Returns the active service-fee configuration used for top-ups (default 5% + $0.30). Call before checkout or a saved-card charge to show users the full total including fee and tax.
+
+Add credits
+
+Two paths depending on whether a card is already on file.
+
+ | Method | Endpoint | When to use
+
+ | Stripe Checkout | POST /billing/checkout | No saved card, user picks a payment method, or delayed methods (ACH, SEPA)
+
+ | Saved card | POST /billing/charge | GET /billing/settings reports has_payment_method: true
+
+Both paths apply the same service fee and tax rules, then credit balance on success.
+
+Stripe Checkout
+
+POST /billing/checkout — requires billing:write.
+
+Body:
+
+ | Field | Type | Required | Description
+
+ | amount | int64 | Yes | Credit to add, in cents (minimum 500 = $5)
+
+ | success_url | string | Yes | Redirect URL after payment
+
+ | cancel_url | string | Yes | Redirect URL if the user cancels
+
+Response — PaymentRecordDTO with status: "pending" and session_url for redirect. Line items include credit_amount, service_fee, and tax fields filled when checkout completes.
+
+Complete checkout:
+
+POST /billing/checkout/success — body: { "session_id": "<stripe_checkout_session_id>" }.
+
+ | status | Meaning
+
+ | complete | Balance credited now; grant included
+
+ | processing | Delayed payment; balance credited when Stripe confirms (poll GET /billing/balance)
+
+Credits apply exactly once — the success URL and Stripe webhooks share the same completion path.
+
+Example:
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/billing/checkout \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "amount": 2000,6    "success_url": "https://app.inference.sh/settings/team/billing?success=1",7    "cancel_url": "https://app.inference.sh/settings/team/billing"8  }'
+
+Saved card charge
+
+POST /billing/charge — requires billing:write.
+
+Body:
+
+ | Field | Type | Required | Description
+
+ | amount | int64 | Yes | Credit to add, in cents (minimum 500)
+
+Success response:
+
+jsoncopy
+
+1{2  "status": "complete",3  "grant": { }4}
+
+Balance is credited immediately.
+
+Errors (400, code charge_failed):
+
+ | Message | Cause
+
+ | no saved payment method | Use checkout or save a card first
+
+ | minimum top-up amount is $5 | amount < 500
+
+ | payment failed: ... | Stripe declined the charge
+
+Redeem voucher code
+
+Redeem a promotional or gift code to add credits to the current workspace. In the web app, open settings → workspace → billing and use the Redeem code section (monospace input, case-normalized as you type).
+
+POST /billing/vouchers/redeem — requires billing:write.
+
+Body:
+
+ | Field | Type | Required | Description
+
+ | code | string | Yes | Voucher code (whitespace trimmed; matching is case-insensitive)
+
+Response — CreditGrantDTO for the credited amount. amount and remaining are in microcents. Grant type is typically voucher; notes includes the code string.
+
+Example:
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/billing/vouchers/redeem \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"code": "PROMO-ABCD-EFGH"}'
+
+After a successful redemption, poll GET /billing/balance or call GET /credit-grants/active (requires billing:read) to confirm the updated balance and grant expiry.
+
+Rate limits
+
+ | Limit | Window
+
+ | 10 attempts per user | 1 minute
+
+ | 30 attempts per IP | 1 minute
+
+When exceeded, the API returns 429 with code rate_limited and message Too many redemption attempts. Please try again later.
+
+Errors
+
+Failed redemptions return 400 with code redeem_failed and one of these messages:
+
+ | Message | Cause
+
+ | invalid code | Code not found
+
+ | this code is no longer active | Code revoked or already used (single-use codes)
+
+ | this voucher is no longer active | Voucher paused, expired, or exhausted
+
+ | this code is not yet valid | Before the voucher valid_from time
+
+ | this code has expired | After the voucher valid_until time
+
+ | this voucher has reached its maximum number of redemptions | Campaign cap reached
+
+ | this code has reached its maximum number of uses | Per-code use limit reached
+
+ | you have already redeemed this voucher | Per-user limit reached
+
+ | your team has already redeemed this voucher | Per-workspace limit reached
+
+ | this code is assigned to a different account | Code is email-restricted
+
+ | this voucher is only available for new users | Workspace has a prior top-up grant
+
+ | failed to credit account | Redemption recorded but grant creation failed (retry may be idempotent)
+
+Voucher administration (creating campaigns, generating codes, pausing vouchers) is internal and not exposed on the public REST API.
+
+Bounty rewards
+
+Credits from bounty programs (for example, the app-builder program via belt app promo submit, or survey answers via belt feedback) are granted as CreditGrantDTO entries with type bounty or survey. Grants expire after the program's expiry_days (typically 30 days). See Bounties and CLI setup — App bounties.
+
+Billing settings
+
+GET /billing/settings — requires billing:read.
+
+Returns auto-recharge, alerts, invoice fields, and saved-card metadata.
+
+ | Field | Description
+
+ | has_payment_method | Whether instant top-up (POST /billing/charge) is available
+
+ | payment_method_label | Display label (for example Visa •••• 4242)
+
+ | auto_recharge_enabled | Auto top-up when balance drops below threshold
+
+ | spending_limit | Workspace spending cap (microcents)
+
+ | low_balance_threshold | Alert threshold (microcents)
+
+POST /billing/settings — requires billing:write. Send only fields to update (BillingSettingsUpdateRequest).
+
+Saved payment methods
+
+ | Endpoint | Method | Scope | Purpose
+
+ | /billing/payment-method/setup | POST | billing:write | Stripe Checkout to save a card
+
+ | /billing/payment-method/success | POST | billing:write | Complete setup (session_id in body)
+
+ | /billing/payment-method | DELETE | billing:write | Remove saved card
+
+Setup body: { "success_url": "...", "cancel_url": "..." }. Success body: { "session_id": "..." } — returns last4 and brand.
+
+Users can also save a card during a balance checkout when Stripe shows “Save my info for future purchases.”
+
+Payment history
+
+GET /billing/payments — requires billing:read.
+
+Lists payment records for the workspace (checkout sessions, charges, and status).
+
+Insufficient balance
+
+When a run would exceed available balance, the API may return 402 Payment Required with a message pointing to settings → workspace → billing. This is separate from plan limit errors (limit_exceeded, feature_not_available) enforced by entitlements.
+
+The belt and infsh CLIs surface billing URLs in error text for 402 responses.
+
+Related
+
+Usage API: workspace spend breakdown, usage summary, and CEL pricing preview
+
+Subscription API — plans and recurring billing
+
+Usage API — aggregated usage summary and cost breakdown
+
+Entitlements API — plan limits and GET /entitlements/usage
+
+Tasks API — usage-based app pricing reads output_meta internally
+
+Extend pricing — CEL formulas for store apps

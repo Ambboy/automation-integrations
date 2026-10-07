@@ -1,0 +1,211 @@
+Hybrid keyword and semantic search across apps, skills, knowledge, agents, flows, MCP servers, and published pages.
+
+→ Search concept: collections, suggest vs search, and discovery in the web app
+
+Suggest
+
+GET /suggest or POST /suggest
+
+Unified search for UI autocomplete and discovery. Returns actionable results ranked globally by relevance score across apps, skills, knowledge, agents, MCP servers, and published public pages.
+
+Authentication is optional. Without a token, results are limited to public resources. With a token, your workspace's content is included according to each entry's visibility. See Access control.
+
+Query Parameters (GET)
+
+ | Field | Type | Required | Description
+
+ | q | string | Yes | Search query
+
+GET does not accept limit, category, or agent — use POST for those fields.
+
+Request Body (POST)
+
+GET only reads q. Use POST for limit, category, and agent.
+
+jsoncopy
+
+1{2  "query": "flux",3  "context": "We were comparing image models for logos.",4  "scope": ["git:github.com/acme/design", "lang:typescript"],5  "limit": 10,6  "category": "app",7  "agent": false,8  "scope": ["git:github.com/inference-sh/cli", "lang:go"]9}
+
+ | Field | Type | Default | Description
+
+ | query | string | — | Search query (required). Used for keyword matching
+
+ | context | string | empty | Optional conversation context for embedding enrichment. Keyword search uses query only; when present, semantic ranking embeds context + \n\n + query
+
+ | scope | string[] | empty | Optional environment signals for semantic proximity (e.g. git:github.com/acme/api, lang:go). Prepended to the embedding text; does not affect keyword matching. See Knowledge — Scoping
+
+ | limit | integer | 3 (all categories) or 10 (single category) | Per-category cap after global ranking and dedup. When category is empty, each suggest collection (apps, skills, knowledge, agents, MCP servers, pages) may contribute up to limit hits; the response is still one globally ranked list
+
+ | category | string | empty = all | Filter to app, skill, knowledge, agent, mcp, or doc (pages). Invalid values return 400
+
+ | agent | boolean | false | Agent mode: full descriptions (no 200-rune truncation) for programmatic consumers
+
+ | scope | string[] | empty | Environment signals for project-scoped ranking — for example git:github.com/user/repo, lang:go. Knowledge entries with matching version.scope tags rank higher; entries without scope are global. belt suggest auto-collects scope from the working directory. See Knowledge API — project scope
+
+Response
+
+Response:
+
+jsoncopy
+
+1{2  "query": "flux",3  "results": [4    {5      "type": "app",6      "name": "pruna/flux-dev",7      "description": "Advanced text-to-image generation...",8      "command": "belt app run pruna/flux-dev",9      "score": 0.9210    },11    {12      "type": "skill",13      "name": "myteam/code-review",14      "description": "Guidelines for reviewing pull requests",15      "command": "belt skill use myteam/code-review",16      "score": 0.8517    },18    {19      "type": "knowledge",20      "tag": "reference",21      "name": "myteam/stripe-webhooks",22      "description": "Stripe webhook handling patterns",23      "command": "belt knowledge get myteam/stripe-webhooks",24      "score": 0.8125    }26  ]27}
+
+ | Field | Description
+
+ | type | Result category: app, skill, knowledge, agent, mcp, or doc (pages)
+
+ | tag | Optional sub-type when the indexed entity type differs from type — for example reference, observation, or blog on a knowledge or page hit. Omitted when redundant with type.
+
+ | name | Display name or namespace/name for entities
+
+ | description | Short summary (truncated to 200 runes unless agent: true)
+
+ | command | Suggested CLI command or doc URL
+
+ | score | Relevance score (0–1)
+
+Results below the relevance floor (default 0.8) are omitted from /suggest responses. Forks with identical content collapse to the highest-scoring hit via content-hash dedup; when the same base name appears under multiple namespaces with different content, only the highest-scoring variant is returned. When searching all collections, each type is hard-capped at limit results so a single collection cannot dominate the list. Lower-scoring hits may still appear in GET /search when you need broader recall.
+
+See REST overview — response format.
+
+Errors
+
+ | Status | Code | Description
+
+ | 400 | bad_request | Missing query, invalid JSON body, or invalid category
+
+ | 502 | search_error | Search backend failure (Meilisearch or embedding service unavailable)
+
+ | 503 | search_unavailable | Search is not configured on this deployment
+
+Example
+
+bashcopy
+
+1curl "https://api.inference.sh/suggest?q=flux"
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/suggest \2  -H "Content-Type: application/json" \3  -d '{"query": "flux", "limit": 5, "agent": true}'
+
+Search
+
+GET /search or POST /search
+
+Direct search with collection and filter control. Returns scored hits with entity metadata.
+
+Query Parameters (GET)
+
+ | Field | Type | Required | Description
+
+ | q | string | Yes | Search query
+
+ | collection | string | No | One collection: apps, skills, knowledge, agents, flows, mcp_servers, or pages. Omit to search all collections.
+
+GET reads only q and collection, and returns up to 20 results per collection. Use POST to search several collections or set limit.
+
+Request Body (POST)
+
+jsoncopy
+
+1{2  "query": "payment processing",3  "collections": ["knowledge", "skills"],4  "limit": 205}
+
+ | Field | Type | Required | Description
+
+ | query | string | Yes | Search query
+
+ | collections | string[] | No | Collections to search. Omit to search all collections.
+
+ | limit | integer | No | Max results per collection. Default 20.
+
+Response
+
+Response:
+
+jsoncopy
+
+1{2  "query": "payment processing",3  "results": [4    {5      "collection": "knowledge",6      "id": "know_abc123",7      "score": 0.87,8      "fields": {9        "name": "stripe-webhooks",10        "namespace": "myteam",11        "description": "Stripe webhook handling patterns",12        "type": "reference",13        "parent_id": "know_abc123",14        "updated_at": 177073201915      }16    }17  ]18}
+
+See REST overview — response format.
+
+ | Field | Description
+
+ | collection | Source collection (apps, skills, knowledge, agents, flows, mcp_servers, pages)
+
+ | id | Entity ID
+
+ | score | Relevance score (0–1)
+
+ | fields | Collection-specific metadata (name, namespace, description, tags, etc.)
+
+Errors
+
+ | Status | Code | Description
+
+ | 400 | bad_request | Missing query or invalid JSON body
+
+ | 500 | search_error | Search backend failure
+
+ | 503 | search_unavailable | Search is not configured on this deployment
+
+Example
+
+bashcopy
+
+1curl "https://api.inference.sh/search?q=flux&collection=apps"
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/search \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "query": "payment processing",6    "collections": ["knowledge"],7    "limit": 208  }'
+
+Use an API key to search your workspace's content. Public resources are searchable without authentication.
+
+Access control
+
+Search applies the same visibility rules as the REST list endpoints. The index filters by your workspace, user, and organization, and Postgres re-checks the final hits. An out-of-date index can hide a result but never exposes private content.
+
+ | Visibility | Who sees it in search
+
+ | public | Everyone, no auth required
+
+ | team | Members of the owning workspace
+
+ | private | Only the creator, within the owning workspace
+
+ | org | Callers whose workspace belongs to the same organization
+
+ | unlisted | Members of the owning workspace. Other callers do not get it from search.
+
+Search never returns other members' private entries to workspace admins. include_private is a listing option and does not apply to search.
+
+Pages are in the pages collection only when they are published and public. Workspace-only and private pages are not indexed.
+
+Collections
+
+ | Collection | Contents
+
+ | apps | Apps in the grid (retired apps are filtered out of results)
+
+ | skills | Skills from the registry and your workspace
+
+ | knowledge | Observations, references, preferences (requires auth for non-public entries)
+
+ | agents | Agents in your workspace and public agents
+
+ | flows | Flow definitions. Returned by /search, not by /suggest.
+
+ | mcp_servers | MCP servers configured for your workspace
+
+ | pages | Published public documentation and blog posts
+
+Search combines keyword matching with semantic similarity. Newly created entities are keyword-searchable immediately; semantic ranking improves after background embedding completes.
+
+If query embedding fails or times out, the API returns keyword-only results for that request (no semantic re-ranking).
+
+Related APIs
+
+Search concept — when to use suggest vs search and what each collection contains
+
+Skills — list, create, and manage skills
+
+Knowledge — manage knowledge entries that appear in search

@@ -1,0 +1,115 @@
+Create, list, and revoke API keys programmatically. Use the scope catalog to build least-privilege keys for CI, engines, and automation.
+→ API keys — personal and workspace keys, who manages them, offboarding
+→ Authentication — how keys are sent on requests
+→ Device authorization — CLI sign-in sessions (alternative to long-lived keys)
+→ Entitlements — plan limits on API key count
+Personal and workspace keys
+A key's scope field says who it acts as. It is set at creation and never changes.
+| scope | Acts as | user_id | Created, listed and revoked by
+| user (default) | The person who created it | That person | Its creator, and workspace owners and admins
+| workspace | The workspace's service account | The service account | Workspace owners and admins only
+created_by is always the person who created the key. A personal key stops working, and is revoked, when its creator leaves the workspace; a workspace key keeps working. Workspace keys are not available on personal workspaces.
+A workspace key never holds the user or apikeys scopes, whatever it was created with, and it cannot sign in, approve devices or OAuth apps, manage the workspace's members, vault or billing, or create keys. See API keys.
+Permission scopes
+API keys carry a list of scopes that gate which endpoints they can call. Each REST page documents the scopes it requires (for example agents:read, secrets:write).
+Hierarchy
+Resource-level scopes (for example agents, apps) grant every action on that resource (agents:read, agents:write, agents:execute).
+Action-level scopes grant a single capability (for example flows:execute).
+* grants full access.
+Empty scopes on a key means full access (backwards compatibility for keys created before scoped permissions).
+Keys cannot grant scopes the creator does not hold. If you authenticate with a scoped credential (a limited API key, or a belt login session), POST /apikeys rejects any scope outside your own grant set, and a request with no scopes creates a key with your scopes, not full access. Only an unrestricted creator (a dashboard session, or a key with empty scopes) can create a full-access key.
+Common scope strings
+| Group | Scopes
+| Agents | agents:read, agents:write, agents:execute
+| Apps / tasks | apps:read, apps:write, apps:execute
+| Knowledge / skills | knowledge:read, knowledge:write
+| Flows | flows:read, flows:write, flows:execute
+| Secrets | secrets:read, secrets:write
+| Artifacts | artifacts:read, artifacts:write
+| Credentials | credentials:read, credentials:write
+| Workspaces | teams:read, teams:write
+| API keys | apikeys:read, apikeys:write
+| Engines | engines:read, engines:write (admin catalog only)
+| Remotes | remotes:read, remotes:write
+| Billing | billing:read, billing:write
+| Settings | settings:read, settings:write
+Use GET /scopes for the full catalog with labels, descriptions, and preset bundles.
+Scope catalog
+GET /scopes
+Returns every scope definition, UI group, and preset bundle. Requires a valid API key (any scope). Non-admin callers do not see engine scopes or the engine preset.
+Example:
+bashcopy
+1curl https://api.inference.sh/scopes \2  -H "Authorization: Bearer inf_your_key"
+Response:
+jsoncopy
+1{2  "scopes": [3    {4      "value": "agents:execute",5      "label": "execute",6      "description": "run agents and send messages",7      "group": "agents"8    }9  ],10  "groups": [11    {12      "id": "agents",13      "label": "agents",14      "description": "manage and run AI agents"15    }16  ],17  "presets": [18    {19      "id": "read",20      "label": "read-only",21      "description": "view resources without making changes",22      "summary": [23        "view your apps, agents, and flows",24        "view files, datastores, and projects",25        "view team information"26      ],27      "scopes": [28        "agents:read", "apps:read", "conversations:read", "files:read", "flows:read",29        "datastores:read", "projects:read", "teams:read", "credentials:read",30        "knowledge:read", "artifacts:read", "user:read", "settings:read"31      ]32    }33  ]34}
+Preset bundles
+| Preset ID | Label | Typical use
+| standard | standard | Full developer access, and the default on the belt login approval page. Every read, execute, and write scope except billing:write and the engine scopes. Includes billing:read.
+| read | read-only | Dashboards and monitoring. Read scopes only, without secrets, API keys, or billing.
+| engine | engine | Connect private engines: engines:read, engines:write, apps:execute. Returned to admins only.
+Presets are convenience lists — pass individual scope strings when creating a key.
+A session or API key stores its scope list when it is created. Scopes added to a preset later are not added to existing credentials. Run belt login again to get a session with the current standard scopes.
+List API keys
+GET /apikeys or POST /apikeys/list
+Requires apikeys:read. Workspace owners and admins get every key of the workspace; everyone else gets their own personal keys.
+Uses cursor pagination (cursor, limit, filters). POST /apikeys/list accepts the same fields in the JSON body.
+Listed keys are masked — only the last four characters of the key string are shown (1nfsh-****wxyz).
+Example:
+bashcopy
+1curl -X POST https://api.inference.sh/apikeys/list \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"limit": 50}'
+Response item fields:
+| Field | Type | Description
+| id | string | Key ID
+| name | string | Display name
+| key | string | Masked key (1nfsh-****wxyz)
+| scope | string | user (personal key) or workspace
+| user_id | string | Who the key acts as: its creator, or the workspace's service account
+| created_by | string | The person who created the key
+| creator | object | That person's id, name, full_name, email and avatar_url
+| scopes | string[] | Granted permissions (empty = full access)
+| last_used_at | string | ISO timestamp of last use
+| expires_at | string | Expiration (optional)
+| source | string | Origin — empty for manual keys, token for temporary keys, device-auth for legacy CLI keys
+Create API key
+POST /apikeys
+Requires apikeys:write. Subject to API key entitlement limits for the workspace.
+Request
+| Field | Type | Required | Description
+| name | string | Yes | Display name
+| scope | string | No | user (default) or workspace. A workspace key needs a workspace owner or admin, and fails with 403 otherwise
+| scopes | string[] | No | Permission list. Omit or [] to get the creator's own scopes (full access only if the creator is unrestricted)
+| expires_at | string | No | ISO timestamp; must be in the future. 24 hours or less makes it a temporary key
+source, user_id and created_by are set by the server; values in the request body are ignored. A workspace key cannot create keys.
+A key created by another API key cannot outlive it: if the creating key expires, the new key's expires_at is capped at the creator's, and a missing expires_at is set to it.
+bashcopy
+1curl -X POST https://api.inference.sh/apikeys \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "name": "ci-deploy",6    "scopes": ["apps:read", "apps:execute", "files:write"]7  }'
+A workspace key for CI:
+bashcopy
+1curl -X POST https://api.inference.sh/apikeys \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"name": "ci", "scope": "workspace", "scopes": ["apps:execute"]}'
+The full key string is returned only in the create response. Store it immediately — list responses never include the plaintext value.
+JavaScript SDK:
+typescriptcopy
+1const key = await client.apiKeys.create({2  name: 'ci-deploy',3  scopes: ['apps:read', 'apps:execute'],4});5console.log(key.key); // only time the full value is available
+Temporary keys
+A personal key created with expires_at 24 hours or less from now is a temporary key. The server marks it source: "token". A short-lived workspace key is not a temporary key. It works like any other key (same scopes, same workspace pinning) with these differences:
+It cannot create API keys, even with apikeys:write, so a leaked one cannot renew itself. POST /apikeys returns 403.
+It sends no expiry reminder emails.
+It is listed while live, where it can be revoked, and deleted once expired.
+bashcopy
+1curl -X POST https://api.inference.sh/apikeys \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "name": "nightly-report",6    "scopes": ["apps:read", "apps:execute"],7    "expires_at": "'"$(date -u -d '+15 minutes' +%Y-%m-%dT%H:%M:%SZ)"'"8  }'
+This is what belt auth token does: it mints a 15-minute key for the active workspace so scripts never see the stored login.
+Revoke API key
+DELETE /apikeys/{id}
+Requires apikeys:write. Members revoke their own personal keys; workspace owners and admins revoke any key of the workspace. Anyone else gets 403. Returns the deleted key DTO.
+bashcopy
+1curl -X DELETE https://api.inference.sh/apikeys/key_abc123 \2  -H "Authorization: Bearer inf_your_key"
+Revocation is immediate — in-flight requests may still succeed briefly while caches expire.
+Workspace pinning
+Keys created in settings → workspace → api keys or via POST /apikeys are pinned to the workspace active when they were created. They ignore X-Team-ID, so a leaked automation key cannot be retargeted at another workspace via a header.
+This includes temporary keys from belt auth token: minted from a session that can switch workspaces, the key itself stays on the workspace that was active at mint time.
+Device-auth and magic-link session tokens support switching workspaces. See Authentication: workspace context.
+Next
+Authentication: header format and workspace context
+Device authorization — CLI sessions and auth/sessions management
+Secrets API — runtime credentials (distinct from API keys)

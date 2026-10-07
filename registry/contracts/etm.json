@@ -1,0 +1,5323 @@
+{
+  "schema_version": 1,
+  "service": "etm",
+  "scope": "All operations in the downloaded official OpenAPI snapshot. Schema support does not establish account permissions or live write verification.",
+  "sources": [
+    {
+      "url": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "sha256": "6482fa6694d46695f368aebfed2024a7695a4a5eeb12c3e4471ed41ed7484183"
+    },
+    {
+      "url": "https://ipro.etm.ru/ns2000/yaml/components.yaml",
+      "sha256": "18ca12dfee897d24ef5428df3e42d64d43f534ac3072a636833ebec14fccec17"
+    },
+    {
+      "url": "https://ipro.etm.ru/ns2000/yaml/goods.yaml",
+      "sha256": "f1e8583029627ce65f3192fb12371b7cbe04c9f51a2294436048c7159b2effc8"
+    },
+    {
+      "url": "https://ipro.etm.ru/ns2000/yaml/invoice.yaml",
+      "sha256": "8881b46ba9a100b868671e389e8618893130deffd43e0027c0d8c64fe5e6d4b5"
+    }
+  ],
+  "runtime_limits": {
+    "request_bytes": 1048576,
+    "json_depth": 64,
+    "path_parameter_length": 2048,
+    "pagination": "Positive integers; no invented provider maximum. One request per invocation; caller follows pagination."
+  },
+  "operations": {
+    "login_check": {
+      "id": "POST /user/login",
+      "method": "POST",
+      "path": "/user/login",
+      "summary": "Авторизация",
+      "effect": "authentication",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "query": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "request_body": {},
+      "response_kind": "json",
+      "response_media_types": [
+        "application/json"
+      ],
+      "responses": {
+        "200": {
+          "description": "Успешная авторизация",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "session": {
+                        "type": "string",
+                        "description": "Ключ пользователя (время жизни 2 часа)"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "Неверный логин или пароль",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "security": [],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null,
+      "authentication": "dispatcher_injects_log_pwd"
+    },
+    "catalog_search": {
+      "id": "GET /catalog",
+      "method": "GET",
+      "path": "/catalog",
+      "summary": "Список товаров",
+      "effect": "read",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [
+        {
+          "in": "query",
+          "name": "val",
+          "description": "Поисковый запрос",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "type",
+          "in": "query",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "code"
+            ]
+          },
+          "description": "по чему ищем:\n * `code` - по коду и артикулу\n"
+        },
+        {
+          "name": "mnf",
+          "in": "query",
+          "schema": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": "Код производителя"
+        }
+      ],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "query": {
+            "type": "object",
+            "properties": {
+              "val": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "code"
+                ]
+              },
+              "mnf": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "additionalProperties": false
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "request_body": {},
+      "response_kind": "json",
+      "response_media_types": [
+        "application/json; charset=utf-8"
+      ],
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json; charset=utf-8": {
+              "schema": {
+                "description": "Каталог товаров",
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "rows": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "description": "ID (КодТовара-NetСкладскойКарточки-NumСкладскойКарточки)"
+                            },
+                            "code": {
+                              "type": "string",
+                              "description": "код товара с префиксом ETM"
+                            },
+                            "gdscode": {
+                              "type": "number",
+                              "description": "код товара"
+                            },
+                            "image": {
+                              "type": "string",
+                              "description": "путь к картинке"
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "наименование"
+                            },
+                            "analog": {
+                              "type": "string",
+                              "description": "наличие у товара аналога и взаимозаменяемого товара (КодВзЗамены;КодАналогов)"
+                            },
+                            "art": {
+                              "type": "string",
+                              "description": "артикул"
+                            },
+                            "mnf_name": {
+                              "type": "string",
+                              "description": "наименование производителя"
+                            },
+                            "pack": {
+                              "type": "string",
+                              "description": "упаковка"
+                            },
+                            "rem_op": {
+                              "type": "number",
+                              "description": "наличие в первом попавшемся ОП в регионе"
+                            },
+                            "rem": {
+                              "type": "string",
+                              "description": "остаток на ЛЦ"
+                            },
+                            "rem_add": {
+                              "type": "string",
+                              "description": "остаток на ОП"
+                            },
+                            "rem_crs": {
+                              "type": "number",
+                              "description": "остаток на ЦРС"
+                            },
+                            "price": {
+                              "type": "string",
+                              "description": "цена клиента"
+                            },
+                            "price98": {
+                              "type": "string",
+                              "description": "розничная цена"
+                            },
+                            "price482": {
+                              "type": "string",
+                              "description": "цена с максимальной скидкой в ИМ"
+                            },
+                            "edizm": {
+                              "type": "string",
+                              "description": "единица измерения"
+                            },
+                            "can_basket": {
+                              "type": "string",
+                              "description": "можно ли добавлять товар в корзину ('p','-' - нельзя; пусто и 'z' - можно)"
+                            },
+                            "basket_cnt": {
+                              "type": "string",
+                              "description": "Количество данного товара уже положенного в корзину"
+                            },
+                            "taking": {
+                              "type": "string",
+                              "description": "количество покупок клиента (избранное и мой каталог)"
+                            },
+                            "group": {
+                              "type": "string",
+                              "description": "наменование группы в режиме конструктора"
+                            },
+                            "min_cnt": {
+                              "type": "string",
+                              "description": "минимально допустимое количество к добавлению в корзину"
+                            },
+                            "price_dec": {
+                              "type": "number",
+                              "description": "числовое выражение цены клиента"
+                            },
+                            "qual": {
+                              "type": "string",
+                              "description": "качество товара (ГОСТ и т.п.)"
+                            },
+                            "more": {
+                              "type": "string",
+                              "description": "есть больше товара, если = 1"
+                            },
+                            "crs_days": {
+                              "type": "number",
+                              "description": "срок поставки на РЦ с ЦРС или экспрессом"
+                            },
+                            "mnf_code": {
+                              "type": "number",
+                              "description": "код производителя"
+                            },
+                            "mnf_link": {
+                              "type": "string",
+                              "description": "url производителя"
+                            },
+                            "country": {
+                              "type": "string",
+                              "description": "страна произвотства"
+                            },
+                            "my": {
+                              "type": "string",
+                              "description": "товар в моем каталоге (избранном)"
+                            },
+                            "my_code": {
+                              "type": "string",
+                              "description": "код товара клиента"
+                            },
+                            "nlk": {
+                              "type": "string",
+                              "description": "1 - это безусловная акция (82 класс), 2 - неликвид, 3 - условная акция (291 класс с ApplicInCatalog=yes), приоритет от большего номера к меньшему"
+                            },
+                            "rem_expected": {
+                              "type": "number",
+                              "description": "ожидаемое к поступлению кол-во товара"
+                            },
+                            "cnt_similar": {
+                              "type": "number",
+                              "description": "кол-во однотипных товаров"
+                            },
+                            "pack_alt": {
+                              "type": "string",
+                              "description": "альтернативные упаковки товара в формате ИмяУпак1$Кол-воУпак1$ТочностьУпак1|ИмяУпак2$Кол-воУпак2$ТочностьУпак2...."
+                            },
+                            "constr": {
+                              "type": "boolean",
+                              "description": "наличие конструктора"
+                            },
+                            "kpp": {
+                              "type": "boolean",
+                              "description": "партионный кабель"
+                            },
+                            "new": {
+                              "type": "boolean",
+                              "description": "новинка"
+                            },
+                            "can_tag": {
+                              "type": "boolean",
+                              "description": "доступность создания тега"
+                            },
+                            "main_card": {
+                              "type": "boolean",
+                              "description": "главная карточка товара"
+                            },
+                            "add_info_card": {
+                              "type": "array",
+                              "description": "массив данных карточки товара",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "gdsNameCountry": {
+                                    "type": "string",
+                                    "description": "страна"
+                                  },
+                                  "description": {
+                                    "type": "string",
+                                    "description": "описание"
+                                  },
+                                  "gdsMnfUrl": {
+                                    "type": "string",
+                                    "description": "ЧПУ производителя товара"
+                                  },
+                                  "gdsSertifName": {
+                                    "type": "string",
+                                    "description": "сертификат"
+                                  },
+                                  "gdsClassTree": {
+                                    "type": "array",
+                                    "description": "дерево классификация товара в каталоге",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "code": {
+                                          "type": "string",
+                                          "description": "код класса"
+                                        },
+                                        "name": {
+                                          "type": "string",
+                                          "description": "имя класса"
+                                        },
+                                        "url": {
+                                          "type": "string",
+                                          "description": "ЧПУ класса"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "gdsChars": {
+                                    "type": "array",
+                                    "description": "характеристики товара",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "gdsCharName": {
+                                          "type": "string",
+                                          "description": "наименование характеристики"
+                                        },
+                                        "gdsCharVal": {
+                                          "type": "string",
+                                          "description": "значение характеристики"
+                                        },
+                                        "ConfigCharCode": {
+                                          "type": "string",
+                                          "description": "код характеристики"
+                                        },
+                                        "ConfigCharIdVal": {
+                                          "type": "string",
+                                          "description": "код значения характеристики"
+                                        },
+                                        "gdsCharSeoValid": {
+                                          "type": "boolean",
+                                          "description": "валидность ссылки в SEO-инструменте"
+                                        },
+                                        "gdsCharSeoURL": {
+                                          "type": "string",
+                                          "description": "ЧПУ"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "gdsImages": {
+                                    "type": "object",
+                                    "description": "изображения товара",
+                                    "properties": {
+                                      "gdsImgSrc": {
+                                        "type": "string",
+                                        "description": "ссылка на картинку"
+                                      },
+                                      "gdsImgRef": {
+                                        "type": "string",
+                                        "description": "ссылка для перехода"
+                                      }
+                                    }
+                                  },
+                                  "gdsVideos": {
+                                    "type": "array",
+                                    "description": "массив с видео",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "gdsVidSrc": {
+                                          "type": "string",
+                                          "description": "ссылка"
+                                        },
+                                        "gdsVidName": {
+                                          "type": "string",
+                                          "description": "наименование"
+                                        },
+                                        "gdsVidType": {
+                                          "type": "string",
+                                          "description": "тип"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "certificates": {
+                                    "type": "array",
+                                    "description": "массив по сертификатам",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "name": {
+                                          "type": "string",
+                                          "description": "наименование"
+                                        },
+                                        "file": {
+                                          "type": "string",
+                                          "description": "файл"
+                                        },
+                                        "type": {
+                                          "type": "string",
+                                          "description": "тип"
+                                        },
+                                        "lable": {
+                                          "type": "string",
+                                          "description": "значение параметра lable"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "gdsTechDescInt": {
+                                    "type": "array",
+                                    "description": "дополнительные материалы по товару",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "gdsTechIntSrc": {
+                                          "type": "string",
+                                          "description": "ссылка на материал"
+                                        },
+                                        "gdsTechIntName": {
+                                          "type": "string",
+                                          "description": "описание"
+                                        },
+                                        "gdsTechIntType": {
+                                          "type": "string",
+                                          "description": "тип файла"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "gdsTechDescExt": {
+                                    "type": "array",
+                                    "description": "внеешняя техническая информация по товару",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "gdsTechIntSrc": {
+                                          "type": "string",
+                                          "description": "ссылка"
+                                        },
+                                        "gdsTechIntName": {
+                                          "type": "string",
+                                          "description": "описание"
+                                        },
+                                        "gdsTechIntType": {
+                                          "type": "string",
+                                          "description": "тип файла"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "gdsInfoPacks": {
+                                    "type": "string",
+                                    "description": "упаковки"
+                                  },
+                                  "sumUsers": {
+                                    "type": "number",
+                                    "description": "количество пользователей, оценивших товар"
+                                  },
+                                  "minPack": {
+                                    "type": "string",
+                                    "description": "минимально возможное кол-во"
+                                  },
+                                  "purchased": {
+                                    "type": "string",
+                                    "description": "пользователь покупал ранее этот товар"
+                                  },
+                                  "bull_mnf": {
+                                    "type": "string",
+                                    "description": "бонусные баллы от производителя"
+                                  },
+                                  "bull_etm": {
+                                    "type": "string",
+                                    "description": "бонусные баллы от ЭТМ"
+                                  },
+                                  "sumRaiting": {
+                                    "type": "number",
+                                    "description": "средняя оценка от всех пользователей"
+                                  },
+                                  "userRaiting": {
+                                    "type": "number",
+                                    "description": "Оценка товара пользователем"
+                                  },
+                                  "gdsClasses": {
+                                    "type": "array",
+                                    "description": "вся классификация товара",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "gdsTypeClass": {
+                                          "type": "string",
+                                          "description": "тип класса"
+                                        },
+                                        "gdsCodeClass": {
+                                          "type": "string",
+                                          "description": "код класса"
+                                        },
+                                        "gdsNameClass": {
+                                          "type": "string",
+                                          "description": "наименование класса"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "gdsPacks": {
+                                    "type": "array",
+                                    "description": "упаковки",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "gdsPackCode": {
+                                          "type": "string",
+                                          "description": "код упаковки"
+                                        },
+                                        "gdsPackName": {
+                                          "type": "string",
+                                          "description": "наименование упаковки"
+                                        },
+                                        "gdsPackVal": {
+                                          "type": "string",
+                                          "description": "количество товара в упаковке"
+                                        },
+                                        "gdsPackWeightVal": {
+                                          "type": "string",
+                                          "description": "вес"
+                                        },
+                                        "gdsPackWeightDim": {
+                                          "type": "string",
+                                          "description": "единица измерения веса"
+                                        },
+                                        "gdsPackLengthVal": {
+                                          "type": "string",
+                                          "description": "длина"
+                                        },
+                                        "gdsPackLengthDim": {
+                                          "type": "string",
+                                          "description": "единица измерения длины"
+                                        },
+                                        "gdsPackWidthVal": {
+                                          "type": "string",
+                                          "description": "ширина"
+                                        },
+                                        "gdsPackWidthDim": {
+                                          "type": "string",
+                                          "description": "единица измерения ширины"
+                                        },
+                                        "gdsPackHeigthVal": {
+                                          "type": "string",
+                                          "description": "высота"
+                                        },
+                                        "gdsPackHeigthDim": {
+                                          "type": "string",
+                                          "description": "единица измерения высоты"
+                                        },
+                                        "gdsPackVolumeVal": {
+                                          "type": "string",
+                                          "description": "объем"
+                                        },
+                                        "gdsPackVolumeDim": {
+                                          "type": "string",
+                                          "description": "единица измерения объема"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "records": {
+                        "type": "integer"
+                      },
+                      "limit": {
+                        "type": "boolean"
+                      },
+                      "timeX": {
+                        "type": "integer"
+                      },
+                      "timeY": {
+                        "type": "integer"
+                      },
+                      "str": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string",
+                        "description": "заголовок документа для отображения в заголовке окна браузера или на вкладке страницы(показывается если в фильтре присутствует класс)"
+                      },
+                      "seo_desc": {
+                        "type": "string",
+                        "description": "мета-описание страницы(показывается если в фильтре присутствует класс)"
+                      },
+                      "seo_h1": {
+                        "type": "string",
+                        "description": "заголовок H1 для класса(показывается если в фильтре присутствует класс)"
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "описание для класса(показывается если в фильтре присутствует класс)"
+                      },
+                      "result_desc": {
+                        "type": "string",
+                        "description": "текстовое описание результата"
+                      },
+                      "result_improve": {
+                        "type": "string",
+                        "description": "текстовое описание, как результат может быть улучшен"
+                      },
+                      "result_tooltip": {
+                        "type": "string",
+                        "description": "подсказка к описанию"
+                      },
+                      "result_key": {
+                        "type": "string",
+                        "description": "значение ключа improve, которое надо использовать для расширенного запроса"
+                      },
+                      "tag": {
+                        "type": "array",
+                        "description": "теги класса(показывается если в фильтре присутствует класс)",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "ctt_class81": {
+                              "type": "string",
+                              "description": "код класса 81 классификатора"
+                            },
+                            "ctt_chpu": {
+                              "type": "string",
+                              "description": "ЧПУ"
+                            },
+                            "ctt_link": {
+                              "type": "string",
+                              "description": "ссылка на страницу тега"
+                            },
+                            "ctt_name": {
+                              "type": "string",
+                              "description": "наименование тега"
+                            },
+                            "ctt_sort": {
+                              "type": "string",
+                              "description": "сортировка"
+                            },
+                            "ctt_title": {
+                              "type": "string",
+                              "description": "заголовок тега"
+                            },
+                            "ctt_desc": {
+                              "type": "string",
+                              "description": "описание тега"
+                            },
+                            "ctt_h1": {
+                              "type": "string",
+                              "description": "H1 заголовок тега"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null
+    },
+    "goods_price": {
+      "id": "GET /goods/{id}/price",
+      "method": "GET",
+      "path": "/goods/{id}/price",
+      "summary": "Цена товара",
+      "effect": "read",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Коды товара через запятую (не более 50 шт.)",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "type",
+          "in": "query",
+          "description": "Тип кода товара:\n * cli - код клиента (дефолт)\n * etm - код ЭТМ\n * mnf - код производителя (артикул)\n",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "cli",
+              "etm",
+              "mnf"
+            ]
+          }
+        }
+      ],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id"
+            ]
+          },
+          "query": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "cli",
+                  "etm",
+                  "mnf"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      },
+      "request_body": {},
+      "response_kind": "json",
+      "response_media_types": [
+        "application/json"
+      ],
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "rows": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "price": {
+                              "description": "цена без НДС",
+                              "type": "number"
+                            },
+                            "pricewnds": {
+                              "description": "цена с НДС",
+                              "type": "number"
+                            },
+                            "price_tarif": {
+                              "description": "цена по тарифу",
+                              "type": "number"
+                            },
+                            "price_retail": {
+                              "description": "розничная цена",
+                              "type": "number"
+                            },
+                            "gdscode": {
+                              "description": "код товара в ЭТМ",
+                              "type": "number"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null
+    },
+    "goods_remains": {
+      "id": "GET /goods/{id}/remains",
+      "method": "GET",
+      "path": "/goods/{id}/remains",
+      "summary": "Доступность товара",
+      "effect": "read",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Код товара",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "type",
+          "in": "query",
+          "description": "Тип кода товара:\n * cli - код клиента (дефолт)\n * etm - код ЭТМ\n * mnf - код производителя (артикул)\n",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "cli",
+              "etm",
+              "mnf"
+            ]
+          }
+        }
+      ],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id"
+            ]
+          },
+          "query": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "cli",
+                  "etm",
+                  "mnf"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      },
+      "request_body": {},
+      "response_kind": "json",
+      "response_media_types": [
+        "application/json; charset=utf-8"
+      ],
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json; charset=utf-8": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "gdscode": {
+                        "description": "код товара в ЭТМ",
+                        "type": "number"
+                      },
+                      "UnitName": {
+                        "description": "ед.измерения",
+                        "type": "string"
+                      },
+                      "InfoStores": {
+                        "description": "перечень складов",
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "StoreCode": {
+                              "description": "код склада",
+                              "type": "number"
+                            },
+                            "StoreName": {
+                              "description": "имя склада",
+                              "type": "string"
+                            },
+                            "StoreType": {
+                              "description": "тип склада (rc,crs,op)",
+                              "type": "string"
+                            },
+                            "StoreQuantRem": {
+                              "description": "остаток",
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "InfoSuppStores": {
+                        "type": "array",
+                        "description": "информация о наличии товара на складах поставщика (если доступна)",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "SuppStoreName": {
+                              "description": "наименование склада",
+                              "type": "string"
+                            },
+                            "SuppStoreState": {
+                              "description": "состояние на (утро такого-то числа/прогноз на такую-то дату)",
+                              "type": "string"
+                            },
+                            "SuppStoreQuantRem": {
+                              "description": "количество товара",
+                              "type": "string"
+                            },
+                            "SuppStoreUnitName": {
+                              "description": "наименование единицы измерения",
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null
+    },
+    "goods_get": {
+      "id": "GET /goods/{id}",
+      "method": "GET",
+      "path": "/goods/{id}",
+      "summary": "Характеристики товара",
+      "effect": "read",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Код товара",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "type",
+          "in": "query",
+          "description": "Тип кода товара:\n * cli - код клиента (дефолт)\n * etm - код ЭТМ\n * mnf - код производителя (артикул)\n",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "cli",
+              "etm",
+              "mnf"
+            ]
+          }
+        },
+        {
+          "name": "mnf",
+          "in": "query",
+          "description": "Код производителя в ЭТМ (работает как фильтр для type=mnf)",
+          "schema": {
+            "type": "number"
+          }
+        }
+      ],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id"
+            ]
+          },
+          "query": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "cli",
+                  "etm",
+                  "mnf"
+                ]
+              },
+              "mnf": {
+                "type": "number"
+              }
+            },
+            "additionalProperties": false
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      },
+      "request_body": {},
+      "response_kind": "json",
+      "response_media_types": [
+        "application/json; charset=utf-8"
+      ],
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json; charset=utf-8": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "gdsCode": {
+                        "type": "string",
+                        "description": "код товара"
+                      },
+                      "gdsNameTitle": {
+                        "type": "string",
+                        "description": "полное наименование товара"
+                      },
+                      "rem_op": {
+                        "type": "string",
+                        "description": "Суммарное количество товара во всех ОП"
+                      },
+                      "rem": {
+                        "type": "string",
+                        "description": "Количество товара в ЛЦ"
+                      },
+                      "gdsNameInMnf": {
+                        "type": "string",
+                        "description": "наименование в прайсе производителя"
+                      },
+                      "gdsInfoClass81": {
+                        "type": "string",
+                        "description": "классификация товара в каталоге"
+                      },
+                      "gdsNameCountry": {
+                        "type": "string",
+                        "description": "страна"
+                      },
+                      "gdsMnfName": {
+                        "type": "string",
+                        "description": "имя производителя товара"
+                      },
+                      "gdsMnfCode": {
+                        "type": "string",
+                        "description": "код производителя товара"
+                      },
+                      "gdsMnfUrl": {
+                        "type": "string",
+                        "description": "ЧПУ производителя товара"
+                      },
+                      "gdsArt": {
+                        "type": "string",
+                        "description": "артикул"
+                      },
+                      "gdsExtArt": {
+                        "type": "string",
+                        "description": "артикул расширенный"
+                      },
+                      "gdsUnitName": {
+                        "type": "string",
+                        "description": "ед.измерения"
+                      },
+                      "gdsInfoPacks": {
+                        "type": "string",
+                        "description": "упаковки"
+                      },
+                      "gdsSertifName": {
+                        "type": "string",
+                        "description": "сертификат"
+                      },
+                      "gdsClassTree": {
+                        "type": "array",
+                        "description": "дерево классификация товара в каталоге",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "code": {
+                              "type": "string",
+                              "description": "код класса"
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "имя класса"
+                            },
+                            "url": {
+                              "type": "string",
+                              "description": "ЧПУ класса"
+                            }
+                          }
+                        }
+                      },
+                      "gdsChars": {
+                        "type": "array",
+                        "description": "характеристики товара",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "gdsCharName": {
+                              "type": "string",
+                              "description": "наименование характеристики"
+                            },
+                            "gdsCharVal": {
+                              "type": "string",
+                              "description": "значение характеристики"
+                            },
+                            "ConfigCharCode": {
+                              "type": "string",
+                              "description": "код характеристики"
+                            },
+                            "ConfigCharIdVal": {
+                              "type": "string",
+                              "description": "код значения характеристики"
+                            },
+                            "gdsCharSeoValid": {
+                              "type": "boolean",
+                              "description": "валидность ссылки в SEO-инструменте"
+                            },
+                            "gdsCharSeoURL": {
+                              "type": "string",
+                              "description": "ЧПУ"
+                            }
+                          }
+                        }
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "описание"
+                      },
+                      "slang": {
+                        "type": "string",
+                        "description": "сленг"
+                      },
+                      "gdsPacks": {
+                        "type": "array",
+                        "description": "упаковки",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "gdsPackCode": {
+                              "type": "string",
+                              "description": "код упаковки"
+                            },
+                            "gdsPackName": {
+                              "type": "string",
+                              "description": "наименование упаковки"
+                            },
+                            "gdsPackVal": {
+                              "type": "string",
+                              "description": "количество товара в упаковке"
+                            },
+                            "gdsPackWeightVal": {
+                              "type": "string",
+                              "description": "вес"
+                            },
+                            "gdsPackWeightDim": {
+                              "type": "string",
+                              "description": "единица измерения веса"
+                            },
+                            "gdsPackLengthVal": {
+                              "type": "string",
+                              "description": "длина"
+                            },
+                            "gdsPackLengthDim": {
+                              "type": "string",
+                              "description": "единица измерения длины"
+                            },
+                            "gdsPackWidthVal": {
+                              "type": "string",
+                              "description": "ширина"
+                            },
+                            "gdsPackWidthDim": {
+                              "type": "string",
+                              "description": "единица измерения ширины"
+                            },
+                            "gdsPackHeigthVal": {
+                              "type": "string",
+                              "description": "высота"
+                            },
+                            "gdsPackHeigthDim": {
+                              "type": "string",
+                              "description": "единица измерения высоты"
+                            },
+                            "gdsPackVolumeVal": {
+                              "type": "string",
+                              "description": "объем"
+                            },
+                            "gdsPackVolumeDim": {
+                              "type": "string",
+                              "description": "единица измерения объема"
+                            }
+                          }
+                        }
+                      },
+                      "gdsClasses": {
+                        "type": "array",
+                        "description": "вся классификация товара",
+                        "items": {
+                          "type": "object"
+                        }
+                      },
+                      "gdsPrice1": {
+                        "type": "string",
+                        "description": "цена продажи"
+                      },
+                      "gdsPrice2": {
+                        "type": "string",
+                        "description": "розничная цена"
+                      },
+                      "gdsPrice3": {
+                        "type": "string",
+                        "description": "доп. справочная цена"
+                      },
+                      "gdsImages": {
+                        "type": "object",
+                        "description": "изображения товара",
+                        "properties": {
+                          "gdsImgSrc": {
+                            "type": "string",
+                            "description": "ссылка на картинку"
+                          },
+                          "gdsImgRef": {
+                            "type": "string",
+                            "description": "ссылка для перехода"
+                          }
+                        }
+                      },
+                      "gdsVz_an": {
+                        "type": "string",
+                        "description": "коды взаимозаменяемых и аналогов"
+                      },
+                      "gdsConstr": {
+                        "type": "string",
+                        "description": "если = 1, то у товара есть конструктор"
+                      },
+                      "qual82_img": {
+                        "type": "string",
+                        "description": "ссылка на картику качества"
+                      },
+                      "qual82_title": {
+                        "type": "string",
+                        "description": "текст к качеству товара"
+                      },
+                      "gdsRemSt": {
+                        "type": "string",
+                        "description": "остаток товара на ЛЦ"
+                      },
+                      "gdsAvail": {
+                        "type": "string",
+                        "description": "доступность"
+                      },
+                      "gdsRemCRS": {
+                        "type": "string",
+                        "description": "остаток на ЦРС"
+                      },
+                      "timeX": {
+                        "type": "string",
+                        "description": "очень приблизительное время с ЛЦ до ОП"
+                      },
+                      "timeY": {
+                        "type": "string",
+                        "description": "очень приблизительное время с ЦРС до ОП"
+                      },
+                      "can_basket": {
+                        "type": "string",
+                        "description": "можно добавлять в корзину (пусто - да, \"-\" - нельзя, \"z\" - заказной)"
+                      },
+                      "gdsRemAddSt": {
+                        "type": "string",
+                        "description": "остаток в ОП"
+                      },
+                      "dif_price": {
+                        "type": "boolean",
+                        "description": "есть этот же товар по другой цене"
+                      },
+                      "not_produced": {
+                        "type": "boolean",
+                        "description": "товар не производится"
+                      },
+                      "gdsSertFiles": {
+                        "type": "array",
+                        "description": "сертификаты на товар",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "minPack": {
+                        "type": "string",
+                        "description": "минимально возможное кол-во"
+                      },
+                      "myCatalog": {
+                        "type": "string",
+                        "description": "если = 1, то товар в избранном клиента"
+                      },
+                      "relatedProducts": {
+                        "type": "array",
+                        "description": "похожие товары",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "gdsCode": {
+                              "type": "string",
+                              "description": "код товара"
+                            },
+                            "gdsName": {
+                              "type": "string",
+                              "description": "наименование товара"
+                            },
+                            "sale": {
+                              "type": "string",
+                              "description": "распродажа"
+                            },
+                            "saleText": {
+                              "type": "string",
+                              "description": "текст к распродаже"
+                            },
+                            "gdsPrice1": {
+                              "type": "string",
+                              "description": "цена продажи"
+                            },
+                            "gdsPrice2": {
+                              "type": "string",
+                              "description": "розничная цена"
+                            },
+                            "gdsPrice3": {
+                              "type": "string",
+                              "description": "доп. справочная цена"
+                            },
+                            "gdsUnitName": {
+                              "type": "string",
+                              "description": "ед.измерения"
+                            },
+                            "minPack": {
+                              "type": "string",
+                              "description": "минимально возможное кол-во"
+                            },
+                            "type": {
+                              "type": "string",
+                              "description": "степень похожести (analog или class)"
+                            },
+                            "mnfName": {
+                              "type": "string",
+                              "description": "имя производителя товара"
+                            },
+                            "mnfSer": {
+                              "type": "string",
+                              "description": "серия производителя"
+                            },
+                            "pack3": {
+                              "type": "string",
+                              "description": "заводская упаковка"
+                            },
+                            "can_basket": {
+                              "type": "string",
+                              "description": "можно добавлять в корзину (пусто - да, \"-\" - нельзя, \"z\" - заказной)"
+                            },
+                            "basket_cnt": {
+                              "type": "string",
+                              "description": "Количество данного товара уже положенного в корзину"
+                            },
+                            "avail": {
+                              "type": "string",
+                              "description": "доступность"
+                            },
+                            "rem_op": {
+                              "type": "string",
+                              "description": "Количество товара во всех ОП"
+                            },
+                            "rem": {
+                              "type": "string",
+                              "description": "Количество товара в ЛЦ"
+                            },
+                            "rem_crs": {
+                              "type": "string",
+                              "description": "Количество товаров на других складах (КДК)"
+                            },
+                            "op_lc_days": {
+                              "type": "string",
+                              "description": "Количество дней поставки товара с ЛЦ до ОП"
+                            },
+                            "crs_days": {
+                              "type": "string",
+                              "description": "Количество дней поставки товара по КДК до ОП"
+                            },
+                            "gdsImgSrc": {
+                              "type": "string",
+                              "description": "ссылка на картинку товара"
+                            },
+                            "sumUsers": {
+                              "type": "number",
+                              "description": "количество пользователей, оценивших товар"
+                            },
+                            "sumRaiting": {
+                              "type": "number",
+                              "description": "средняя оценка от всех пользователей"
+                            },
+                            "userRaiting": {
+                              "type": "number",
+                              "description": "Оценка товара пользователем"
+                            },
+                            "purchased": {
+                              "type": "string",
+                              "description": "Пользователь покупал ранее этот товар"
+                            }
+                          }
+                        }
+                      },
+                      "barcodes": {
+                        "type": "array",
+                        "description": "штрихкоды",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "val": {
+                              "type": "string",
+                              "description": "штрихкод"
+                            },
+                            "pack": {
+                              "type": "string",
+                              "description": "упаковка"
+                            }
+                          }
+                        }
+                      },
+                      "gdsTechDescInt": {
+                        "type": "array",
+                        "description": "дополнительные материалы по товару",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "gdsTechIntSrc": {
+                              "type": "string",
+                              "description": "ссылка на материал"
+                            },
+                            "gdsTechIntName": {
+                              "type": "string",
+                              "description": "описание"
+                            },
+                            "gdsTechIntType": {
+                              "type": "string",
+                              "description": "тип файла"
+                            }
+                          }
+                        }
+                      },
+                      "gdsTechDescExt": {
+                        "type": "array",
+                        "description": "внеешняя техническая информация по товару",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "gdsTechIntSrc": {
+                              "type": "string",
+                              "description": "ссылка"
+                            },
+                            "gdsTechIntName": {
+                              "type": "string",
+                              "description": "описание"
+                            },
+                            "gdsTechIntType": {
+                              "type": "string",
+                              "description": "тип файла"
+                            }
+                          }
+                        }
+                      },
+                      "similar": {
+                        "type": "object",
+                        "description": "однотипные товары",
+                        "properties": {
+                          "property1": {
+                            "type": "object",
+                            "description": "первая отличительная характеристика",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "description": "название характеристики"
+                              },
+                              "code": {
+                                "type": "string",
+                                "description": "код характеристики"
+                              },
+                              "columns": {
+                                "type": "string",
+                                "description": "список колонок через '|'"
+                              },
+                              "values": {
+                                "type": "array",
+                                "description": "возможные значения",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "val": {
+                                      "type": "string",
+                                      "description": "значение"
+                                    },
+                                    "name": {
+                                      "type": "string",
+                                      "description": "наименование значения"
+                                    },
+                                    "selected": {
+                                      "type": "boolean",
+                                      "description": "соответствие текущему товару"
+                                    },
+                                    "gdsName": {
+                                      "type": "string",
+                                      "description": "наименование однотипного товара"
+                                    },
+                                    "gdsArt": {
+                                      "type": "string",
+                                      "description": "артикул"
+                                    },
+                                    "mnfName": {
+                                      "type": "string",
+                                      "description": "производитель"
+                                    },
+                                    "mnfSer": {
+                                      "type": "string",
+                                      "description": "серия"
+                                    },
+                                    "pack3": {
+                                      "type": "string",
+                                      "description": "упаковка"
+                                    },
+                                    "gdsAvail": {
+                                      "type": "string",
+                                      "description": "наличие"
+                                    },
+                                    "sale": {
+                                      "type": "string",
+                                      "description": "распродажа"
+                                    },
+                                    "gdsPrice1": {
+                                      "type": "string",
+                                      "description": "цена продажи"
+                                    },
+                                    "gdsPrice2": {
+                                      "type": "string",
+                                      "description": "розничная цена"
+                                    },
+                                    "gdsPrice3": {
+                                      "type": "string",
+                                      "description": "доп. справочная цена"
+                                    },
+                                    "can_basket": {
+                                      "type": "string",
+                                      "description": "можно добавлять в корзину (пусто - да, \"-\" - нельзя, \"z\" - заказной)"
+                                    },
+                                    "minPack": {
+                                      "type": "string",
+                                      "description": "минимально возможное кол-во"
+                                    },
+                                    "basket_cnt": {
+                                      "type": "number",
+                                      "description": "Количество данного товара уже положенного в корзину"
+                                    },
+                                    "gdsCode": {
+                                      "type": "number",
+                                      "description": "код однотипного товара"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "property2": {
+                            "type": "object",
+                            "description": "вторая отличительная характеристика",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "description": "название характеристики"
+                              },
+                              "code": {
+                                "type": "string",
+                                "description": "код характеристики"
+                              },
+                              "values": {
+                                "type": "array",
+                                "description": "возможные значения",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "val": {
+                                      "type": "string",
+                                      "description": "значение"
+                                    },
+                                    "name": {
+                                      "type": "string",
+                                      "description": "наименование значения"
+                                    },
+                                    "selected": {
+                                      "type": "boolean",
+                                      "description": "соответствие текущему товару"
+                                    },
+                                    "gdsCode": {
+                                      "type": "number",
+                                      "description": "код однотипного товара"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null
+    },
+    "stock_remains": {
+      "id": "GET /goods/remains",
+      "method": "GET",
+      "path": "/goods/remains",
+      "summary": "Остатки всех товаров",
+      "effect": "read",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [
+        {
+          "name": "store",
+          "in": "query",
+          "description": "Склад (если нужен ответ по конкретному, а не всем доступным)",
+          "schema": {
+            "type": "number"
+          }
+        }
+      ],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "query": {
+            "type": "object",
+            "properties": {
+              "store": {
+                "type": "number"
+              }
+            },
+            "additionalProperties": false
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "request_body": {},
+      "response_kind": "json",
+      "response_media_types": [
+        "application/json; charset=utf-8"
+      ],
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json; charset=utf-8": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "rows": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "gdsCode": {
+                              "type": "string",
+                              "description": "код товара"
+                            },
+                            "gdsName": {
+                              "type": "string",
+                              "description": "наименование товара"
+                            },
+                            "Article": {
+                              "type": "string",
+                              "description": "артикул товара"
+                            },
+                            "RemInfo": {
+                              "type": "string",
+                              "description": "остаток товара"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null
+    },
+    "catalog_job_create": {
+      "id": "POST /job/create/{procedure}",
+      "method": "POST",
+      "path": "/job/create/{procedure}",
+      "summary": "Запуск формирования задачи (отчета)",
+      "effect": "report_generation",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "procedure",
+          "description": "Номер процедуры:\n * 40029846 - формирование списка товаров (формат - json массив c данными: id,name,brand,article,brand_code,cli_code,class)\n",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "40029846"
+            ]
+          }
+        }
+      ],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {
+              "procedure": {
+                "type": "string",
+                "enum": [
+                  "40029846"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "procedure"
+            ]
+          },
+          "query": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      },
+      "request_body": {},
+      "response_kind": "json",
+      "response_media_types": [
+        "application/json; charset=utf-8"
+      ],
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json; charset=utf-8": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "description": "сообщение об ошибке",
+                        "type": "string"
+                      },
+                      "uuid": {
+                        "description": "uuid созданной задачи на формирование",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null,
+      "limitations": [
+        "Result URLs are returned as data; arbitrary download URLs are not executed."
+      ]
+    },
+    "catalog_job_get": {
+      "id": "GET /job/{uuid}",
+      "method": "GET",
+      "path": "/job/{uuid}",
+      "summary": "Состояние задачи",
+      "effect": "read",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "uuid",
+          "description": "uuid из ответа метода /job/create/",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {
+              "uuid": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "uuid"
+            ]
+          },
+          "query": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      },
+      "request_body": {},
+      "response_kind": "json",
+      "response_media_types": [
+        "application/json; charset=utf-8"
+      ],
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json; charset=utf-8": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "rows": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "state": {
+                              "type": "string",
+                              "description": "Состояние задачи:\n * 0 - создана\n * 1 - успешно завершена\n * 2 - завершена с ошибкой\n * 3 - ждет назначенного времени запуска\n"
+                            },
+                            "msg": {
+                              "type": "string",
+                              "description": "сообщение об ошибке"
+                            },
+                            "name": {
+                              "type": "string",
+                              "description": "название задачи (отчета)"
+                            },
+                            "urls": {
+                              "type": "array",
+                              "description": "массив ссылок на файлы с результатом",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "whencre": {
+                              "type": "string",
+                              "description": "дата запуска"
+                            },
+                            "timecre": {
+                              "type": "string",
+                              "description": "время запуска"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null,
+      "limitations": [
+        "Result URLs are returned as data; arbitrary download URLs are not executed."
+      ]
+    },
+    "reference_search": {
+      "id": "GET /info/search/{type}/",
+      "method": "GET",
+      "path": "/info/search/{type}/",
+      "summary": "Справочники",
+      "effect": "read",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "type",
+          "description": "Тип справочника:\n  * r-manuf - производители\n",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "r-manuf"
+            ]
+          }
+        },
+        {
+          "in": "query",
+          "name": "term",
+          "description": "контекст поиска:\n  * для type=r-manuf - код или наименование производителя              \n",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "page",
+          "in": "query",
+          "schema": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": "Номер страницы с данными"
+        },
+        {
+          "name": "rows",
+          "in": "query",
+          "schema": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": "Строк данных на странице"
+        }
+      ],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "r-manuf"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "type"
+            ]
+          },
+          "query": {
+            "type": "object",
+            "properties": {
+              "term": {
+                "type": "string"
+              },
+              "page": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "rows": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "additionalProperties": false
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      },
+      "request_body": {},
+      "response_kind": "json",
+      "response_media_types": [
+        "application/json; charset=utf-8"
+      ],
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json; charset=utf-8": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "rows": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "description": "внутренний id записи"
+                            },
+                            "value": {
+                              "type": "string",
+                              "description": "код"
+                            },
+                            "label": {
+                              "type": "string",
+                              "description": "наименование"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "security": [],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null
+    },
+    "invoice_list": {
+      "id": "GET /invoice",
+      "method": "GET",
+      "path": "/invoice",
+      "summary": "Список докуменов",
+      "effect": "read",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [
+        {
+          "in": "query",
+          "name": "d1",
+          "description": "Начало периода",
+          "schema": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        {
+          "in": "query",
+          "name": "d2",
+          "description": "Конец периода",
+          "schema": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        {
+          "in": "query",
+          "name": "usr-inv-num",
+          "description": "Номер документа",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "status",
+          "description": "Статус документа",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "cprStatus",
+          "description": "Статус ЦПР\n * `rejected` - Отклонен\n * `agreed` - Согласован\n * `wait` - Ожидает согласования\n",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "rejected",
+              "agreed",
+              "wait"
+            ]
+          }
+        },
+        {
+          "name": "sidx",
+          "in": "query",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "inv-date",
+              "usr-inv-num",
+              "inv-store-sum"
+            ]
+          },
+          "description": "Поле сортировки:\n * `inv-date` - дата документа\n * `usr-inv-num` - номер документа\n * `inv-store-sum` - сумма докуемнта\n"
+        },
+        {
+          "name": "sord",
+          "in": "query",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          },
+          "description": "Порядок сортировки:\n * `asc` - по возрастанию\n * `desc` - по убыванию\n"
+        },
+        {
+          "name": "page",
+          "in": "query",
+          "schema": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": "Номер страницы с данными"
+        },
+        {
+          "name": "rows",
+          "in": "query",
+          "schema": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": "Строк данных на странице"
+        }
+      ],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "query": {
+            "type": "object",
+            "properties": {
+              "d1": {
+                "type": "string",
+                "format": "date"
+              },
+              "d2": {
+                "type": "string",
+                "format": "date"
+              },
+              "usr-inv-num": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "cprStatus": {
+                "type": "string",
+                "enum": [
+                  "rejected",
+                  "agreed",
+                  "wait"
+                ]
+              },
+              "sidx": {
+                "type": "string",
+                "enum": [
+                  "inv-date",
+                  "usr-inv-num",
+                  "inv-store-sum"
+                ]
+              },
+              "sord": {
+                "type": "string",
+                "enum": [
+                  "asc",
+                  "desc"
+                ]
+              },
+              "page": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "rows": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "additionalProperties": false
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "request_body": {},
+      "response_kind": "json",
+      "response_media_types": [
+        "application/json; charset=utf-8"
+      ],
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json; charset=utf-8": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "rows": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "description": "id документа"
+                            },
+                            "can_look": {
+                              "type": "boolean",
+                              "description": "доступность к полному просмотру и операциям документа"
+                            },
+                            "i": {
+                              "type": "string",
+                              "description": "заказ через интернет (i)"
+                            },
+                            "usr_inv_num": {
+                              "type": "string",
+                              "description": "номер документа"
+                            },
+                            "deal": {
+                              "type": "string",
+                              "description": "ссылка на сделку (только для менеджеров)"
+                            },
+                            "deal_invnetnum": {
+                              "type": "string",
+                              "description": "внутренний номер сделки"
+                            },
+                            "deal_state": {
+                              "type": "string",
+                              "description": "код статуса"
+                            },
+                            "deal_standart": {
+                              "type": "string",
+                              "description": "стандартная / нестандартная сделка"
+                            },
+                            "deal_text": {
+                              "type": "string",
+                              "description": "текст статуса"
+                            },
+                            "deal_whomcre": {
+                              "type": "string",
+                              "description": "инициатор создания сделки (400-ый признак)"
+                            },
+                            "create_deal": {
+                              "type": "string",
+                              "description": "ключ для возможности создания сделки"
+                            },
+                            "delivery": {
+                              "type": "string",
+                              "description": "доставка"
+                            },
+                            "delivery_status": {
+                              "type": "string",
+                              "description": "Код статуса доставки"
+                            },
+                            "delivery_name": {
+                              "type": "string",
+                              "description": "Наименование статуса доставки"
+                            },
+                            "cli_name": {
+                              "type": "string",
+                              "description": "имя контрагента в документе"
+                            },
+                            "inv_date": {
+                              "type": "string",
+                              "format": "date",
+                              "description": "дата документа"
+                            },
+                            "st_code": {
+                              "type": "integer",
+                              "format": "int32",
+                              "description": "склад"
+                            },
+                            "firm_code": {
+                              "type": "string",
+                              "description": "фирма"
+                            },
+                            "st_dest": {
+                              "type": "string",
+                              "description": "склад-получатель"
+                            },
+                            "status_code": {
+                              "type": "string",
+                              "description": "код статуса"
+                            },
+                            "status_name": {
+                              "type": "string",
+                              "description": "описание статуса"
+                            },
+                            "status_color": {
+                              "type": "string",
+                              "description": "цвет статуса"
+                            },
+                            "configStageText": {
+                              "type": "string",
+                              "description": "пояснение к статусу заказа (конфигурируемые, проектные и т.д.)"
+                            },
+                            "inv_type": {
+                              "type": "integer",
+                              "format": "int32",
+                              "description": "вид документа"
+                            },
+                            "inv_fact": {
+                              "type": "string",
+                              "description": "состояние (усл/фак)"
+                            },
+                            "summa": {
+                              "type": "string",
+                              "description": "сумма"
+                            },
+                            "pay": {
+                              "type": "string",
+                              "description": "сумма оплат"
+                            },
+                            "pay_sum": {
+                              "type": "string",
+                              "description": "сумма к оплате"
+                            },
+                            "pay_state": {
+                              "type": "string",
+                              "description": "статус оплаты"
+                            },
+                            "pay_color": {
+                              "type": "string",
+                              "description": "цвет поля с оплатой"
+                            },
+                            "pay_text": {
+                              "type": "string",
+                              "description": "описание состояния оплаты"
+                            },
+                            "pay_date": {
+                              "type": "string",
+                              "description": "требуемая дата оплаты"
+                            },
+                            "pay_date_color": {
+                              "type": "string",
+                              "description": "цвет поля требуемая дата оплаты"
+                            },
+                            "pay_amper": {
+                              "type": "boolean",
+                              "description": "оплата амперами"
+                            },
+                            "operations": {
+                              "description": "возмодные действия с документом (выводятся только допустимые)",
+                              "type": "object",
+                              "properties": {
+                                "bill": {
+                                  "description": "можно выписать счет",
+                                  "type": "boolean"
+                                },
+                                "reserve": {
+                                  "description": "можно в резерв",
+                                  "type": "boolean"
+                                },
+                                "del_reserve": {
+                                  "description": "возможна отмена резерва",
+                                  "type": "boolean"
+                                },
+                                "ship": {
+                                  "description": "допустим комплект на склад (отгрузка)",
+                                  "type": "boolean"
+                                },
+                                "from_op": {
+                                  "description": "можно выписать на складе ОП",
+                                  "type": "boolean"
+                                },
+                                "delivery": {
+                                  "description": "допустимо создание доставки",
+                                  "type": "boolean"
+                                },
+                                "copy": {
+                                  "description": "можно копировать",
+                                  "type": "boolean"
+                                },
+                                "edit": {
+                                  "description": "можно редактировать",
+                                  "type": "boolean"
+                                },
+                                "union": {
+                                  "description": "можно объединять",
+                                  "type": "boolean"
+                                },
+                                "split": {
+                                  "description": "можно разделять",
+                                  "type": "boolean"
+                                },
+                                "deal": {
+                                  "description": "можно включать в сделку",
+                                  "type": "boolean"
+                                },
+                                "change_date": {
+                                  "description": "можно менять дату",
+                                  "type": "boolean"
+                                },
+                                "change_cli": {
+                                  "description": "можно менять контрагента",
+                                  "type": "boolean"
+                                },
+                                "certificate": {
+                                  "description": "можно печатать сертификаты",
+                                  "type": "boolean"
+                                },
+                                "request": {
+                                  "description": "можно запрашивать цены, сроки",
+                                  "type": "boolean"
+                                },
+                                "return": {
+                                  "description": "можно оформить возврат",
+                                  "type": "boolean"
+                                },
+                                "pay_card": {
+                                  "description": "можно оплатить",
+                                  "type": "boolean"
+                                },
+                                "hist": {
+                                  "description": "документ завершен (в истории)",
+                                  "type": "boolean"
+                                },
+                                "stpol": {
+                                  "description": "можно менять склад-получатель",
+                                  "type": "boolean"
+                                },
+                                "cancel": {
+                                  "description": "можно отменять заказ",
+                                  "type": "boolean"
+                                },
+                                "deal_cli": {
+                                  "description": "можно создать сделку клиенту по данному документу",
+                                  "type": "boolean"
+                                },
+                                "price_request_vdiscount": {
+                                  "description": "доступность выбора функции Скидка на объем",
+                                  "type": "boolean"
+                                },
+                                "creServiceNote": {
+                                  "description": "Операции создания СЗ на документы",
+                                  "type": "boolean"
+                                }
+                              }
+                            },
+                            "ps": {
+                              "type": "string",
+                              "description": "примечание"
+                            },
+                            "agreed": {
+                              "type": "string",
+                              "description": "согласованность (пусто - нет, 1 - согласован, 2 - разсогласован)"
+                            },
+                            "cli_code": {
+                              "type": "integer",
+                              "format": "int32",
+                              "description": "код контрагента"
+                            },
+                            "cls17_code": {
+                              "type": "string",
+                              "description": "код города (17 класс)"
+                            },
+                            "cls17_name": {
+                              "type": "string",
+                              "description": "имя города (17 класс)"
+                            },
+                            "st_rc": {
+                              "type": "integer",
+                              "format": "int32",
+                              "description": "склад ЛЦ"
+                            },
+                            "exp1c": {
+                              "type": "string",
+                              "description": "выгрузка в 1С"
+                            },
+                            "rating": {
+                              "type": "string",
+                              "description": "оценка"
+                            },
+                            "dd_status_code": {
+                              "type": "string",
+                              "description": "код статуса ЭДО"
+                            },
+                            "dd_status_name": {
+                              "type": "string",
+                              "description": "статус ЭДО"
+                            },
+                            "dd_status_color": {
+                              "type": "string",
+                              "description": "цвет статуса ЭДО"
+                            },
+                            "invWhomcre": {
+                              "type": "string",
+                              "description": "ФИО инициатора заказа"
+                            },
+                            "hasTask": {
+                              "type": "boolean",
+                              "description": "флаг для определения наличия задач на документе"
+                            }
+                          }
+                        }
+                      },
+                      "records": {
+                        "type": "integer",
+                        "format": "int32"
+                      },
+                      "limit": {
+                        "type": "boolean"
+                      },
+                      "inv_ankid": {
+                        "type": "number",
+                        "description": "id анкеты"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null
+    },
+    "invoice_get": {
+      "id": "GET /invoice/{id}/body",
+      "method": "GET",
+      "path": "/invoice/{id}/body",
+      "summary": "Документ (товарные строки)",
+      "effect": "read",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "id",
+          "description": "id документа",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "nodateotgr",
+          "description": "не считать возможную дату отгрузки",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "yes"
+            ]
+          }
+        },
+        {
+          "in": "query",
+          "name": "nobonus",
+          "description": "не считать возможные баллы",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "yes"
+            ]
+          }
+        },
+        {
+          "in": "query",
+          "name": "nosize",
+          "description": "не выводить размеры товара",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "yes"
+            ]
+          }
+        },
+        {
+          "in": "query",
+          "name": "detail",
+          "description": "Значения для вывода через запятую (seller,buyer,delivery,upd,country,price)",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id"
+            ]
+          },
+          "query": {
+            "type": "object",
+            "properties": {
+              "nodateotgr": {
+                "type": "string",
+                "enum": [
+                  "yes"
+                ]
+              },
+              "nobonus": {
+                "type": "string",
+                "enum": [
+                  "yes"
+                ]
+              },
+              "nosize": {
+                "type": "string",
+                "enum": [
+                  "yes"
+                ]
+              },
+              "detail": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      },
+      "request_body": {},
+      "response_kind": "json",
+      "response_media_types": [
+        "application/json; charset=utf-8"
+      ],
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json; charset=utf-8": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "rows": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "isFict": {
+                              "description": "yes, если в строке фиктивная номенклатура",
+                              "type": "logical"
+                            },
+                            "cmt": {
+                              "description": "Комментарий к ФН",
+                              "type": "string"
+                            },
+                            "isService": {
+                              "description": "yes, если в строке услуга",
+                              "type": "logical"
+                            },
+                            "linenum": {
+                              "description": "номер строки в документе",
+                              "type": "number"
+                            },
+                            "cliGdsCode": {
+                              "description": "Код НСИ клиента",
+                              "type": "string"
+                            },
+                            "gdscode": {
+                              "description": "код товара",
+                              "type": "string"
+                            },
+                            "gdsname": {
+                              "description": "наименование товара",
+                              "type": "string"
+                            },
+                            "uhod": {
+                              "description": "уходимость товара",
+                              "type": "string"
+                            },
+                            "mnf_code": {
+                              "description": "код произволителя товара",
+                              "type": "number"
+                            },
+                            "manuf": {
+                              "description": "наименование произволителя товара",
+                              "type": "string"
+                            },
+                            "rsu_code": {
+                              "description": "Код поставщика",
+                              "type": "string"
+                            },
+                            "rse_code": {
+                              "description": "Код продавца",
+                              "type": "string"
+                            },
+                            "rag_code": {
+                              "description": "Код агента",
+                              "type": "string"
+                            },
+                            "class33": {
+                              "description": "33 класс товара",
+                              "type": "string"
+                            },
+                            "art": {
+                              "description": "партия товара или артикул, если ее нет",
+                              "type": "string"
+                            },
+                            "article": {
+                              "description": "артикул товара",
+                              "type": "string"
+                            },
+                            "country": {
+                              "description": "страна произвотства",
+                              "type": "string"
+                            },
+                            "pack": {
+                              "description": "возможная упаковка товара (3)",
+                              "type": "string"
+                            },
+                            "pack_color": {
+                              "description": "подсветка поля с упаковкой",
+                              "type": "string"
+                            },
+                            "cnt": {
+                              "description": "кол-во товара в документе",
+                              "type": "number"
+                            },
+                            "measure": {
+                              "description": "единица измерения",
+                              "type": "string"
+                            },
+                            "okeiMeasure": {
+                              "description": "единица измерения в формате ОКЕИ",
+                              "type": "string"
+                            },
+                            "rem": {
+                              "description": "остаток на складе",
+                              "type": "string"
+                            },
+                            "price": {
+                              "description": "цена с НДС",
+                              "type": "string"
+                            },
+                            "sum": {
+                              "description": "стоимость с НДС",
+                              "type": "string"
+                            },
+                            "i": {
+                              "description": "тип строки (ПЦ, ipro)",
+                              "type": "string"
+                            },
+                            "dateotgr": {
+                              "description": "срок поставки (для version = 3)",
+                              "type": "string"
+                            },
+                            "origDatePost": {
+                              "description": "Изначальная требуемая дата",
+                              "type": "string"
+                            },
+                            "uid_1": {
+                              "description": "Номер заявки (для version = 3)",
+                              "type": "string"
+                            },
+                            "uid_2": {
+                              "description": "Номер позиции заявки (для version = 3)",
+                              "type": "string"
+                            },
+                            "PrimArticle": {
+                              "description": "Код АСВ НСИ из заявки (для version = 3)",
+                              "type": "string"
+                            },
+                            "MinParty": {
+                              "description": "Мин. партия (для version = 3)",
+                              "type": "string"
+                            },
+                            "MTPZV": {
+                              "description": "Наименование МТР Клиента из заявки (для version = 3)",
+                              "type": "string"
+                            },
+                            "MTR": {
+                              "description": "Наименование МТР Клиента (для version = 3)",
+                              "type": "string"
+                            },
+                            "ACB": {
+                              "description": "Код АСВ НСИ (для version = 3)",
+                              "type": "string"
+                            },
+                            "analog": {
+                              "description": "Замена на аналог (для version = 3)",
+                              "type": "boolean"
+                            },
+                            "gdsImage": {
+                              "description": "путь к картинке товара",
+                              "type": "string"
+                            },
+                            "minpromtorg": {
+                              "type": "boolean",
+                              "description": "Логический ключ о нахождении товара в реестре Минпромторга",
+                              "example": true
+                            },
+                            "weight": {
+                              "description": "масса",
+                              "type": "number"
+                            },
+                            "volume": {
+                              "description": "объем",
+                              "type": "number"
+                            },
+                            "length": {
+                              "description": "длина",
+                              "type": "number"
+                            },
+                            "width": {
+                              "description": "ширина",
+                              "type": "number"
+                            },
+                            "height": {
+                              "description": "высота",
+                              "type": "number"
+                            },
+                            "digits": {
+                              "description": "число разрядов",
+                              "type": "number"
+                            },
+                            "st_code": {
+                              "description": "код склада",
+                              "type": "number"
+                            }
+                          }
+                        }
+                      },
+                      "records": {
+                        "description": "всего строк",
+                        "type": "number"
+                      },
+                      "invnum": {
+                        "description": "номер документа",
+                        "type": "string"
+                      },
+                      "invnetnum": {
+                        "description": "внутренний номер документа",
+                        "type": "string"
+                      },
+                      "invdate": {
+                        "description": "дата документа",
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "invsum": {
+                        "description": "сумма",
+                        "type": "number"
+                      },
+                      "paysum": {
+                        "description": "сумма оплат на документе",
+                        "type": "number"
+                      },
+                      "store": {
+                        "description": "код склада, на котором документ находится",
+                        "type": "number"
+                      },
+                      "invStatus": {
+                        "description": "статус докумена",
+                        "type": "string"
+                      },
+                      "cli_code": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "код контрагента"
+                      },
+                      "cli_name": {
+                        "type": "string",
+                        "description": "имя контрагента в документе"
+                      },
+                      "ClientType": {
+                        "type": "string",
+                        "description": "Тип контрагента в документе (ЧЛ - частное лицо / ЮЛ - юридическое лицо)"
+                      },
+                      "operations": {
+                        "description": "возмодные действия с документом (выводятся только допустимые)",
+                        "type": "object",
+                        "properties": {
+                          "bill": {
+                            "description": "можно выписать счет",
+                            "type": "boolean"
+                          },
+                          "reserve": {
+                            "description": "можно в резерв",
+                            "type": "boolean"
+                          },
+                          "del_reserve": {
+                            "description": "возможна отмена резерва",
+                            "type": "boolean"
+                          },
+                          "ship": {
+                            "description": "допустим комплект на склад (отгрузка)",
+                            "type": "boolean"
+                          },
+                          "from_op": {
+                            "description": "можно выписать на складе ОП",
+                            "type": "boolean"
+                          },
+                          "delivery": {
+                            "description": "допустимо создание доставки",
+                            "type": "boolean"
+                          },
+                          "copy": {
+                            "description": "можно копировать",
+                            "type": "boolean"
+                          },
+                          "edit": {
+                            "description": "можно редактировать",
+                            "type": "boolean"
+                          },
+                          "union": {
+                            "description": "можно объединять",
+                            "type": "boolean"
+                          },
+                          "split": {
+                            "description": "можно разделять",
+                            "type": "boolean"
+                          },
+                          "deal": {
+                            "description": "можно включать в сделку",
+                            "type": "boolean"
+                          },
+                          "change_date": {
+                            "description": "можно менять дату",
+                            "type": "boolean"
+                          },
+                          "change_cli": {
+                            "description": "можно менять контрагента",
+                            "type": "boolean"
+                          },
+                          "certificate": {
+                            "description": "можно печатать сертификаты",
+                            "type": "boolean"
+                          },
+                          "request": {
+                            "description": "можно запрашивать цены, сроки",
+                            "type": "boolean"
+                          },
+                          "return": {
+                            "description": "можно оформить возврат",
+                            "type": "boolean"
+                          },
+                          "pay_card": {
+                            "description": "можно оплатить",
+                            "type": "boolean"
+                          },
+                          "hist": {
+                            "description": "документ завершен (в истории)",
+                            "type": "boolean"
+                          },
+                          "stpol": {
+                            "description": "можно менять склад-получатель",
+                            "type": "boolean"
+                          },
+                          "cancel": {
+                            "description": "можно отменять заказ",
+                            "type": "boolean"
+                          },
+                          "deal_cli": {
+                            "description": "можно создать сделку клиенту по данному документу",
+                            "type": "boolean"
+                          },
+                          "price_request_vdiscount": {
+                            "description": "доступность выбора функции Скидка на объем",
+                            "type": "boolean"
+                          },
+                          "creServiceNote": {
+                            "description": "Операции создания СЗ на документы",
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "bonus": {
+                        "description": "бонусные баллы по документу (фактические или возможные)",
+                        "type": "string"
+                      },
+                      "checkurl": {
+                        "description": "урл для получения кассового чека",
+                        "type": "string"
+                      },
+                      "volume": {
+                        "description": "суммарный объем",
+                        "type": "number"
+                      },
+                      "weight": {
+                        "description": "суммарный вес",
+                        "type": "number"
+                      },
+                      "discount": {
+                        "description": "скидка от розничной цены",
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null
+    },
+    "invoice_create": {
+      "id": "POST /invoice/create",
+      "method": "POST",
+      "path": "/invoice/create",
+      "summary": "Создание документа",
+      "effect": "business_write",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [
+        {
+          "in": "query",
+          "name": "TypeDoc",
+          "description": "вид документа",
+          "schema": {
+            "type": "number",
+            "enum": [
+              10,
+              250,
+              345
+            ]
+          }
+        }
+      ],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "query": {
+            "type": "object",
+            "properties": {
+              "TypeDoc": {
+                "type": "number",
+                "enum": [
+                  10,
+                  250,
+                  345
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "body": {
+            "type": "object",
+            "properties": {
+              "OrderNumber": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[0-9A-ZБ-ЯЁ./-]+\\Z"
+              },
+              "OrderDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "ExpectedDeliveryDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "ContractNumber": {
+                "type": "string"
+              },
+              "ContractDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "Currency": {
+                "type": "string",
+                "maxLength": 3,
+                "pattern": "^[A-Z]{3}\\Z"
+              },
+              "DocumentFunctionCode": {
+                "type": "string",
+                "enum": [
+                  "P",
+                  "A",
+                  "D",
+                  "C"
+                ]
+              },
+              "Remarks": {
+                "type": "string"
+              },
+              "Buyer": {
+                "type": "object",
+                "properties": {
+                  "ILN": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "Seller": {
+                "type": "object",
+                "properties": {
+                  "ILN": {
+                    "const": "4660011519999"
+                  },
+                  "CodeByBuyer": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "ILN"
+                ]
+              },
+              "DeliveryPoint": {
+                "type": "object",
+                "properties": {
+                  "ILN": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "Invoicee": {
+                "type": "object",
+                "properties": {
+                  "ILN": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "Order-Lines": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "LineNumber": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^[1-9][0-9]*\\Z"
+                        }
+                      ]
+                    },
+                    "EAN": {
+                      "type": "string",
+                      "maxLength": 13,
+                      "pattern": "^[0-9]+\\Z"
+                    },
+                    "BuyerItemCode": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "SupplierItemCode": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "ManufacturerArticle": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "ManufacturerCod": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "ItemDescription": {
+                      "type": "string"
+                    },
+                    "ItemType": {
+                      "type": "string"
+                    },
+                    "OrderedQuantity": {
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                        }
+                      ]
+                    },
+                    "UnitOfMeasure": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "ExpectedDeliveryDate": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "OrderedUnitNetPrice": {
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                        }
+                      ]
+                    },
+                    "OrderedUnitGrossPrice": {
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                        }
+                      ]
+                    },
+                    "NetAmount": {
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                        }
+                      ]
+                    },
+                    "GrossAmount": {
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                        }
+                      ]
+                    },
+                    "TaxRate": {
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "required": [
+                    "LineNumber",
+                    "OrderedQuantity"
+                  ],
+                  "anyOf": [
+                    {
+                      "required": [
+                        "SupplierItemCode"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "BuyerItemCode"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "ManufacturerArticle"
+                      ]
+                    }
+                  ],
+                  "dependentRequired": {
+                    "ManufacturerArticle": [
+                      "ManufacturerCod"
+                    ]
+                  }
+                }
+              },
+              "TotalLines": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^[1-9][0-9]*\\Z"
+                  }
+                ]
+              },
+              "TotalOrderedAmount": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                  }
+                ]
+              },
+              "TotalNetAmount": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                  }
+                ]
+              },
+              "TotalGrossAmount": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                  }
+                ]
+              },
+              "TotalTaxAmount": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "OrderNumber",
+              "DocumentFunctionCode",
+              "Seller",
+              "Order-Lines"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "body"
+        ]
+      },
+      "request_body": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": null
+          },
+          "application/xml": {
+            "schema": null
+          }
+        }
+      },
+      "response_kind": "json",
+      "response_media_types": [
+        "application/json; charset=utf-8"
+      ],
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json; charset=utf-8": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "id созданного документа"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null,
+      "limitations": [
+        "OrderNumber is the visible customer document number. Use an owner-provided reference or the durable customer reference generated by order_checkout; never present it as an ETM-assigned number. Website checkout uses native ETM numbering.",
+        "DocumentFunctionCode C cancels the old document and creates a new one; D refuses the existing order. Include this business effect in the preview.",
+        "Creation alone does not prove pickup, payment terms or delivery. Read every returned data.id/data.ids[].docid and any subsequent split document.",
+        "The manual marks ItemDescription required in its table but omits it in its own SupplierItemCode example; this contract accepts that documented example.",
+        "ManufacturerCod follows the field table; prose also spells it ManufacturerCode. Prefer a verified SupplierItemCode when ordering a known product."
+      ],
+      "supplemental_contract_source": "ETM API. Работа с заказами, revision 24.01.2025, pages 4–9",
+      "supplemental_source": {
+        "local_snapshot": "docs/etm-order-research/ETM_Order_24_01_25.pdf",
+        "title": "ETM API. Работа с заказами, 24.01.2025",
+        "sha256": "2efc6b5beba945c8b63aaa0202eb01c0516e9b2e93a9197f8ea2a70070f7e262",
+        "provenance": "Vendor-authored order manual retained by the existing ETM integration; cross-checked with live OpenAPI and previous provider readbacks."
+      }
+    },
+    "invoice_print": {
+      "id": "POST /invoice/{id}/print/{proc}",
+      "method": "POST",
+      "path": "/invoice/{id}/print/{proc}",
+      "summary": "Печать по документу(ам) формы печати",
+      "effect": "report_generation",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "id",
+          "description": "id документа",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "proc",
+          "description": "Вид формы печати:\n * `bill` - счет\n",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "ch2",
+          "description": "id второго документа при групповых операциях",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "ch3",
+          "description": "id третьего документа при групповых операциях (и так до 40)",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "ch4",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch5",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch6",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch7",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch8",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch9",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch10",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch11",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch12",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch13",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch14",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch15",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch16",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch17",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch18",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch19",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch20",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch21",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch22",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch23",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch24",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch25",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch26",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch27",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch28",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch29",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch30",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch31",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch32",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch33",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch34",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch35",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch36",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch37",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch38",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch39",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        },
+        {
+          "name": "ch40",
+          "in": "query",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Additional document for group print (documented ch2..ch40)"
+        }
+      ],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "proc": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "proc"
+            ]
+          },
+          "query": {
+            "type": "object",
+            "properties": {
+              "ch2": {
+                "type": "string"
+              },
+              "ch3": {
+                "type": "string"
+              },
+              "ch4": {
+                "type": "string"
+              },
+              "ch5": {
+                "type": "string"
+              },
+              "ch6": {
+                "type": "string"
+              },
+              "ch7": {
+                "type": "string"
+              },
+              "ch8": {
+                "type": "string"
+              },
+              "ch9": {
+                "type": "string"
+              },
+              "ch10": {
+                "type": "string"
+              },
+              "ch11": {
+                "type": "string"
+              },
+              "ch12": {
+                "type": "string"
+              },
+              "ch13": {
+                "type": "string"
+              },
+              "ch14": {
+                "type": "string"
+              },
+              "ch15": {
+                "type": "string"
+              },
+              "ch16": {
+                "type": "string"
+              },
+              "ch17": {
+                "type": "string"
+              },
+              "ch18": {
+                "type": "string"
+              },
+              "ch19": {
+                "type": "string"
+              },
+              "ch20": {
+                "type": "string"
+              },
+              "ch21": {
+                "type": "string"
+              },
+              "ch22": {
+                "type": "string"
+              },
+              "ch23": {
+                "type": "string"
+              },
+              "ch24": {
+                "type": "string"
+              },
+              "ch25": {
+                "type": "string"
+              },
+              "ch26": {
+                "type": "string"
+              },
+              "ch27": {
+                "type": "string"
+              },
+              "ch28": {
+                "type": "string"
+              },
+              "ch29": {
+                "type": "string"
+              },
+              "ch30": {
+                "type": "string"
+              },
+              "ch31": {
+                "type": "string"
+              },
+              "ch32": {
+                "type": "string"
+              },
+              "ch33": {
+                "type": "string"
+              },
+              "ch34": {
+                "type": "string"
+              },
+              "ch35": {
+                "type": "string"
+              },
+              "ch36": {
+                "type": "string"
+              },
+              "ch37": {
+                "type": "string"
+              },
+              "ch38": {
+                "type": "string"
+              },
+              "ch39": {
+                "type": "string"
+              },
+              "ch40": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      },
+      "request_body": {},
+      "response_kind": "pdf_or_json",
+      "response_media_types": [
+        "application/json; charset=utf-8",
+        "application/pdf"
+      ],
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/pdf": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            },
+            "application/json; charset=utf-8": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  },
+                  "data": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "403": {
+          "description": "Ошибка"
+        },
+        "404": {
+          "description": "Не найден"
+        }
+      },
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null
+    },
+    "invoice_order": {
+      "id": "POST /invoice/{id}/order",
+      "method": "POST",
+      "path": "/invoice/{id}/order",
+      "summary": "Заказ на основе документа",
+      "effect": "business_write",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "id",
+          "description": "id документа",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "skl",
+          "in": "query",
+          "description": "код склада-получетеля (для доставки передавать 1000)",
+          "schema": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        {
+          "name": "tovzak",
+          "in": "query",
+          "description": "примечание",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id"
+            ]
+          },
+          "query": {
+            "type": "object",
+            "properties": {
+              "skl": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "tovzak": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      },
+      "request_body": {},
+      "response_kind": "json",
+      "response_media_types": [
+        "application/json; charset=utf-8"
+      ],
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json; charset=utf-8": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                    "type": "integer",
+                    "format": "int32",
+                    "example": 200
+                  },
+                  "message": {
+                    "description": "Сообщение об ошибке или информационное",
+                    "type": "string",
+                    "example": ""
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null
+    },
+    "invoice_delivery": {
+      "id": "POST /invoice/{id}/delivery",
+      "method": "POST",
+      "path": "/invoice/{id}/delivery",
+      "summary": "Добавление документа в новую доставку",
+      "effect": "business_write",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "id",
+          "description": "id документа",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "required": true,
+          "name": "adr",
+          "description": "id точки доставки",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "required": true,
+          "name": "date",
+          "description": "дата разгрузки",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "required": true,
+          "name": "time",
+          "description": "время разгрузки с",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "required": true,
+          "name": "time_po",
+          "description": "время разгрузки по",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "required": true,
+          "name": "phone",
+          "description": "телефон",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id"
+            ]
+          },
+          "query": {
+            "type": "object",
+            "properties": {
+              "adr": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string"
+              },
+              "time": {
+                "type": "string"
+              },
+              "time_po": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "adr",
+              "date",
+              "time",
+              "time_po",
+              "phone"
+            ]
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "query"
+        ]
+      },
+      "request_body": {},
+      "response_kind": "json",
+      "response_media_types": [
+        "application/json; charset=utf-8"
+      ],
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json; charset=utf-8": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null
+    },
+    "invoice_approvals": {
+      "id": "GET /invoice/{id}/ps",
+      "method": "GET",
+      "path": "/invoice/{id}/ps",
+      "summary": "Получение примечаний (записей в переписке) на документе",
+      "effect": "read",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "id",
+          "description": "id документа",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id"
+            ]
+          },
+          "query": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      },
+      "request_body": {},
+      "response_kind": "json",
+      "response_media_types": [
+        "application/json; charset=utf-8"
+      ],
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json; charset=utf-8": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "ps": {
+                        "type": "string",
+                        "description": "примечание документа"
+                      },
+                      "invWhencre": {
+                        "type": "string",
+                        "description": "дата создания документа"
+                      },
+                      "invTimecre": {
+                        "type": "string",
+                        "description": "время создания документа"
+                      },
+                      "author": {
+                        "type": "string",
+                        "description": "автор документа"
+                      },
+                      "agreement": {
+                        "type": "string",
+                        "description": "Если пользователь может согласовать/рассогласовать документ то 1, иначе 0"
+                      },
+                      "comments": {
+                        "type": "array",
+                        "description": "массив с перепиской",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "candel": {
+                              "type": "string"
+                            },
+                            "date": {
+                              "type": "string"
+                            },
+                            "time": {
+                              "type": "string"
+                            },
+                            "fio": {
+                              "type": "string"
+                            },
+                            "agreed": {
+                              "type": "string"
+                            },
+                            "text": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null
+    },
+    "invoice_approval_update": {
+      "id": "POST /invoice/{id}/ps",
+      "method": "POST",
+      "path": "/invoice/{id}/ps",
+      "summary": "Добавление примечания (записи в переписке) к документу",
+      "effect": "business_write",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "id",
+          "description": "id документа",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "sg",
+          "description": "Согласования: * 1 - согласовано * 2 - рассогласовано * 3 - требует согласование\n",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "1",
+              "2",
+              "3"
+            ]
+          }
+        },
+        {
+          "in": "query",
+          "name": "text",
+          "description": "текст",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "docStatus",
+          "description": "Итоговый статус согласования * agreed - согласован  * rejected - отклонен * wait - ожидает согласования\n",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "service_message",
+          "description": "Внутреннее сообщение, не доступное для просмотра пользователями",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          }
+        }
+      ],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id"
+            ]
+          },
+          "query": {
+            "type": "object",
+            "properties": {
+              "sg": {
+                "type": "string",
+                "enum": [
+                  "1",
+                  "2",
+                  "3"
+                ]
+              },
+              "text": {
+                "type": "string"
+              },
+              "docStatus": {
+                "type": "string"
+              },
+              "service_message": {
+                "type": "string",
+                "enum": [
+                  "true",
+                  "false"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      },
+      "request_body": {},
+      "response_kind": "json",
+      "response_media_types": [
+        "application/json; charset=utf-8"
+      ],
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json; charset=utf-8": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "msg": {
+                        "type": "string"
+                      },
+                      "fio": {
+                        "type": "string"
+                      },
+                      "date": {
+                        "type": "string"
+                      },
+                      "time": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null
+    },
+    "delivery_point_create": {
+      "id": "POST /delivery/point/create",
+      "method": "POST",
+      "path": "/delivery/point/create",
+      "summary": "Создание точки доставки",
+      "effect": "business_write",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [
+        {
+          "in": "query",
+          "required": true,
+          "name": "t-adr",
+          "description": "Адрес",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "required": true,
+          "name": "t-gps",
+          "description": "Координаты (через запятую)",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "t-info",
+          "description": "Информация для водителя",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "t-kont",
+          "description": "ФИО",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "required": true,
+          "name": "t-tel",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Телефон"
+        }
+      ],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "query": {
+            "type": "object",
+            "properties": {
+              "t-adr": {
+                "type": "string"
+              },
+              "t-gps": {
+                "type": "string"
+              },
+              "t-info": {
+                "type": "string"
+              },
+              "t-kont": {
+                "type": "string"
+              },
+              "t-tel": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "t-adr",
+              "t-gps",
+              "t-tel"
+            ]
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "query"
+        ]
+      },
+      "request_body": {},
+      "response_kind": "json",
+      "response_media_types": [
+        "application/json; charset=utf-8"
+      ],
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json; charset=utf-8": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "id созданной точки"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null
+    },
+    "delivery_point_dates": {
+      "id": "GET /delivery/point/{id}/date",
+      "method": "GET",
+      "path": "/delivery/point/{id}/date",
+      "summary": "Даты возможной доставки в выбранную точку",
+      "effect": "read",
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "id",
+          "description": "id точки доставки",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "month",
+          "description": "месяц",
+          "schema": {
+            "type": "number"
+          }
+        },
+        {
+          "in": "query",
+          "name": "year",
+          "description": "год",
+          "schema": {
+            "type": "number"
+          }
+        }
+      ],
+      "params_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "id"
+            ]
+          },
+          "query": {
+            "type": "object",
+            "properties": {
+              "month": {
+                "type": "number"
+              },
+              "year": {
+                "type": "number"
+              }
+            },
+            "additionalProperties": false
+          },
+          "headers": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "path"
+        ]
+      },
+      "request_body": {},
+      "response_kind": "json",
+      "response_media_types": [
+        "application/json; charset=utf-8"
+      ],
+      "responses": {
+        "200": {
+          "description": "",
+          "content": {
+            "application/json; charset=utf-8": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "description": "Статус ответа:\n * `200` - Ок\n * `400` - Ошибка\n * `403` - Ошибка проверки сессии пользователя\n * `404` - Объект не найден                          \n",
+                        "type": "integer",
+                        "format": "int32",
+                        "example": 200
+                      },
+                      "message": {
+                        "description": "Сообщение об ошибке или информационное",
+                        "type": "string",
+                        "example": ""
+                      }
+                    }
+                  },
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "rows": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "scheduleErr": {
+                              "type": "string"
+                            },
+                            "shipmentDates": {
+                              "type": "array",
+                              "description": "список доступных дат через запятую"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "live_verified": false,
+      "validation": "offline_schema_only",
+      "unsupported_reason": null
+    }
+  }
+}

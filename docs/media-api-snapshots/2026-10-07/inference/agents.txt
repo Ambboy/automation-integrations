@@ -1,0 +1,497 @@
+Chat with AI agents via REST. For SDK helpers (sendMessage, run, streaming), see the Agent SDK.
+Most integrations use POST /agents/run: it creates a chat when needed, sends the user message, and returns assistant output. For a pure chat-first flow (create a chat, then send messages separately), use POST /chats followed by POST /chats/:id/messages, the same pattern the web app and React AgentChatProvider use for new conversations (client.agent().sendMessage() still uses POST /agents/run). Use the tool endpoints below for client tools, widgets, and human-in-the-loop (HIL) approval.
+Run agent (recommended)
+POST /agents/run
+Send a message to a template or ad-hoc agent. Creates a new chat when chat_id is omitted.
+Request
+| Field | Type | Required | Description
+| chat_id | string | No | Existing chat ID (omit to start a new chat)
+| agent | string | No | Template agent ref (namespace/name@version)
+| agent_config | object | No | Ad-hoc agent config (tools, system prompt, core app)
+| agent_name | string | No | Display name for ad-hoc chats
+| context | object | No | Per-chat context for call-tool URL templates (only when starting a new chat)
+| channel_context | object | No | Origin messaging channel for this message (channel_type, channel_metadata). The API stamps it on the chat the first time it is seen and routes agent replies back through that channel; omit for chats started in the app or SDK. See Channel context.
+| input | object | Yes | Message payload (see below)
+| stream | boolean | No | If true, response is SSE instead of JSON
+input fields:
+| Field | Type | Description
+| text | string | User message text
+| attachments | array | File refs (uri, filename, content_type) from Files API
+| role | string | Usually "user"
+Template agent (new chat):
+jsoncopy
+1{2  "agent": "myteam/support-agent@latest",3  "context": {4    "project_id": "proj_456"5  },6  "input": {7    "text": "Summarize open tickets"8  }9}
+Continue chat:
+jsoncopy
+1{2  "chat_id": "chat_abc123",3  "input": {4    "text": "What about priority ones?"5  }6}
+Response
+The response body is the DTO under data:
+jsoncopy
+1{2  "user_message": { "id": "msg_...", "chat_id": "chat_abc123", "role": "user", "content": [...] },3  "assistant_message": { "id": "msg_...", "chat_id": "chat_abc123", "role": "assistant", "content": [...], "tool_invocations": [...] }4}
+See REST overview — response format.
+Set stream: true to receive message updates over SSE. See Stream chat updates. Streaming applies when a new agent run starts — if the chat already has an active run, the message is auto-queued instead (no SSE stream).
+Queuing while a run is active
+When chat_id points to a chat with a non-terminal agent run (status: busy), POST /agents/run and POST /agents/message do not start a new run. The user message is queued for the agent's next turn — the same behavior as Send chat message.
+Each chat has at most one active agent run. Rapid follow-up messages are queued rather than starting a parallel run or stopping the in-progress response — use Stop chat to cancel explicitly.
+Remote harness exception. When the active run uses a profile with capabilities.steer: true (for example Claude Code or Codex, as reported at registration), mid-turn messages are forwarded into the running harness turn at once. The user message is ready immediately and is tied to the active run — not held until the next turn. Profiles with steer: false (typical ACP harnesses) keep the queued behavior below. See Remote harness runs — Mid-turn messages.
+The response returns immediately with only user_message (status: "queued" for most runs, or "ready" when a steerable remote harness accepted the message mid-turn). assistant_message is omitted. Poll or stream the chat to see when the agent picks up the message and generates a reply.
+jsoncopy
+1{2  "user_message": {3    "id": "msg_...",4    "chat_id": "chat_abc123",5    "role": "user",6    "status": "queued",7    "content": [{ "type": "text", "text": "Focus on P0 tickets only" }]8  }9}
+Use POST /chats/:id/messages when you only need to send a message without other run parameters. See Chat message status.
+Send message (alternate)
+POST /agents/message or POST /agents/messages
+Same request body as Run agent, using agent_id / agent_version_id instead of agent when referencing a stored template:
+jsoncopy
+1{2  "agent_id": "agent_abc123",3  "agent_version_id": "ver_xyz789",4  "input": { "text": "Hello" }5}
+Create chat
+POST /chats
+Create a chat, optionally assigning a template agent before the first message. Pair with Send chat message for a two-step new conversation: create the chat, then post the first user message.
+Use POST /agents/run when you want one call that creates the chat, sends the message, and returns assistant output — recommended for scripts, ad-hoc agent_config, per-chat context, attachments, and A2A integrations. Use the chat-first flow when you need a chat ID before sending (for example to open a stream or navigate in a SPA).
+Requires conversations:write scope.
+Request
+| Field | Type | Required | Description
+| agent | string | No | Template agent ref (namespace/name or namespace/name@version)
+| name | string | No | Display name for the chat
+When agent is provided, the API resolves the template and pins agent_id and agent_version_id on the chat (same version pinning as Run agent). Omit agent to create an empty chat and assign an agent later with Set agent.
+Response
+Returns the chat DTO (same shape as Get chat).
+Errors
+| HTTP status | Code | When
+| 400 | invalid_request | Invalid request body
+| 404 | not_found | Agent ref not found
+Example — two-step new conversation
+bashcopy
+1# 1. Create chat with agent2curl -X POST https://api.inference.sh/chats \3  -H "Authorization: Bearer inf_your_key" \4  -H "Content-Type: application/json" \5  -d '{"agent": "myteam/support-agent@latest", "name": "Support"}'67# 2. Send first message (starts the agent run)8curl -X POST https://api.inference.sh/chats/chat_abc123/messages \9  -H "Authorization: Bearer inf_your_key" \10  -H "Content-Type: application/json" \11  -d '{"message": "Summarize open tickets"}'
+JavaScript SDK: AgentChatProvider / useAgentActions().sendMessage() on a template agent with no bound chat ID calls POST /chats, then POST /chats/{id}/messages; call reset() before the next message to start a new chat. client.agent().sendMessage() still uses POST /agents/run.
+List chats
+GET /chats or POST /chats/list
+Cursor-paginated list of chats. POST /chats/list accepts a JSON body with limit, cursor, direction, and filters (for example status in busy, awaiting_input).
+Each item includes the default chat projection: id, name, status, active_run_id, and channel_context when the chat originated from an external messaging channel. Use Get chat for the full metadata shape (output, context, active_run, …).
+Get chat
+GET /chats/:id
+Returns chat metadata — status, structured output, per-chat context, optional channel_context, and active run. Does not include message history or tool invocations.
+Response
+| Field | Type | Description
+| id | string | Chat ID
+| status | string | busy, idle, awaiting_input, or completed
+| output | object | Structured result from the agent's finish tool (when set)
+| context | object | Per-chat context values for call-tool URL templates (see Per-chat context)
+| channel_context | object | Present when the chat came through an external messaging channel (Slack thread, Telegram chat, …): channel_type plus opaque channel_metadata used to route replies back. Omitted for chats started in the app or SDK. See Channel context.
+| work_dir | string | When set, the folder a remote harness works in for this chat
+| harness_session_id | string | When set, the harness's own session id on the remote (for example to resume with claude --resume)
+| active_run | object | Current agent run, when one is in progress
+| work_dir | string | When a remote harness drives this chat, the working directory on that machine (set at launch). Harness sessions are folder-bound; each chat can use a different folder with the same harness agent.
+| harness_session_id | string | null | When a remote harness profile drives this chat, the harness vendor's session id (for example to resume on that machine). Omitted when the platform loop runs the agent.
+| work_dir | string | When set, the folder on the remote where the harness works for this chat (from launch or assignment). Omitted when empty.
+| forked_from_message_id | string | null | Message id this chat was branched from. Not the same as parent_id on sub-agent chats.
+context and channel_context are unrelated: context holds template placeholders you pass when starting a chat; channel_context is set by the platform when a chat is created from a messaging channel webhook, or by your integration when you pass channel_context on POST /agents/run.
+jsoncopy
+1{2  "id": "chat_abc123",3  "status": "awaiting_input",4  "output": null,5  "context": { "project_id": "proj_123" },6  "channel_context": {7    "channel_type": "slack",8    "channel_metadata": { "channel": "C01234567", "thread_ts": "1234567890.123456" }9  },10  "active_run": {11    "id": "run_abc123",12    "state": "awaiting_input"13  }14}
+channel_context is omitted on chats that did not originate from an external channel. channel_metadata shape is provider-specific and opaque to callers — treat it as pass-through data for the platform's outbound delivery.
+output is populated when the agent calls the internal finish tool. See Structured Output.
+For message history and tool invocations, use List chat messages. For live updates, use Stream chat updates or GET /chats/:id/status for status-only polling.
+Remote placement on chats and runs
+When an agent is bound to a remote harness profile, responses include where thinking happens and which harness session backs the chat:
+| Field | On | Meaning
+| harness | Agent | What drives the agent: inference (platform loop, default for deployed templates) or an agentprotocol registry id (claude, codex, …) for a harness on a remote. The UI uses this to decide what is editable; the registry describes display name, vendor, and capabilities. Harness agents use the harness's own instructions, tools, and versions — not AgentVersionDTO config.
+| profile_id | Agent, active_run | Harness profile that thinks for the agent or run. Omitted or null when the platform loop runs the agent.
+| remote_id | Agent, active_run | Remote machine id. Terminal and remote internal tools use this host by default.
+| work_dir | Chat | Folder on the remote for this harness session (from Launch harness chat or the workspace).
+| harness_session_id | Chat | Vendor session id on the remote, stable for the chat's lifetime.
+| forked_from_message_id | Chat | Branch point when this chat was forked from another conversation.
+On AgentDTO, harness, profile_id, and remote_id are deployment fields on the agent record (not on AgentVersionDTO config). Changing them affects new runs only. When harness is not inference, the agent is backed by an external harness — platform instructions, tools, and version history are not used for execution. Harness agents are created on first harness launch per profile; you cannot add new versions to them.
+On AgentRunDTO, profile_id and remote_id are a snapshot taken when the run is created. Updating the agent later does not rewrite past runs; the turn driver is chosen from the run record.
+Remote harness runs
+When active_run.profile_id is set, the API drives a harness session on that profile's remote instead of calling a hosted model in the platform loop. The chat wire format, streaming endpoints, approval interrupts, and queue behavior match a normal agent run — only execution moves to your machine.
+| Phase | Behavior
+| Start | Opens or resumes the chat's harness session on the remote in work_dir (harness_session_id when resuming), then sends the user prompt. A new session in a chat that already has messages receives prior conversation text first so the harness continues rather than starts over.
+| Streaming | Harness output becomes assistant messages and broadcasts on the chat stream. Tool calls the harness makes on the host appear as tool invocations and tool messages with type: harness — they are recorded for the transcript and are not executed again on inference.sh.
+| Approvals | Harness permission requests surface as the standard approval interrupt (input_required). Allow or deny through the same REST/SDK paths as platform tools; the decision is forwarded to the harness once. If the harness withdraws a request before you answer (for example you interrupted the turn, or the harness moved on), it sends approval.resolved while the invocation is still awaiting_approval. The API cancels the tool call, resolves the interrupt, and the run is no longer blocked. Your own allow/deny that arrives after the invocation has already left awaiting_approval is ignored — the harness already handled it.
+| Mid-turn messages | Depends on the profile's capabilities.steer from registration. When steer is true, follow-up user messages during a working turn are sent to the harness immediately and appear as ready on the active run. When steer is false, messages are queued for the next turn (same as queuing while a run is active).
+| Stop | Stop chat sends an interrupt to the harness turn in flight and keeps the session for later messages.
+| End | When the harness finishes the turn, the run completes and queued messages drain into the next turn. Session errors fail the run.
+Start failures (the run does not begin; error text is returned to the client):
+| Condition | Typical message
+| Remote not connected | the remote this agent runs on is not connected
+| Daemon without --agents | this remote does not run agent sessions; start it with belt remote start --agents
+| Profile missing, logged out, or not drivable | the harness this agent runs on is not available on its remote
+Remote disconnect. When a remote goes disconnected or stopped, every non-terminal harness run on that machine fails with the remote disconnected. Those turns are not retried automatically — the harness may already have changed files locally. Exec runs on the same remote fail the same way (remote disconnected before the command finished).
+Setup: Remotes guide — Agent harness sessions, Profile-backed agent chats, and Launch harness chat.
+List chat messages
+GET /chats/:id/messages or POST /chats/:id/messages/list
+Returns cursor-paginated messages for a chat. Requires the conversations:read scope (same as Get chat). The chat must exist and belong to your workspace.
+Returns every message in the chat. Access is verified when loading the chat ID. Message rows are not filtered by creator or workspace.
+Default sort is order descending (newest first) — load older pages as users scroll up. POST /chats/:id/messages/list accepts the same fields in a JSON body (cursor, limit, direction, sort, filters).
+| Query / body field | Type | Description
+| limit | integer | Page size (default 50). Pass -1 to return up to 10,000 messages in one response — see Cursor pagination.
+| cursor | string | Opaque cursor from next_cursor (ignored when limit=-1)
+| direction | string | forward or backward (ignored when limit=-1)
+| sort | array | Sort orders (default [{ "field": "order", "dir": "desc" }])
+| filters | array | Filter expressions (same pattern as other list endpoints)
+Uses the same cursor pagination shape as List skills. Each items entry is a ChatMessageDTO with role, status, content, order, and optional tool_invocations.
+Message order: Integer sequence within a chat (unique per chat_id, allocated by the server on insert). Sort transcripts by order, not created_at — messages written in the same turn can share a timestamp. While status is queued, order is provisional; when the message becomes ready on the agent's next turn, the server may assign a new order so it follows any tool results that completed while it was queued. See Chat message status.
+Example (newest page):
+bashcopy
+1curl "https://api.inference.sh/chats/chat_abc123/messages?limit=50" \2  -H "Authorization: Bearer inf_your_key"
+Example response:
+jsoncopy
+1{2  "items": [3    {4      "id": "msg_xyz789",5      "chat_id": "chat_abc123",6      "role": "assistant",7      "status": "ready",8      "order": 4,9      "content": [{ "type": "text", "text": "Here is the summary." }],10      "tool_invocations": []11    }12  ],13  "next_cursor": "msg_abc456",14  "has_next": true,15  "has_previous": false,16  "items_per_page": 50,17  "total_items": 1218}
+Pass cursor from next_cursor to fetch older messages.
+Example (full transcript — no pagination):
+bashcopy
+1curl "https://api.inference.sh/chats/chat_abc123/messages?limit=-1" \2  -H "Authorization: Bearer inf_your_key"
+When limit=-1, has_next is false and up to 10,000 matching messages are returned in items (sorted and filtered as requested). Prefer cursor pagination for UI scroll-back; use limit=-1 for exports or debugging on chats with fewer than 10,000 messages.
+JavaScript SDK (@inferencesh/sdk agent module, v0.6.40+): AgentChatProvider loads one page of history using the server default limit (50) when GET /chats/:id omits chat_messages. v0.6.41+: useAgentActions().loadOlderMessages() fetches the next page via cursor and prepends deduplicated messages to useAgentChat().messages; hasOlderMessages is true when another page exists. For custom UIs outside AgentChatProvider, call this endpoint directly with cursor or limit=-1.
+For live updates while the agent runs, use Stream chat updates instead of polling this endpoint.
+Get chat trace
+GET /chats/:id/trace
+Returns the execution graph for an agent chat: nodes (assistant turns, tool invocations, sync barriers, and long-running work such as app tasks and remote_exec exec runs), edges (dependencies), and step counts by status. Requires the conversations:read scope (same as other chat endpoints).
+Long-running tools add execution nodes linked to their backing resource (for example resource_type task for app tools, exec_run for remote commands). The tool invocation node stays in progress until that work finishes.
+Use this to debug agent runs programmatically: see which tools ran, how long each step took, and where failures occurred. The web app shows the same trace in the chat UI.
+Response
+| Field | Type | Description
+| graph_id | string | Graph identifier (same as the chat ID)
+| nodes | array | Execution steps (type, label, status, resource_id, started_at, completed_at, duration_ms, …)
+| edges | array | Dependencies between nodes (from_node, to_node, type)
+| total_steps | number | Total nodes in the graph
+| completed_steps | number | Steps that finished successfully
+| running_steps | number | Steps still in progress
+| failed_steps | number | Steps that failed
+Example:
+bashcopy
+1curl https://api.inference.sh/chats/chat_abc123/trace \2  -H "Authorization: Bearer inf_your_key"
+JavaScript SDK: client.chats.getTrace('chat_abc123').
+→ Observability · Stream chat updates
+Chat status values
+| Status | Meaning
+| busy | Agent is working — LLM generation, or automated tool execution (apps, sub-agents, hooks, client tools, MCP)
+| idle | Agent finished; chat can accept new messages
+| awaiting_input | A human must act on this chat: HIL tool approval or an interactive widget
+| completed | Terminal state (archived chat)
+Client tools and hooks keep the chat in busy while they execute. Use chat.status === "awaiting_input" when you need a human on the conversation; use tool invocation status for per-tool progress.
+Chat message status
+Each entry in chat_messages has its own status, separate from the chat-level status above.
+| Status | Meaning
+| pending | Assistant message still being generated (LLM stream in progress)
+| queued | User message queued while the agent is still running — via Send chat message or auto-queue on run/message — waiting for the next turn
+| ready | Complete — included in LLM context on subsequent turns
+| failed | Generation failed
+| cancelled | Cancelled — via Cancel message or when the chat run is stopped
+Messages from POST /agents/run or POST /agents/message start as status: ready when no run is active. When a run is already active, they are auto-queued with status: queued instead. Messages sent via POST /chats/:id/messages (or auto-queue) transition to ready when the agent begins its next turn, before context is built.
+Poll List chat messages or stream chat updates to detect queued messages — the stream emits chat_messages events as status transitions from queued to ready, often including an updated order in the same partial update. To withdraw a queued message before the agent consumes it, use Cancel message.
+While a message is still queued, sorting the transcript by order alone can place it between an in-flight tool call and its result; that position is corrected when the message is readied.
+SDK types: Import ChatMessageStatusQueued from @inferencesh/sdk (JavaScript) or ChatMessageStatus.QUEUED from inferencesh.types (Python) when comparing message status values. JavaScript SDK (v0.6.36+): client.chats.cancelMessage(messageId) and useAgentActions().cancelMessage(messageId) with AgentChatProvider cancel queued messages. Python SDK does not expose cancelMessage yet.
+Stop chat
+POST /chats/:id/stop
+Stop the current agent run and cancel pending tool invocations.
+JavaScript SDK: client.chats.stop('chat_abc123') — or agent.stopChat() when using client.agent().
+Turn budget
+Each chat has a turn budget that caps one uninterrupted stretch of agent work. The runtime counts the messages added since the last user message, ordered by message order. When the count reaches 500, the run ends without dispatching further tool calls.
+| Behavior | Detail
+| What counts | Assistant and tool messages since the last user message
+| Limit | 500 consecutive non-user messages per chat
+| On exceed | Pending tool calls are dropped. The run ends the same way as when the model stops calling tools
+| User message | A new user message resets the counter for that chat
+| Scope | Per chat. Budget does not accumulate across user turns
+If the model's last response has no text, the runtime sets it to a message saying that the task was not finished and asking the user how to continue. Sub-agent and agent tool chats are separate chats with their own budgets.
+The budget stops tool-calling loops that never converge from running and consuming credits indefinitely. Use Stop chat to end a run earlier.
+Set agent
+POST /chats/:id/agent
+Change which template agent handles an existing chat. Message history and per-chat context are preserved; the next run uses the new agent's tools and system prompt.
+Agent switching is explicit — call this endpoint to change agents. Sending a message via POST /agents/run, POST /agents/message, or POST /chats/:id/messages does not change which agent owns the chat, and there is no per-message agent binding.
+Requires conversations:write scope. In the JavaScript SDK this is useAgentActions().switchAgent(ref). Only agents the platform loop runs can take over a chat; a chat on a remote harness keeps its agent (409).
+Request
+| Field | Type | Required | Description
+| agent | string | Yes | Template agent ref (namespace/name or namespace/name@version)
+Response
+Returns what the switch changed, not the chat:
+| Field | Type | Description
+| chat_id | string | The chat
+| agent_id | string | The agent the chat now runs on
+| agent | object | That agent
+| agent_version_id | string | The agent version the next run uses
+| agent_version | object | That version
+Merge it into the chat you hold. Messages and the rest of the chat are unchanged.
+Errors
+| HTTP status | Code | When
+| 400 | invalid_request | Missing or empty agent
+| 404 | not_found | Chat or agent not found
+| 409 | conflict | The chat or the agent runs on a remote harness, or the chat is a review branch
+Example
+bashcopy
+1curl -X POST https://api.inference.sh/chats/chat_abc123/agent \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"agent": "myteam/escalation-agent@latest"}'
+Chat settings
+POST /chats/:id/settings
+Change a chat's settings. A field left out is left as it is. Requires conversations:write scope. In the JavaScript SDK this is useAgentActions().updateChatSettings(settings).
+Request
+| Field | Type | Description
+| name | string | Rename the chat. Cannot be empty.
+| visibility | string | private, team or public
+| allow_all_tools | boolean | Run every tool call without asking. Switching it on also approves the calls already waiting.
+| disable_hooks | boolean | Stop the agent's lifecycle hooks firing in this chat
+| forget_memory | string[] | Remove these keys from the chat's memory. A key that is not there is ignored.
+Response
+Returns the chat's settings after the change, not the chat:
+| Field | Type | Description
+| chat_id | string | The chat
+| name | string | Chat name
+| visibility | string | private, team or public
+| allow_all_tools | boolean | agent_data.allow_all_tools on the chat
+| disable_hooks | boolean | agent_data.disable_hooks on the chat
+| memory | object | agent_data.memory on the chat, after forget_memory
+Merge it into the chat you hold. Calls approved by switching allow_all_tools on arrive on the chat stream.
+Example
+bashcopy
+1curl -X POST https://api.inference.sh/chats/chat_abc123/settings \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"name": "release notes", "forget_memory": ["draft"]}'
+jsoncopy
+1{2  "chat_id": "chat_abc123",3  "name": "release notes",4  "visibility": "team",5  "allow_all_tools": false,6  "disable_hooks": false,7  "memory": { "goal": "ship the release" }8}
+Send chat message
+POST /chats/:id/messages
+Send a user message to an existing chat. If the agent is idle, this starts a new run. If a run is already active (status: busy), the message is queued and picked up on the agent's next turn — the same auto-queue behavior as POST /agents/run with an existing chat_id.
+Use this endpoint when you only need to send a message without other run parameters (for example a follow-up while tools are executing, or continuing a chat without specifying agent config again).
+Legacy alias: POST /chats/:id/steer — same request and response. Prefer POST /chats/:id/messages.
+Requires conversations:write scope. JavaScript SDK: used internally by AgentChatProvider / useAgentActions().sendMessage() (client.agent().sendMessage() still uses POST /agents/run). Python SDK: call the REST endpoint directly.
+Request
+jsoncopy
+1{2  "message": "Also prioritize tickets from enterprise customers"3}
+| Field | Type | Required | Description
+| message | string | Yes | User message text
+Response
+Returns the created message DTO with role: "user". When a run is active, status is "queued" and agent_run_id is set; when idle, a new run starts and the message is "ready". Queued messages transition to ready when the agent begins its next turn, before context is built. See Chat message status.
+Errors
+| HTTP status | Code | When
+| 400 | invalid_request | Missing or empty message
+| 404 | not_found | Chat does not exist
+| 409 | conflict | Harness-backed chat and the remote profile's harness is below the driver's minimum (profiles[].support.level is older-than-supported). The message explains what is missing and how to upgrade on the host. Nothing is sent to the machine.
+Example
+bashcopy
+1curl -X POST https://api.inference.sh/chats/chat_abc123/messages \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"message": "Focus on P0 tickets only"}'
+Cancel message
+POST /chats/messages/:messageId/cancel
+Cancel a queued user message before the agent picks it up — for example a message from Send chat message or an auto-queued message you want to withdraw. The message status becomes cancelled and content is cleared.
+Only messages with status: "queued" can be cancelled. Messages that are ready, failed, or already cancelled return 409 not_cancellable.
+Requires conversations:write scope. JavaScript SDK: client.chats.cancelMessage('msg_abc123') — or useAgentActions().cancelMessage(messageId) with AgentChatProvider. Python SDK: call the REST endpoint directly.
+Response
+Returns the updated message DTO with status: "cancelled". The chat stream emits a chat_messages event when the cancellation succeeds.
+Errors
+| HTTP status | Code | When
+| 400 | missing_id | messageId path parameter is missing
+| 404 | not_found | Message does not exist
+| 409 | not_cancellable | Message is not queued
+Example
+bashcopy
+1curl -X POST https://api.inference.sh/chats/messages/msg_abc123/cancel \2  -H "Authorization: Bearer inf_your_key"
+Tool invocations
+Tool calls on assistant messages expose tool_invocations. Each invocation has an id used by the endpoints below.
+Tool invocation status
+| Status | Meaning
+| pending | Queued
+| in_progress | Executing — apps, sub-agents, client tools, hooks, MCP
+| awaiting_input | Interactive widget or form needs human input
+| awaiting_approval | HIL approval needed before execution
+| completed | Done
+| failed | Error
+| cancelled | Cancelled
+Status transitions
+The API enforces valid transitions server-side. Terminal states (completed, failed, cancelled) cannot change again. A typical successful path is pending → in_progress → completed, with optional stops at awaiting_approval or awaiting_input. Skipping required steps is rejected — for example pending cannot go directly to awaiting_input.
+If a chat run is cancelled while a tool is executing, the invocation moves to failed and any late completion attempt from the tool is rejected.
+Tool invocation updates are delivered on the chat stream as chat_messages events (the server republishes the parent message when an invocation changes).
+Submit tool result
+POST /tools/:toolInvocationId
+Submit a result for client tools (in_progress) or interactive widgets (awaiting_input).
+Request
+jsoncopy
+1{2  "result": "{\"temperature\": 72}"3}
+For widget actions, JSON-serialize { "action": {...}, "form_data": {...} } into result, or use the deprecated POST /tools/:id/widget endpoint.
+The JavaScript and Python SDKs call this via submitToolResult / submit_tool_result. See Client Tools.
+Approve tool (HIL)
+POST /tools/:toolInvocationId/invoke
+Approve a tool with status: awaiting_approval and execute it. Returns 400 invalid_state if the invocation is not awaiting approval.
+bashcopy
+1curl -X POST https://api.inference.sh/tools/ti_abc123/invoke \2  -H "Authorization: Bearer inf_your_key"
+→ Approval settings · Human-in-the-loop
+Reject tool (HIL)
+POST /tools/:toolInvocationId/reject
+Reject a pending approval. The agent continues with the rejection reason.
+Request
+jsoncopy
+1{2  "reason": "Not authorized to delete files"3}
+reason is optional.
+Always allow tool
+POST /chats/:chatId/tools/:toolInvocationId/always-allow
+Approve the current invocation and add the tool to this chat's always-allowed list.
+Request
+jsoncopy
+1{2  "tool_name": "delete_file"3}
+Human-in-the-loop workflow
+Run an agent with tools marked require_approval (see Approval settings).
+Poll or stream the chat until status is awaiting_input.
+In List chat messages (or the chat stream), find invocations with status: awaiting_approval.
+Call POST /tools/:id/invoke to approve or POST /tools/:id/reject to reject.
+Poll or stream again until the agent reaches idle or completed.
+List chats with status in busy or awaiting_input to find conversations needing action. The belt CLI wraps this flow with belt chat pending, belt chat approve, and belt chat reject — see CLI Setup.
+Interrupt gates
+When an agent run needs external input — tool approval, widget input, missing credentials, or a lifecycle hook gate — the platform creates an interrupt record. Interrupts provide a unified gate model alongside the tool-invocation endpoints above.
+→ Lifecycle hooks — gate handlers for hook-driven interrupts
+GET /chats/:id includes active_run when a run is in progress. When the run is interrupted, active_run.state is input_required or auth_required and active_run may include:
+| Field | Description
+| interrupt_reason | Why the run paused (see Interrupt reasons)
+| interrupt_tool_id | Related tool invocation ID (when applicable)
+| interrupt_meta | Additional context (JSON)
+List pending interrupts for a run
+GET /agent-runs/:runId/interrupts
+Returns pending interrupts for the given agent run. Requires the conversations:read scope.
+Example:
+bashcopy
+1curl https://api.inference.sh/agent-runs/ar_abc123/interrupts \2  -H "Authorization: Bearer inf_your_key"
+JavaScript SDK: client.agents.listRunInterrupts('ar_abc123')
+CLI: belt interrupt list ar_abc123 — see CLI setup — Interrupt.
+Python SDK: use the REST endpoint with typed responses — import InterruptDTO from inferencesh.types (see Python SDK — Interrupt gates). Client helpers are not yet exposed in Python.
+Resolve interrupt
+POST /interrupts/:id/resolve
+Resolve a pending interrupt with allow or deny. Requires the conversations:write scope. When all pending interrupts for the run are resolved, the agent run resumes automatically.
+Request
+jsoncopy
+1{2  "decision": "allow",3  "data": { "reviewer": "security-bot" }4}
+decision must be "allow" or "deny". Optional data (any JSON object) is stored on the interrupt as resolved_data and returned in the response — useful for audit metadata on hook gate resolutions.
+Example:
+bashcopy
+1curl -X POST https://api.inference.sh/interrupts/int_abc123/resolve \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"decision": "allow"}'
+JavaScript SDK: client.agents.resolveInterrupt('int_abc123', 'allow') — or agent.resolveInterrupt() when using client.agent().
+CLI: belt interrupt resolve int_abc123 allow (or deny).
+Python SDK: POST /interrupts/:id/resolve with {"decision": "allow"} or "deny" — type the response as InterruptDTO from inferencesh.types.
+For tool approval interrupts (reason: tool_approval), resolving with allow is equivalent to POST /tools/:id/invoke; deny is equivalent to POST /tools/:id/reject.
+To automate interrupt resolution from webhooks or schedules, create a trigger with action: resolve_interrupt — see Triggers API — resolve_interrupt action.
+InterruptDTO fields
+| Field | Type | Description
+| id | string | Interrupt ID
+| run_id | string | Agent run ID
+| chat_id | string | Chat ID
+| reason | string | Why the run paused
+| source | string | Gate origin (runtime component)
+| resource_id | string | Related resource ID (for example a tool invocation)
+| resource_type | string | tool_invocation (tool approval gates) or hook_event (lifecycle hook gates)
+| status | string | pending, resolved, expired, or cancelled
+| resolution | string | allow or deny (set when resolved)
+| resolved_data | object | Optional JSON from the resolve request data field
+| expires_at | string | RFC3339 expiry (if set)
+| meta | object | Additional context (JSON). For hook_gate, contains the hook payload.
+Interrupt reasons
+| Reason | When
+| tool_approval | Tool requires human approval before execution
+| client_tool | Client-side tool must run in your app or browser
+| widget | Interactive widget needs user input
+| auth | Missing credentials
+| confirmation | Agent is waiting for explicit user confirmation
+| hook_gate | Lifecycle hook gate awaiting an external decision
+→ Approval settings · Lifecycle hooks
+List internal tool definitions
+GET /agents/internal-tools
+Returns the registry of built-in internal tool categories (plan, memory, widget, finish, skills, artifacts, agent, remotes, knowledge, meta). Use it to build agent configuration UIs. Each item includes the default the runtime applies when that category's flag is unset.
+Requires the agents:read scope.
+Response:
+jsoncopy
+1[2  {3    "id": "plan",4    "name": "Plan",5    "description": "Task planning tools for creating, updating, and tracking multi-step plans. Helps the agent organize complex tasks into manageable steps.",6    "tools": ["plan_create", "plan_update", "plan_load"],7    "scope": "all",8    "default_enabled": true9  },10  {11    "id": "agent",12    "name": "Agent",13    "description": "Run a copy of this agent on a self-contained side task and get its answer back, ...",14    "tools": ["agent"],15    "scope": "all",16    "default_enabled": false17  }18]
+| Field | Type | Description
+| id | string | Category key in internal_tools (for example plan, meta, knowledge)
+| name | string | Display name
+| description | string | What the category does
+| tools | string[] | Tool names in this category
+| scope | string | all, top_level, or sub_agent
+| default_enabled | boolean | What the runtime applies when the agent's flag for this category is unset. false for the opt-in categories (meta, artifact, agent, remote, knowledge), true for the rest
+→ Internal Tools · JavaScript SDK: list internal tool definitions
+List hook events
+GET /agents/hook-events
+Returns the canonical list of lifecycle hook events with metadata. Requires the agents:read scope.
+Response:
+jsoncopy
+1[2  {3    "event": "agent.tool_call",4    "description": "Fires before a tool is executed",5    "can_gate": true6  },7  {8    "event": "agent.tool_result",9    "description": "Fires after a tool completes",10    "can_gate": false11  }12]
+Use can_gate to choose between a synchronous webhook (decision: deny) and a gate handler (type: "gate") that creates an interrupt. See Lifecycle hooks.
+cURL example
+bashcopy
+1# Start or continue a chat2curl -X POST https://api.inference.sh/agents/run \3  -H "Authorization: Bearer inf_your_key" \4  -H "Content-Type: application/json" \5  -d '{6    "agent": "myteam/support-agent@latest",7    "input": { "text": "Hello!" }8  }'910# Get chat (includes tool invocations)11curl https://api.inference.sh/chats/chat_abc123 \12  -H "Authorization: Bearer inf_your_key"1314# Approve a tool awaiting HIL15curl -X POST https://api.inference.sh/tools/ti_abc123/invoke \16  -H "Authorization: Bearer inf_your_key"
+Messaging channel webhooks
+Connect external chat platforms so users can talk to an agent where they already work. Inbound platform events create agent messages; agent replies are delivered back through the same channel.
+Receive events
+POST /agents/{id}/channel/{provider}
+| Parameter | Description
+| id | Agent ID
+| provider | Integration provider slug (currently slack)
+Legacy route (Slack only): POST /agents/{id}/slack — same behavior as provider=slack.
+No API key is required. The platform verifies the request (for Slack, using your app's Signing Secret from the Slack integration). URL verification challenges (for example Slack url_verification) are answered automatically.
+Example (Slack event subscription Request URL):
+codecopy
+1https://api.inference.sh/agents/agent_abc123/channel/slack
+On a valid inbound message, the API acknowledges immediately (200 with {"status":"ok"}) and processes the message asynchronously. Thread history is fetched when the channel supports it, so the agent has prior context.
+Supported providers are registered per deployment; check integration guides for availability. See Chatting with Agents for the web app workflow.
+Channel context
+channel_context records where a conversation lives outside inference.sh so assistant replies can be delivered back through the same transport (Slack thread, Telegram chat, a wearable tag, …).
+| Field | Type | Description
+| channel_type | string | Provider slug — for example slack, telegram, teams, discord
+| channel_metadata | object | Transport-specific routing data (JSON object on the wire)
+Webhook ingress. Inbound messaging channel webhooks set channel_context on the first user message automatically. The API persists it on the chat; later turns in that chat inherit routing without resending metadata.
+Custom bridges. If your integration receives messages from an external chat platform and calls the API directly, include channel_context on the first POST /agents/run (or POST /agents/message) for a new chat:
+jsoncopy
+1{2  "agent": "myteam/support-agent@latest",3  "channel_context": {4    "channel_type": "slack",5    "channel_metadata": {6      "channel": "C01234567",7      "thread_ts": "1700000000.000100"8    }9  },10  "input": { "text": "Need help with billing" }11}
+For Slack, channel_metadata matches the fields the platform stores when events arrive through the channel webhook (channel, thread_ts, and optionally team_id, user_id, event_ts). Other providers use their own metadata shape; replies are dispatched only when a registered transport exists for channel_type.
+GET /chats/:id returns channel_context on channel-originated chats. Chats started in the web app or via the SDK without channel_context omit the field.
+→ JavaScript SDK — Channel routing · Slack event subscriptions
+Get A2A agent card
+GET /agents/{id}/card
+GET /agents/{namespace}/{name}/card
+Returns an Agent2Agent (A2A) protocol agent card for agent discovery and marketplace listings (for example GCP AI Agents Producer Portal). Requires agents:read.
+The response is raw A2A JSON — not wrapped in the usual { "success": true, "data": … } envelope. Resolve the agent by ID or by namespace/name ref.
+bashcopy
+1curl https://api.inference.sh/agents/myteam/support-agent/card \2  -H "Authorization: Bearer inf_your_key"
+Example response:
+jsoncopy
+1{2  "name": "myteam/support-agent",3  "description": "Customer support assistant",4  "version": "1.0.0",5  "url": "https://api.inference.sh/agents/myteam/support-agent/a2a",6  "documentationUrl": "https://app.inference.sh/agents/myteam/support-agent",7  "protocolVersion": "1.0",8  "preferredTransport": "JSONRPC",9  "provider": { "name": "inference shell", "url": "https://inference.sh" },10  "capabilities": { "streaming": true, "pushNotifications": false },11  "defaultInputModes": ["text/plain"],12  "defaultOutputModes": ["text/plain", "application/json", "application/a2ui+json"],13  "skills": [14    { "id": "search-tickets", "name": "Search tickets", "tags": ["app"] }15  ],16  "securitySchemes": [{ "scheme": "bearer" }]17}
+url is the agent's A2A endpoint (see A2A protocol); documentationUrl is its page in the web app. Skills are derived from the agent's current version tools (apps, sub-agents, MCP servers, HTTP hooks) and attached knowledge skills. In the web app, open an agent and use a2a card on the detail header to copy this JSON to the clipboard.
+JavaScript SDK (@inferencesh/sdk ≥ v0.6.12): client.agents.getA2ACard('agent_abc123') — returns the same raw card object. See JavaScript SDK — Agent SDK.
+A2A protocol
+Every agent speaks A2A under its own path. The agent is the resource; the protocol is a dialect of it:
+codecopy
+1/agents/{id}/a2a2/agents/{namespace}/{name}/a2a
+| Method | Path | Scope
+| POST | /agents/{ref}/a2a | agents:execute — JSON-RPC 2.0 entry point (message/send, message/stream, tasks/get, tasks/cancel…)
+| POST | /agents/{ref}/a2a/message:send | agents:execute
+| POST | /agents/{ref}/a2a/message:stream | agents:execute — SSE
+| GET | /agents/{ref}/a2a/tasks | conversations:read
+| GET | /agents/{ref}/a2a/tasks/{runID} | conversations:read
+| POST | /agents/{ref}/a2a/tasks/{runID}:cancel | conversations:write
+| GET | /agents/{ref}/a2a/tasks/{runID}:subscribe | conversations:read — SSE
+Requests may carry an A2A-Version header; the response echoes the supported version. An A2A task maps to an agent run, not to a platform task.
+bashcopy
+1curl https://api.inference.sh/agents/myteam/support-agent/a2a/message:send \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"message": {"messageId": "m1", "role": "user", "parts": [{"text": "hello"}]}}'
+OpenAI-compatible dialect
+The same idea for OpenAI clients: /agents/{namespace}/{name}/openai/chat/completions runs one turn of the agent over the Chat Completions wire format, with channel, continue, wait and max_chars for clients that only send their latest utterance. See OpenAI-Compatible API — Agents.
+Create or update agent template
+POST /agents
+Creates a saved agent template, or adds a new version when an agent with the same name already exists in your workspace's namespace. Requires the agents:write scope.
+This mirrors app deploy semantics: the namespace is assigned server-side from your workspace username, so redeploying only requires the agent name and a version payload. You do not need to look up the agent ID first, and the namespace field in the request is optional.
+| Field | Type | Required | Description
+| name | string | Yes | Agent name (unique per workspace namespace)
+| namespace | string | No | Optional. The server uses your workspace username
+| id | string | No | Agent ID — include to create a new version of a known agent (alternative to name-based upsert)
+| version | object | No | Version config (system_prompt, core_app, tools, skills, context, output_schema, …)
+When name matches an existing agent, the API creates a new version and sets it as current (same outcome as POST /agents/{id} with a version payload). Omitting visibility on redeploy preserves the existing visibility setting.
+Example — first deploy:
+bashcopy
+1curl -X POST https://api.inference.sh/agents \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "name": "support-agent",6    "version": {7      "description": "Customer support assistant",8      "system_prompt": "You help users with billing questions.",9      "core_app": { "ref": "openrouter/claude-sonnet-46" }10    }11  }'
+Example — redeploy same name (creates new version):
+Send the same request shape with updated version fields — no agent ID lookup required.
+To update by ID instead (for example when you already have agent_abc123), use POST /agents/{id} with a version object. To change visibility or store images without a new version, use POST /agents/{id}/visibility or include only agent-level fields in POST /agents/{id}.
+CLI: belt agent deploy <path> and belt agent create both use this endpoint. See CLI setup — Agents.
+Delete agent template
+DELETE /agents/{id}
+Permanently deletes a saved agent template (workspace definition). Requires the agents:write scope. This does not delete chat history from past runs.
+bashcopy
+1curl -X DELETE https://api.inference.sh/agents/agent_abc123 \2  -H "Authorization: Bearer inf_your_key"
+CLI equivalent: belt agent delete <ref> (accepts agent ID or namespace/name). See CLI setup — Agents.
+Related
+Agent SDK overview
+Streaming API
+Observability
+Structured output
+Client tools
+Slack integration

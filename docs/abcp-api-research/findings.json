@@ -1,0 +1,332 @@
+{
+  "schema_version": 1,
+  "service": "abcp",
+  "source_date": "2026-10-05",
+  "findings": [
+    {
+      "code": "auth_profiles",
+      "kind": "auth",
+      "operations": [],
+      "detail": "ABCP/TS: tenant host, userlogin + MD5 userpsw; административные методы требуют специального API-администратора. VINQU и CarCare имеют отдельные хосты и реквизиты, ABCP ключ не заменяет их. Общая HTTP-документация требует UTF-8 и Accept application/json.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/docs",
+        "https://www.abcp.ru/d/docs/vinqu/apivinqu",
+        "https://www.abcp.ru/d/docs/carcare/carcaremodule/api"
+      ]
+    },
+    {
+      "code": "wire_encoding",
+      "kind": "transport",
+      "operations": [
+        "abcp_client_post_advices_batch",
+        "abcp1_admin_post_cp_distributor_pricelist_update",
+        "abcp1_admin_post_cp_usercatalogs_catalog_id_upload",
+        "abcp1_admin_post_cp_product_cards_import",
+        "vinqu_post_vinquery_add"
+      ],
+      "detail": "POST по умолчанию application/x-www-form-urlencoded. /advices/batch — JSON. Файлы — multipart; usercatalogs upload и productCards import передают auth в query, pricelistUpdate в body. VINQU add содержит optional file upload; multipart выведен из curl file=@, текст не называет Content-Type явно.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#загрузка-прайс-листа-поставщика",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#импорт-карточек-товаров-файлом",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#импорт-каталога-из-файла",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#механизм-с-этим-товаром-покупают",
+        "https://www.abcp.ru/d/docs/vinqu/apivinqu#создание-запроса"
+      ]
+    },
+    {
+      "code": "vinqu_hash_alias",
+      "kind": "auth",
+      "operations": [
+        "vinqu_get_brands_get"
+      ],
+      "detail": "VINQU /brands/get принимает hash вместо обычного siteHash. POST VINQU auth передают в form body согласно примерам.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/vinqu/apivinqu#получение-марок"
+      ]
+    },
+    {
+      "code": "unsafe_get_payment_links",
+      "kind": "risk",
+      "operations": [
+        "abcp1_admin_get_cp_payment_token",
+        "abcp1_admin_get_cp_payment_top_balance_link"
+      ],
+      "detail": "Получение платёжных ссылок консервативно классифицировано как business_write: GET не означает отсутствие эффекта. Документация не раскрывает идемпотентность генерации ссылок.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-ссылки-на-оплату-заказа",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-ссылки-на-пополнение-баланса"
+      ]
+    },
+    {
+      "code": "basket_partial_success",
+      "kind": "partial_success",
+      "operations": [
+        "abcp_client_post_basket_add",
+        "abcp_client_post_basket_order",
+        "abcp_client_post_orders_instant"
+      ],
+      "detail": "HTTP 200 и status=0 могут сочетаться с успешными позициями. Для add смотреть positions[].status, для оформления всегда orders[], даже при status=0. Не повторять весь пакет, не сверив уже созданные заказы.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#добавлять-товар-в-корзину-удаление-товара-из-корзины",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#моментальный-заказ",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#отправлять-корзину-в-заказ"
+      ]
+    },
+    {
+      "code": "supplier_ambiguous_commit",
+      "kind": "partial_success",
+      "operations": [
+        "abcp1_admin_get_cp_orders_online",
+        "abcp1_admin_post_cp_orders_online"
+      ],
+      "detail": "POST возвращает массив заказов с positions[].confirmSend. false не доказывает отсутствие заказа у поставщика: при таймауте заказ может появиться позже. Не отправлять повторно до сверки с поставщиком. При отправке нельзя параллельно работать с тем же поставщиком через API, ПУ ABCP или его корзину.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#отправка-online-заказа-поставщику",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-параметров-для-отправки-online-заказа-поставщику"
+      ]
+    },
+    {
+      "code": "supplier_batch_limit",
+      "kind": "limit",
+      "operations": [
+        "abcp1_admin_get_cp_orders_online",
+        "abcp1_admin_post_cp_orders_online"
+      ],
+      "detail": "Не более20 позиций в одном запросе для сторонних поставщиков и100 для поставщиков ABCP. GET сначала возвращает orderParams/positionParams; когда способы доставки зависят от адреса, повторить GET с orderParams[shipmentAddress].",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#отправка-online-заказа-поставщику",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-параметров-для-отправки-online-заказа-поставщику"
+      ]
+    },
+    {
+      "code": "order_create_serial",
+      "kind": "limit",
+      "operations": [
+        "abcp1_admin_get_cp_order",
+        "abcp1_admin_post_cp_order"
+      ],
+      "detail": "Создание заказов cp/order выполнять последовательно. Рекомендуются пакеты до100 позиций; максимум500 позиций на заказ, лишние позиции завершаются ошибкой.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-информации-о-заказе",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#сохранение-заказа"
+      ]
+    },
+    {
+      "code": "order_position_limits",
+      "kind": "limit",
+      "operations": [
+        "abcp_client_post_basket_order",
+        "abcp_client_post_orders_instant",
+        "abcp1_admin_post_cp_order_merge"
+      ],
+      "detail": "basket/order и orders/instant ограничены500 позициями заказа; cp/order/merge —50 позициями за объединение.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#объединение-заказов",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#моментальный-заказ",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#отправлять-корзину-в-заказ"
+      ]
+    },
+    {
+      "code": "shipping_requirements",
+      "kind": "validation",
+      "operations": [
+        "abcp_client_post_basket_order",
+        "abcp_client_post_orders_instant",
+        "ts_client_post_ts_orders_create_by_cart",
+        "ts_admin_post_cp_ts_orders_create_by_cart"
+      ],
+      "detail": "shipmentAddress обязателен, если есть доступные адреса доставки; самовывоз shipmentAddress=0. В TS вложенные delivery.meetData поля условны по типу доставки: нельзя требовать одновременно officeId, address и shipmentAddressId только из-за звёздочек таблицы.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#моментальный-заказ",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#отправлять-корзину-в-заказ",
+        "https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#создание-заказа-по-позициям-корзины",
+        "https://www.abcp.ru/d/docs/api/abcp2/api-ts-client#создание-заказа-по-позициям-корзины"
+      ]
+    },
+    {
+      "code": "zones_replace_all",
+      "kind": "destructive",
+      "operations": [
+        "abcp1_admin_get_cp_user_shipment_address_zones",
+        "abcp1_admin_post_cp_user_shipment_address_zones"
+      ],
+      "detail": "POST shipmentAddressZones заменяет полный набор: непереданные существующие зоны удаляются. Для адресного обновления лучше документированный /{id}/update. isOnDay[1...7] в таблице означает isOnDay1…isOnDay7 по примерам, не PHP-массив.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-списка-зон-адресов-доставки",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#сохранение-зон-адресов-доставки"
+      ]
+    },
+    {
+      "code": "archive_date_bulk",
+      "kind": "destructive",
+      "operations": [
+        "abcp1_admin_post_cp_orders_from_archive",
+        "abcp1_admin_post_cp_orders_to_archive"
+      ],
+      "detail": "fromArchive принимает массив orders. toArchive переводит все заказы до dateTime, не симметричный список IDs. Документирован успешный HTTP200 без обязательного JSON body.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#пакетное-получение-истории-изменений-статусов-позиций-заказов"
+      ]
+    },
+    {
+      "code": "default_page_and_time",
+      "kind": "pagination",
+      "operations": [
+        "abcp1_admin_get_cp_orders",
+        "abcp1_admin_get_cp_users"
+      ],
+      "detail": "Выборка по умолчанию ограничена1000; format=p даёт постраничный результат и количество. cp/orders без фильтра даты берёт createdDate за последние30дней. Не считать одну страницу полной историей.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-списка-заказов",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-списка-пользователей"
+      ]
+    },
+    {
+      "code": "logs_and_legal_limits",
+      "kind": "limit",
+      "operations": [
+        "ts_admin_get_cp_ts_logs_read",
+        "ts_admin_get_cp_ts_legal_persons_list"
+      ],
+      "detail": "logs/read limit максимум1000, обязательны dateStart/dateEnd/type/limit. legalPersons/list максимум50; без contractorId возвращаются юрлица магазина. Дополнительные фильтры logs/read зависят от type и сохранены в схеме.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-действий",
+        "https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#получение-списка-юридических-лиц"
+      ]
+    },
+    {
+      "code": "distributor_limits",
+      "kind": "limit",
+      "operations": [
+        "abcp1_admin_post_cp_distributor_copy",
+        "abcp1_admin_post_cp_route_create"
+      ],
+      "detail": "Копирование поставщика не более100 операций в сутки; копия создаётся выключенной. API создание маршрутов ограничено5 маршрутами на поставщика.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#копирование-поставщика",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#создание-маршрута-поставщика"
+      ]
+    },
+    {
+      "code": "notes_atomicity",
+      "kind": "partial_success",
+      "operations": [
+        "abcp1_admin_get_cp_distributors_notes",
+        "abcp1_admin_post_cp_distributors_notes"
+      ],
+      "detail": "POST notes атомарный: при ошибке откатывается всё. Максимум2000 акций. isDelete в элементе удаляет акцию.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-акций",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#редактирование-акций"
+      ]
+    },
+    {
+      "code": "product_import_async",
+      "kind": "async",
+      "operations": [
+        "abcp1_admin_post_cp_product_cards_import",
+        "abcp1_admin_post_cp_product_cards_export",
+        "abcp1_admin_get_cp_product_cards_file_status",
+        "abcp1_admin_get_cp_product_cards_export_file"
+      ],
+      "detail": "Импорт/экспорт асинхронный через taskId. Пока импорт выполняется, новый запрос не создаёт новую задачу. Import updateMode=2 удаляет карточки выбранной локали перед загрузкой. Файл xls/xlsx; лимит услуги может оставить карточки недобавленными. export/file возвращает либо JSON processing, либо бинарный xlsx.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#импорт-карточек-товаров-файлом",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-статуса-задачи-импорт--экспорт",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#получение-файла-экспорта",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin#экспорт-карточек-товаров-в-файл"
+      ]
+    },
+    {
+      "code": "search_scope",
+      "kind": "read_semantics",
+      "operations": [
+        "abcp_client_get_search_brands",
+        "abcp_client_get_search_articles",
+        "abcp_client_post_search_batch",
+        "abcp_client_get_search_history"
+      ],
+      "detail": "useOnlineStocks по умолчанию0; онлайн-склады требуют1. search/batch не обращается к онлайн-складам. history — последние50 поисков. Отсутствие офферов не равно неисправному подключению.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#искать-бренд-по-артикулу",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#искать-товар-по-артикулу-и-бренду",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#пакетный-запрос-без-учета-аналогов",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#получать-историю-поиска"
+      ]
+    },
+    {
+      "code": "vinqu_chat_empty",
+      "kind": "read_semantics",
+      "operations": [
+        "vinqu_get_vinquery_chat_list"
+      ],
+      "detail": "chatList охватывает максимум последние15минут. Документированный HTTP404 messages not found означает пустую выборку; другие404 нельзя нормализовать как успех. VINQU ошибки могут иметь регистрозависимое поле Error.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/vinqu/apivinqu#поиск-новых-сообщений-во-всех-чатах-клиента"
+      ]
+    },
+    {
+      "code": "carcare_date_pair",
+      "kind": "pagination",
+      "operations": [
+        "carcare_get_reservation"
+      ],
+      "detail": "В CarCare filter.dateStart/dateStop передаются вместе в формате ДД.ММ.ГГГГ; по умолчанию с текущего дня в часовом поясе автосервиса. skip/limit по умолчанию0/30.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/carcare/carcaremodule/api#получение-списка-резервированных-работ"
+      ]
+    },
+    {
+      "code": "garage_admin_prose",
+      "kind": "validation",
+      "operations": [
+        "abcp_client_get_user_garage",
+        "abcp_client_get_user_garage_car",
+        "abcp_client_post_user_garage_add",
+        "abcp_client_post_user_garage_update",
+        "abcp_client_post_user_garage_delete"
+      ],
+      "detail": "При вызове garage методов от API-администратора нужен userId, указанный только в prose. Для add обязательно одно из name/vin/frame, а не все3 звёздочные поля.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#добавление-автомобиля-в-гараж",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#обновление-автомобиля-в-гараже",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#получение-информации-об-автомобиле-в-гараже",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#получение-списка-автомобилей-в-гараже",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#удаление-автомобиля-из-гаража"
+      ]
+    },
+    {
+      "code": "embedded_json_strings",
+      "kind": "transport",
+      "operations": [
+        "ts_admin_post_cp_ts_order_pickings_fast_get_out",
+        "ts_admin_post_cp_ts_order_pickings_update"
+      ],
+      "detail": "orderPickingResellerData/resellerData — JSON-строка внутри обычной form. Схема требует string; нельзя превращать JSON-объект в PHP-brackets.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#изменение-операции-отгрузка",
+        "https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin#операция-быстрого-создания-приёмки-брони-отгрузки"
+      ]
+    },
+    {
+      "code": "password_recovery_stages",
+      "kind": "external_side_effect",
+      "operations": [
+        "abcp_client_post_user_new",
+        "abcp_client_post_user_restore"
+      ],
+      "detail": "Регистрация и восстановление не требуют инжекции API auth. Восстановление: emailOrMobile сначала отправляет письмо/SMS; passwordNew+code меняют пароль на втором этапе. Оба метода business_write, содержат sensitive inputs.",
+      "sources": [
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#восстановление-пароля",
+        "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client#регистрация-пользователя"
+      ]
+    }
+  ],
+  "known_documentation_limits": [
+    "Нет опубликованного общего численного RPS-лимита в изученных страницах.",
+    "У ряда полей отсутствуют типы или условная обязательность приведена только в prose; строгие ограничения не выдумываются.",
+    "Отдельные примеры противоречат таблицам: supplierReturns/positions/createMultiple пример показывает плоские поля, тогда как таблица требует posesData. Таблица и пример сохранены для сверки.",
+    "HTTP-error behavior зависит от семейства: ABCP >=400; CarCare описывает500 с errorCode/errorMessage; VINQU использует Error.",
+    "Документационное покрытие287 методов не подтверждает доступ аккаунта, наличие всех модулей или успешность записей."
+  ]
+}

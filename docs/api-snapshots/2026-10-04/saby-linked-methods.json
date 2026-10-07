@@ -1,0 +1,735 @@
+{
+  "generated_at": "2026-10-04T07:26:34.585082+00:00",
+  "provenance": "Extracted named links from freshly downloaded category pages",
+  "total": 91,
+  "methods": [
+    {
+      "method_id": "ekdapi.DocumentsListForPerson",
+      "source": "https://saby.ru/help/integration/api/all_methods/ekdapi_documentslistforperson",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/ekdapi.DocumentsListForPerson.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/ekdapi_documentslistforperson",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyCadresDoc.AddEmployees",
+      "source": "https://saby.ru/help/integration/api/all_methods/sabycadresdoc_addemployees",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyCadresDoc.AddEmployees.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/sabycadresdoc_addemployees",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyCadresDoc.DeleteEmployees",
+      "source": "https://saby.ru/help/integration/api/all_methods/sabycadresdoc_deleteemployees",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyCadresDoc.DeleteEmployees.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/sabycadresdoc_deleteemployees",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyCadresDoc.ReadEmployees",
+      "source": "https://saby.ru/help/integration/api/all_methods/sabycadresdoc_reademployees",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyCadresDoc.ReadEmployees.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/sabycadresdoc_reademployees",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyDepartment.ChangeId",
+      "source": "https://saby.ru/help/integration/api/all_methods/changeid",
+      "linked_from": "saby/update_division.html",
+      "file": "saby-extra-methods/sabyDepartment.ChangeId.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/changeid",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyDepartment.Delete",
+      "source": "https://saby.ru/help/integration/api/all_methods/del_division",
+      "linked_from": "saby/update_division.html",
+      "file": "saby-extra-methods/sabyDepartment.Delete.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/del_division",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyDepartment.Read",
+      "source": "https://saby.ru/help/integration/api/all_methods/read_division",
+      "linked_from": "saby/update_division.html",
+      "file": "saby-extra-methods/sabyDepartment.Read.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/read_division",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyDepartment.Update",
+      "source": "https://saby.ru/help/integration/api/all_methods/update_division",
+      "linked_from": "saby/update_division.html",
+      "file": "saby/update_division.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/update_division",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyEmployee.CreateContactData",
+      "source": "https://saby.ru/help/integration/api/all_methods/createContactData",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyEmployee.CreateContactData.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/createContactData",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyEmployee.CreateFamilyMembers",
+      "source": "https://saby.ru/help/integration/api/all_methods/createFamilyMembers",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyEmployee.CreateFamilyMembers.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/createFamilyMembers",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyEmployee.Delete",
+      "source": "https://saby.ru/help/integration/api/all_methods/sabyemployee_delete",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyEmployee.Delete.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/sabyemployee_delete",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyEmployee.DeleteContactData",
+      "source": "https://saby.ru/help/integration/api/all_methods/deleteContactData",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyEmployee.DeleteContactData.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/deleteContactData",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyEmployee.DeleteFamilyMembers",
+      "source": "https://saby.ru/help/integration/api/all_methods/deleteFamilyMembers",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyEmployee.DeleteFamilyMembers.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/deleteFamilyMembers",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyEmployee.DeletePosition",
+      "source": "https://saby.ru/help/integration/api/recruit/docs/working_time_schedule/sabyEmployee_deleteposition",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyEmployee.DeletePosition.html",
+      "download_source": "https://saby.ru/help/integration/api/recruit/docs/working_time_schedule/sabyEmployee_deleteposition",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyEmployee.ListContactData",
+      "source": "https://saby.ru/help/integration/api/all_methods/listContactData",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyEmployee.ListContactData.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/listContactData",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyEmployee.ListFamilyMembers",
+      "source": "https://saby.ru/help/integration/api/all_methods/listFamilyMembers",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyEmployee.ListFamilyMembers.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/listFamilyMembers",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyEmployee.ListPositions",
+      "source": "https://saby.ru/help/integration/api/recruit/docs/working_time_schedule/sabyEmployee_listposition",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyEmployee.ListPositions.html",
+      "download_source": "https://saby.ru/help/integration/api/recruit/docs/working_time_schedule/sabyEmployee_listposition",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyEmployee.ReadAdditionalFields",
+      "source": "https://saby.ru/help/integration/api/directory/additionalfields/sabyemployeereadadditionalfields",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyEmployee.ReadAdditionalFields.html",
+      "download_source": "https://saby.ru/help/integration/api/directory/additionalfields/sabyemployeereadadditionalfields",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyEmployee.ReadAttachments",
+      "source": "https://saby.ru/help/integration/api/all_methods/sabyemployee_readattachments",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyEmployee.ReadAttachments.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/sabyemployee_readattachments",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyEmployee.UpdateContactData",
+      "source": "https://saby.ru/help/integration/api/all_methods/updatecontactdata",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyEmployee.UpdateContactData.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/updatecontactdata",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyEmployee.UpdatePosition",
+      "source": "https://saby.ru/help/integration/api/recruit/docs/sabyEmployee/sabyEmployee_updateposition",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyEmployee.UpdatePosition.html",
+      "download_source": "https://saby.ru/help/integration/api/recruit/docs/sabyEmployee/sabyEmployee_updateposition",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyEmployee.WriteAdditionalFields",
+      "source": "https://saby.ru/help/integration/api/directory/additionalfields/sabyemployeewriteadditionalfields",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyEmployee.WriteAdditionalFields.html",
+      "download_source": "https://saby.ru/help/integration/api/directory/additionalfields/sabyemployeewriteadditionalfields",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyEmployeeAdditionalVacation.Delete",
+      "source": "https://saby.ru/help/integration/api/recruit/directory/sabyemployeeadditionalvacation/delete",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyEmployeeAdditionalVacation.Delete.html",
+      "download_source": "https://saby.ru/help/integration/api/recruit/directory/sabyemployeeadditionalvacation/delete",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyEmployeeAdditionalVacation.List",
+      "source": "https://saby.ru/help/integration/api/recruit/directory/sabyemployeeadditionalvacation/list",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyEmployeeAdditionalVacation.List.html",
+      "download_source": "https://saby.ru/help/integration/api/recruit/directory/sabyemployeeadditionalvacation/list",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyEmployeeAdditionalVacation.Update",
+      "source": "https://saby.ru/help/integration/api/recruit/directory/sabyemployeeadditionalvacation/update",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyEmployeeAdditionalVacation.Update.html",
+      "download_source": "https://saby.ru/help/integration/api/recruit/directory/sabyemployeeadditionalvacation/update",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyMchd.GetContent",
+      "source": "https://saby.ru/help/integration/api/all_methods/powers/sabymchd_getcontent",
+      "linked_from": "saby/powers.html",
+      "file": "saby-methods/sabyMchd.GetContent.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/powers/sabymchd_getcontent",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyMchd.GetStatus",
+      "source": "https://saby.ru/help/integration/api/all_methods/powers/sabymchd_getstatus",
+      "linked_from": "saby/powers.html",
+      "file": "saby-methods/sabyMchd.GetStatus.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/powers/sabymchd_getstatus",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyMchd.SendRegistration",
+      "source": "https://saby.ru/help/integration/api/all_methods/powers/sabymchd_sendregistration",
+      "linked_from": "saby/powers.html",
+      "file": "saby-methods/sabyMchd.SendRegistration.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/powers/sabymchd_sendregistration",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyMchd.SendRevocation",
+      "source": "https://saby.ru/help/integration/api/all_methods/powers/sabymchd_sendrevocation",
+      "linked_from": "saby/powers.html",
+      "file": "saby-methods/sabyMchd.SendRevocation.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/powers/sabymchd_sendrevocation",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyMotivation.List",
+      "source": "https://saby.ru/help/integration/api/all_methods/sabymotivation_list1",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyMotivation.List.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/sabymotivation_list1",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyOurCompany.ChangeId",
+      "source": "https://saby.ru/help/partner/api/sabycompany_changeId",
+      "linked_from": "saby/update_division.html",
+      "file": "saby-extra-methods/sabyOurCompany.ChangeId.html",
+      "download_source": "https://saby.ru/help/partner/api/sabycompany_changeId",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyOurCompany.Create",
+      "source": "https://saby.ru/help/partner/api/sabycompany_create",
+      "linked_from": "saby/update_division.html",
+      "file": "saby-extra-methods/sabyOurCompany.Create.html",
+      "download_source": "https://saby.ru/help/partner/api/sabycompany_create",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyOurCompany.Delete",
+      "source": "https://saby.ru/help/partner/api/sabycompany_delete",
+      "linked_from": "saby/update_division.html",
+      "file": "saby-extra-methods/sabyOurCompany.Delete.html",
+      "download_source": "https://saby.ru/help/partner/api/sabycompany_delete",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyOurCompany.List",
+      "source": "https://saby.ru/help/partner/api/sabycompany_list",
+      "linked_from": "saby/update_division.html",
+      "file": "saby-extra-methods/sabyOurCompany.List.html",
+      "download_source": "https://saby.ru/help/partner/api/sabycompany_list",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyOurCompany.Publish",
+      "source": "https://saby.ru/help/partner/api/sabycompany_publish",
+      "linked_from": "saby/update_division.html",
+      "file": "saby-extra-methods/sabyOurCompany.Publish.html",
+      "download_source": "https://saby.ru/help/partner/api/sabycompany_publish",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyOurCompany.Update",
+      "source": "https://saby.ru/help/partner/api/sabycompany_update",
+      "linked_from": "saby/update_division.html",
+      "file": "saby-extra-methods/sabyOurCompany.Update.html",
+      "download_source": "https://saby.ru/help/partner/api/sabycompany_update",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyPVS.GetDocumentListByWorkmanList",
+      "source": "https://saby.ru/help/integration/api/recruit/directory/employee/sabypvs_getdocumentlistbyworkmanlist",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyPVS.GetDocumentListByWorkmanList.html",
+      "download_source": "https://saby.ru/help/integration/api/recruit/directory/employee/sabypvs_getdocumentlistbyworkmanlist",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyTask.ReassignTasks",
+      "source": "https://saby.ru/help/integration/api/all_methods/ReassignTasks",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyTask.ReassignTasks.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/ReassignTasks",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyVacation.GetPlanned",
+      "source": "https://saby.ru/help/integration/api/all_methods/sabyvacation_getplanned",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyVacation.GetPlanned.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/sabyvacation_getplanned",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "sabyVacation.GetRemains",
+      "source": "https://saby.ru/help/integration/api/all_methods/sabyvacation_getremains",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-extra-methods/sabyVacation.GetRemains.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/sabyvacation_getremains",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.Аутентифицировать",
+      "source": "https://saby.ru/help/integration/api/all_methods/auth_one/",
+      "linked_from": "saby/authentication.html",
+      "file": "saby-methods/СБИС.Аутентифицировать.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/auth_one",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.АутентифицироватьПоСертификату",
+      "source": "https://saby.ru/help/integration/api/all_methods/authinput_ep/",
+      "linked_from": "saby/authentication.html",
+      "file": "saby-methods/СБИС.АутентифицироватьПоСертификату.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/authinput_ep",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ВосстановитьДокумент",
+      "source": "https://saby.ru/help/integration/api/all_methods/recover/",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.ВосстановитьДокумент.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/recover",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ВыполнитьДействие",
+      "source": "https://saby.ru/help/integration/api/all_methods/make_doc/",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.ВыполнитьДействие.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/make_doc",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.Выход",
+      "source": "https://saby.ru/help/integration/api/all_methods/authexit/",
+      "linked_from": "saby/authentication.html",
+      "file": "saby-methods/СБИС.Выход.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/authexit",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ДобавитьОбразованиеСотрудника",
+      "source": "https://saby.ru/help/integration/api/all_methods/add_education",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-methods/СБИС.ДобавитьОбразованиеСотрудника.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/add_education",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ДобавитьПользователя",
+      "source": "https://saby.ru/help/integration/api/all_methods/new_user/",
+      "linked_from": "saby/user_reg.html",
+      "file": "saby-methods/СБИС.ДобавитьПользователя.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/new_user",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ЗаписатьВложение",
+      "source": "https://saby.ru/help/integration/api/all_methods/write_enclosure",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.ЗаписатьВложение.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/write_enclosure",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ЗаписатьДоверие",
+      "source": "https://saby.ru/help/integration/api/all_methods/write_trust",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-methods/СБИС.ЗаписатьДоверие.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/write_trust",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ЗаписатьДокумент",
+      "source": "https://saby.ru/help/integration/api/all_methods/doc/",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.ЗаписатьДокумент.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/doc",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ЗаписатьПодразделение",
+      "source": "https://saby.ru/help/integration/api/all_methods/rec_squad/",
+      "linked_from": "saby/partner.html",
+      "file": "saby-methods/СБИС.ЗаписатьПодразделение.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/rec_squad",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ЗаписатьСоглашениеНЭП",
+      "source": "https://saby.ru/help/integration/api/all_methods/write_agreement_nep",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-methods/СБИС.ЗаписатьСоглашениеНЭП.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/write_agreement_nep",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ЗаписатьСотрудника",
+      "source": "https://saby.ru/help/integration/api/staff/",
+      "linked_from": "saby/user_reg.html",
+      "file": "saby-methods/СБИС.ЗаписатьСотрудника.html",
+      "download_source": "https://saby.ru/help/integration/api/staff",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ИмпортНоменклатурыИзCML",
+      "source": "https://saby.ru/help/integration/api/all_methods/import_cml/",
+      "linked_from": "saby/service_func.html",
+      "file": "saby-methods/СБИС.ИмпортНоменклатурыИзCML.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/import_cml",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ИнформацияОВерсии",
+      "source": "https://saby.ru/help/integration/api/all_methods/infover/",
+      "linked_from": "saby/service_func.html",
+      "file": "saby-methods/СБИС.ИнформацияОВерсии.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/infover",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ИнформацияОКонтрагенте",
+      "source": "https://saby.ru/help/integration/api/all_methods/companyinfo/",
+      "linked_from": "saby/counterparty.html",
+      "file": "saby-methods/СБИС.ИнформацияОКонтрагенте.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/companyinfo",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ИнформацияОСлужебныхЭтапах",
+      "source": "https://saby.ru/help/integration/api/all_methods/info_doc/",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.ИнформацияОСлужебныхЭтапах.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/info_doc",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ИнформацияОТекущемПользователе",
+      "source": "https://saby.ru/help/integration/api/all_methods/auth_infouser/",
+      "linked_from": "saby/authentication.html",
+      "file": "saby-methods/СБИС.ИнформацияОТекущемПользователе.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/auth_infouser",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ОтложитьСлужебныйЭтап",
+      "source": "https://saby.ru/help/integration/api/all_methods/lay_stage/",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.ОтложитьСлужебныйЭтап.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/lay_stage",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ОтправитьКодАутентификации",
+      "source": "https://saby.ru/help/integration/api/all_methods/send_code_auth/",
+      "linked_from": "saby/authentication.html",
+      "file": "saby-methods/СБИС.ОтправитьКодАутентификации.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/send_code_auth",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ОтправитьПриглашение",
+      "source": "https://saby.ru/help/integration/api/all_methods/send_invitation",
+      "linked_from": "saby/counterparty.html",
+      "file": "saby-methods/СБИС.ОтправитьПриглашение.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/send_invitation",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ПереключитьАккаунт",
+      "source": "https://saby.ru/help/integration/api/all_methods/change_acc/",
+      "linked_from": "saby/authentication.html",
+      "file": "saby-methods/СБИС.ПереключитьАккаунт.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/change_acc",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ПовторитьЭтап",
+      "source": "https://saby.ru/help/integration/api/all_methods/repeat_stage/",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.ПовторитьЭтап.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/repeat_stage",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ПодготовитьДействие",
+      "source": "https://saby.ru/help/integration/api/all_methods/develop_doc/",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.ПодготовитьДействие.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/develop_doc",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ПодписатьВложение",
+      "source": "https://saby.ru/help/integration/api/all_methods/sign_attachment",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.ПодписатьВложение.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/sign_attachment",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ПодтвердитьВход",
+      "source": "https://saby.ru/help/integration/api/all_methods/accept_enter/",
+      "linked_from": "saby/authentication.html",
+      "file": "saby-methods/СБИС.ПодтвердитьВход.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/accept_enter",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ПрочитатьДокумент",
+      "source": "https://saby.ru/help/integration/api/all_methods/read_doc/",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.ПрочитатьДокумент.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/read_doc",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ПрочитатьПриглашение",
+      "source": "https://saby.ru/help/integration/api/all_methods/read_invitation",
+      "linked_from": "saby/counterparty.html",
+      "file": "saby-methods/СБИС.ПрочитатьПриглашение.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/read_invitation",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ПрочитатьСоглашениеНЭП",
+      "source": "https://saby.ru/help/integration/api/all_methods/read_agreement_nep",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-methods/СБИС.ПрочитатьСоглашениеНЭП.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/read_agreement_nep",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.ПрочитатьСотрудника",
+      "source": "https://saby.ru/help/integration/api/read_staff",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-methods/СБИС.ПрочитатьСотрудника.html",
+      "download_source": "https://saby.ru/help/integration/api/read_staff",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.СписокАккаунтов",
+      "source": "https://saby.ru/help/integration/api/all_methods/list_of_acc/",
+      "linked_from": "saby/authentication.html",
+      "file": "saby-methods/СБИС.СписокАккаунтов.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/list_of_acc",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.СписокДоверий",
+      "source": "https://saby.ru/help/integration/api/all_methods/trust_list",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-methods/СБИС.СписокДоверий.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/trust_list",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.СписокДокументов",
+      "source": "https://saby.ru/help/integration/api/all_methods/list_doc/",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.СписокДокументов.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/list_doc",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.СписокДокументовПоСобытиям",
+      "source": "https://saby.ru/help/integration/api/all_methods/events_doc/",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.СписокДокументовПоСобытиям.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/events_doc",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.СписокЗадач",
+      "source": "https://saby.ru/help/integration/api/all_methods/task_list",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.СписокЗадач.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/task_list",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.СписокИзменений",
+      "source": "https://saby.ru/help/integration/api/all_methods/changeslist/",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.СписокИзменений.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/changeslist",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.СписокИзмененийПриглашений",
+      "source": "https://saby.ru/help/integration/api/all_methods/list_invitation_changes",
+      "linked_from": "saby/counterparty.html",
+      "file": "saby-methods/СБИС.СписокИзмененийПриглашений.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/list_invitation_changes",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.СписокНашихОрганизаций",
+      "source": "https://saby.ru/help/integration/api/all_methods/company/",
+      "linked_from": "saby/partner.html",
+      "file": "saby-methods/СБИС.СписокНашихОрганизаций.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/company",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.СписокОперацийПодЗП",
+      "source": "https://saby.ru/help/integration/api/all_methods/operation_list",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-methods/СБИС.СписокОперацийПодЗП.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/operation_list",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.СписокОрганизацийПодЗП",
+      "source": "https://saby.ru/help/integration/api/all_methods/company_list",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-methods/СБИС.СписокОрганизацийПодЗП.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/company_list",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.СписокПодразделений",
+      "source": "https://saby.ru/help/integration/api/all_methods/list_squad",
+      "linked_from": "saby/update_division.html",
+      "file": "saby-methods/СБИС.СписокПодразделений.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/list_squad",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.СписокСертификатовДляАутентификации",
+      "source": "https://saby.ru/help/integration/api/all_methods/auth_ep/",
+      "linked_from": "saby/authentication.html",
+      "file": "saby-methods/СБИС.СписокСертификатовДляАутентификации.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/auth_ep",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.СписокСлужебныхЭтапов",
+      "source": "https://saby.ru/help/integration/api/all_methods/stage_doc/",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.СписокСлужебныхЭтапов.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/stage_doc",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.СписокСотрудников",
+      "source": "https://saby.ru/help/integration/api/list_staff",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-methods/СБИС.СписокСотрудников.html",
+      "download_source": "https://saby.ru/help/integration/api/list_staff",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.СписокСотрудниковПодЗП",
+      "source": "https://saby.ru/help/integration/api/all_methods/employee_list",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-methods/СБИС.СписокСотрудниковПодЗП.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/employee_list",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.СформироватьHTMLИзXML",
+      "source": "https://saby.ru/help/integration/api/all_methods/html_xml/",
+      "linked_from": "saby/service_func.html",
+      "file": "saby-methods/СБИС.СформироватьHTMLИзXML.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/html_xml",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.УдалитьВложение",
+      "source": "https://saby.ru/help/integration/api/all_methods/del_attachment",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.УдалитьВложение.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/del_attachment",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.УдалитьДоверие",
+      "source": "https://saby.ru/help/integration/api/all_methods/del_trust",
+      "linked_from": "saby/recruit_directory_employee.html",
+      "file": "saby-methods/СБИС.УдалитьДоверие.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/del_trust",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.УдалитьДокумент",
+      "source": "https://saby.ru/help/integration/api/all_methods/del_doc/",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.УдалитьДокумент.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/del_doc",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.УдалитьСлужебныйЭтап",
+      "source": "https://saby.ru/help/integration/api/all_methods/delete_way/",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.УдалитьСлужебныйЭтап.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/delete_way",
+      "download_status": "downloaded"
+    },
+    {
+      "method_id": "СБИС.УничтожитьДокумент",
+      "source": "https://saby.ru/help/integration/api/all_methods/destruct/",
+      "linked_from": "saby/documents.html",
+      "file": "saby-methods/СБИС.УничтожитьДокумент.html",
+      "download_source": "https://saby.ru/help/integration/api/all_methods/destruct",
+      "download_status": "downloaded"
+    }
+  ]
+}

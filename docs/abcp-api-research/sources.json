@@ -1,0 +1,61 @@
+{
+  "fetched_at": "2026-10-05",
+  "sources": [
+    {
+      "url": "https://www.abcp.ru/d/docs/api/public-api",
+      "html": "snapshots/api__public-api.html",
+      "text": "snapshots/api__public-api.txt",
+      "sha256": "fddd4030cf5cad7b9a2dfdb2177f9f742c3e9d9e717002eceec58db89bf380c6",
+      "size": 23446
+    },
+    {
+      "url": "https://www.abcp.ru/d/docs/api/docs",
+      "html": "snapshots/api__docs.html",
+      "text": "snapshots/api__docs.txt",
+      "sha256": "d2bbb73d8a90ba311c54c88f2d1df886bd60e5855bf2fcf052548e5308ac65bb",
+      "size": 50147
+    },
+    {
+      "url": "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-client",
+      "html": "snapshots/api__abcp1__api-abcp-client.html",
+      "text": "snapshots/api__abcp1__api-abcp-client.txt",
+      "sha256": "18b059cc5189accd84e61168da2d7221f239a3e1ea9668c31d284b2af67eae08",
+      "size": 356782
+    },
+    {
+      "url": "https://www.abcp.ru/d/docs/api/abcp1/api-abcp-admin",
+      "html": "snapshots/api__abcp1__api-abcp-admin.html",
+      "text": "snapshots/api__abcp1__api-abcp-admin.txt",
+      "sha256": "ab1536342fc2605a3e580869fb85d4b8a67e248403d2ace4db9cfc2fa315949d",
+      "size": 622721
+    },
+    {
+      "url": "https://www.abcp.ru/d/docs/api/abcp2/api-ts-client",
+      "html": "snapshots/api__abcp2__api-ts-client.html",
+      "text": "snapshots/api__abcp2__api-ts-client.txt",
+      "sha256": "87321f5cf6f781db3f789e2441ed2a0b3d8861dd455a77256300f613b5222c90",
+      "size": 164727
+    },
+    {
+      "url": "https://www.abcp.ru/d/docs/api/abcp2/api-ts-admin",
+      "html": "snapshots/api__abcp2__api-ts-admin.html",
+      "text": "snapshots/api__abcp2__api-ts-admin.txt",
+      "sha256": "a5a2d67e9befd96b706885453e715f3c4edf9740629eb50f6568c5a4fd45640e",
+      "size": 584667
+    },
+    {
+      "url": "https://www.abcp.ru/d/docs/vinqu/apivinqu",
+      "html": "snapshots/vinqu__apivinqu.html",
+      "text": "snapshots/vinqu__apivinqu.txt",
+      "sha256": "a4bcd0892519b60f6756aaa58fc7968617d7f8296ba83a72db1853ed3f0bb82b",
+      "size": 48080
+    },
+    {
+      "url": "https://www.abcp.ru/d/docs/carcare/carcaremodule/api",
+      "html": "snapshots/carcare__carcaremodule__api.html",
+      "text": "snapshots/carcare__carcaremodule__api.txt",
+      "sha256": "9c680023c691d7f5b8d87b7a8e68322fe6f8cc5556c07a48ae2921878c8d4796",
+      "size": 234060
+    }
+  ]
+}

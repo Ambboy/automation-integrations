@@ -1,0 +1,199 @@
+Passwordless email sign-in for the inference shell workspace. The same email includes a clickable link and a short login code for users who read email on a different device than the one they sign in on.
+
+The workspace app uses this flow on the login page. You can call the endpoints directly to build a custom sign-in experience.
+
+No API key is required for send or verify endpoints. Successful sign-in sets a session cookie on the response (same cookie the workspace uses for browser sessions). For accounts that require a second factor, the session cookie is issued only after the second factor is verified. See Admin OTP (second factor).
+
+→ Authentication · Device authorization (CLI and IDE login)
+
+Flow overview
+
+mermaidcopy
+
+1sequenceDiagram2    participant Client as Your app or browser3    participant API as api.inference.sh4    participant Email as User email56    Client->>API: POST /auth/magic-link/send {email}7    API->>Email: Magic link + 5-char login code8    alt Click link (same device)9        Email->>API: GET /auth/magic-link/verify?token=…10        API-->>Client: Redirect (session cookie set, or 2FA prompt)11    else Enter code (different device)12        Client->>API: POST /auth/magic-link/verify-code {email, code}13        API-->>Client: AuthResponse (session cookie set, or challenge_token)14    end15    opt Login 2FA required16        Client->>API: POST /auth/otp/verify {code, challenge_token}17        API-->>Client: AuthResponse + session cookie18    end
+
+Call POST /auth/magic-link/send with the user's email.
+
+The user receives an email with a verification link and a 5-character login code (valid for 15 minutes). Both redeem the same challenge — using one consumes the other.
+
+Complete sign-in by clicking the link (GET /auth/magic-link/verify) or submitting the code (POST /auth/magic-link/verify-code).
+
+Admin accounts, and any account with an authenticator app enrolled, require a second factor before a session is created. After magic-link or code sign-in, the API returns otp_required: true, an otp_method (email or totp), and a challenge_token. Pass the challenge token to the OTP endpoints to complete sign-in. No session cookie is issued until 2FA succeeds.
+
+Send magic link
+
+POST /auth/magic-link/send
+
+Authentication: None.
+
+Request body
+
+ | Field | Type | Required | Description
+
+ | email | string | Yes | Email address to sign in with
+
+ | redirect_to | string | No | Path or URL appended to the verification link (for example /dashboard)
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/auth/magic-link/send \2  -H "Content-Type: application/json" \3  -d '{"email": "[email protected]"}'
+
+Response
+
+The API always returns success to prevent email enumeration, even when the address is unknown or rate limited (except IP-level throttling):
+
+jsoncopy
+
+1{2  "message": "If an account exists, a magic link has been sent"3}
+
+When the same email requests another link within the burst window (about one per minute), the response includes:
+
+jsoncopy
+
+1{2  "message": "Please wait before requesting another link",3  "rate_limited": true,4  "retry_after": 605}
+
+IP-level rate limits return HTTP 429 with a Retry-After header (seconds). The header is exposed to browser clients via CORS.
+
+Errors
+
+ | Code | HTTP | Description
+
+ | missing_email | 400 | email is empty
+
+ | disposable_email | 400 | Temporary or disposable email domain. Applies to new signups only; existing accounts are not affected. The same restriction applies when an account is created through OAuth. See REST overview: Signup email restrictions.
+
+ | invalid_email | 400 | Malformed address, or an alias with + in the local part (for example [email protected])
+
+Verify via link (browser)
+
+GET /auth/magic-link/verify?token={token}
+
+Authentication: None.
+
+Used when the user clicks the link in the email. On success, the API sets the session cookie and redirects to the workspace (or to redirect_to when provided at send time).
+
+Accounts that require login 2FA are redirected without a session cookie. The redirect URL includes otp_required=true and a challenge_token query parameter so the client can show the OTP step and call the OTP endpoints.
+
+For SPA or mobile clients that handle the token themselves, use the JSON endpoint below instead.
+
+Verify via token (JSON)
+
+POST /auth/magic-link/verify
+
+Authentication: None.
+
+Request body
+
+ | Field | Type | Required | Description
+
+ | token | string | Yes | Token from the magic link URL
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/auth/magic-link/verify \2  -H "Content-Type: application/json" \3  -c cookies.txt \4  -d '{"token": "TOKEN_FROM_EMAIL_LINK"}'
+
+Response
+
+When sign-in completes without 2FA:
+
+jsoncopy
+
+1{2  "user": { "id": "user_abc", "email": "[email protected]", "username": "you" },3  "session_id": "sess_xyz",4  "otp_required": false5}
+
+When login 2FA is required, the response omits session_id and no session cookie is set:
+
+jsoncopy
+
+1{2  "user": { "id": "user_abc", "email": "[email protected]", "username": "you" },3  "otp_required": true,4  "otp_method": "email",5  "challenge_token": "CHALLENGE_TOKEN"6}
+
+Complete login 2FA with the challenge_token before calling authenticated routes. The session cookie is set on the successful POST /auth/otp/verify response.
+
+Verify via login code
+
+POST /auth/magic-link/verify-code
+
+Authentication: None.
+
+Device-independent sign-in: the user reads the 5-character code from email and enters it on the sign-in device.
+
+Request body
+
+ | Field | Type | Required | Description
+
+ | email | string | Yes | Same email used in send
+
+ | code | string | Yes | 5-character code from the email (case-insensitive)
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/auth/magic-link/verify-code \2  -H "Content-Type: application/json" \3  -c cookies.txt \4  -d '{"email": "[email protected]", "code": "AB3K9"}'
+
+Response
+
+Same AuthResponse shape as verify via token. The session cookie is set when sign-in completes: immediately when no 2FA is required, after OTP verification otherwise.
+
+Errors
+
+ | Code | HTTP | Description
+
+ | invalid_code | 400 | Code wrong, expired, or already used
+
+ | account_locked | 429 | Too many failed attempts for this email
+
+ | rate_limited | 429 | Too many verification attempts from this IP
+
+Failed code attempts count toward per-email lockout. Codes use an alphanumeric charset without ambiguous characters (0, 1, O, I, L).
+
+Admin OTP (second factor)
+
+Admin accounts require a second factor after passwordless sign-in (magic link, login code, OAuth, or SAML). Non-admin accounts require one only when they have an authenticator app enrolled. This is separate from the 5-character login code. The OTP endpoints support two modes:
+
+ | Mode | When | Credential
+
+ | Login 2FA (pre-session) | Immediately after sign-in, before any session exists | challenge_token from the auth response or redirect URL
+
+ | Re-auth | A sensitive route returns 403 with code otp_required on an existing session | Session cookie
+
+The same routes handle both modes. Include challenge_token for login 2FA; omit it for re-auth.
+
+ | Endpoint | Method | Description
+
+ | /auth/otp/status | GET | Whether OTP is pending (required, verified, method). Pass ?challenge_token= for login 2FA, or send the session cookie for re-auth.
+
+ | /auth/otp/verify | POST | Verify the code. Body: { "code": "123456", "challenge_token": "…" } for login 2FA, or { "code": "123456" } with the session cookie for re-auth.
+
+ | /auth/otp/resend | POST | Resend the email OTP. Body: { "challenge_token": "…" } for login 2FA, or the session cookie for re-auth. Returns totp_no_resend (400) when otp_method is totp.
+
+Login challenges expire after 10 minutes. Email OTP is a 6-digit code. Accounts with an authenticator app enrolled get otp_method: "totp" instead and enter a code from the app.
+
+After a successful OTP verification (login 2FA or re-auth), the session is marked re-authenticated for 4 hours. OTP-gated routes accept the session without prompting again until that window expires.
+
+Login 2FA (pre-session)
+
+Used during sign-in when otp_required: true is returned. No session cookie exists yet. Store the challenge_token and pass it to every OTP call until verification succeeds.
+
+bashcopy
+
+1# Check pending login 2FA (no session cookie)2curl "https://api.inference.sh/auth/otp/status?challenge_token=CHALLENGE_TOKEN"34# Submit the 6-digit code from email, or from the authenticator app5curl -X POST https://api.inference.sh/auth/otp/verify \6  -H "Content-Type: application/json" \7  -c cookies.txt \8  -d '{"code": "123456", "challenge_token": "CHALLENGE_TOKEN"}'910# Resend the email OTP (not available for totp)11curl -X POST https://api.inference.sh/auth/otp/resend \12  -H "Content-Type: application/json" \13  -d '{"challenge_token": "CHALLENGE_TOKEN"}'
+
+On success, POST /auth/otp/verify returns an AuthResponse with session_id and sets the session cookie.
+
+The same pre-session flow applies to OAuth and SAML sign-in. Those auth responses and redirect URLs also include challenge_token when otp_required is true.
+
+Re-auth (existing session)
+
+When an OTP-gated route returns 403 with code otp_required, the platform emails a fresh OTP if the previous one is missing or expired. Accounts with an authenticator app enrolled get no email and enter a code from the app. Re-auth uses the session cookie. Do not pass challenge_token.
+
+bashcopy
+
+1# Check re-auth status2curl https://api.inference.sh/auth/otp/status -b cookies.txt34# Submit the code (session cookie required)5curl -X POST https://api.inference.sh/auth/otp/verify \6  -H "Content-Type: application/json" \7  -b cookies.txt \8  -d '{"code": "123456"}'
+
+On success, the response includes reauth_until (ISO 8601 timestamp), 4 hours from verification. Sensitive routes stay unlocked until that time.
+
+Related
+
+Device authorization — CLI and IDE login (returns an API key instead of a session cookie)
+
+Authentication — API keys for programmatic access
+
+REST API overview — /v1/ path prefix removed

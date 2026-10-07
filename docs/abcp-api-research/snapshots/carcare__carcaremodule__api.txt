@@ -1,0 +1,1753 @@
+Автосервисы
+Виджет "Автосервисы"
+CarCareModule:API
+Содержание этой страницы
+CarCareModule:API
+Модуль "Автосервис" имеет необходимый набор API-методов для интеграции с вашей собственной учетной системой, в частности, для синхронизации резервов.
+Сервис представляет собой обычный RESTfull сервис поверх HTTP. Вызовы на модификацию принимаются через POST, на получение - через GET. Все ответы приходят в формате JSON.
+Обмен осуществляется в кодировке UTF-8.
+При использовании метода POST в HTTP-заголовке Content-Type необходимо передать медиа-тип данных запроса application/x-www-form-urlencoded и соответственно с данным типом сформировать тело HTTP-запроса.
+Для отладки вы можете воспользоваться расширением
+Talend API Tester - Free Edition
+для обозревателя Google Chrome.
+Базовым URI для веб-службы является:
+https://car-care.abcp.ru
+Строки от веб-службы, содержащие русские символы, возвращаются в виде escape unicode.
+В каждом запросе должен присутствовать набор обязательных параметров:
+sitelogin - логин сайта с которого производится запрос
+sitepsw - пароль сайта, закодированный алгоритмом md5
+Для получения указанных выше логина и пароля необходимо обратиться в техподдержку.
+Результат, возвращаемый веб-сервисом, может иметь один из следующих статусов:
+200 - ОК
+500 - Internal Server Error
+Если выставлен статус 500, значит в процессе работы веб-сервиса произошла ошибка. В этом случае ответ веб-сервиса должен содержать объект с двумя полями errorCode и errorMessage.
+{
+"errorCode"
+:
+2
+,
+"errorMessage"
+:
+"Недостаточно параметров"
+}
+Сущности
+​
+Объект CarCare
+​
+carCareId - integer - глобальный идентификатор автосервиса
+url - string - сайт сервиса
+name - string - название сервиса
+workingTime - object
+WorkingTime
+- данные о рабочем времени
+address - объект
+Address
+timeZone - string - временная зона нахождения автосервиса [Пример: Europe/Moscow] (
+полный список поддерживаемых временных зон
+)
+phones - array of string - телефоны
+reservationStepInMinutes - integer - шаг резервирования в минутах
+status - integer - состояние модерации автосервиса (1 - в работе, 2 - на проверке модератора, 3 - подтверждён)
+conditions - string - условия работы
+departmentCount - integer - количество боксов
+departments - array of
+Department
+- массив боксов
+notificationsPhone - string - телефон для SMS-оповещений
+inNetwork - bool - признак "входит в сеть"
+informerSite - string - хост сайта, где расположен информер рейтинга автосервиса
+logo - string - имя файла логотипа, загруженного в image.api
+photos - array - массив фотографий
+notificationEmails - array of string - список email для уведомлений
+disableForMyCarReservation - bool - флаг отключения онлайн-записи на 4mycar
+Объект WorkingTime
+​
+Содержит массив с ассоциативными ключами от "1" до "7", соответствующими дням недели от ПН до ВС, а также "holiday", соответствующего праздничным дням.
+В качестве значений объект со свойствами "start" и "stop", соответствующими началу и окончанию рабочего времени в текстовом формате "09:00". Пустой объект
+{}
+- означает выходной.
+Пример:
+[
+{
+"1"
+:
+{
+}
+,
+"2"
+:
+{
+"start"
+:
+"09:00"
+,
+"stop"
+:
+"18:00"
+}
+,
+...
+"7"
+:
+{
+"start"
+:
+"10:00"
+,
+"stop"
+:
+"22:00"
+}
+,
+"holiday"
+:
+{
+"start"
+:
+"10:00"
+,
+"stop"
+:
+"22:00"
+}
+}
+]
+Объект Address
+​
+countryId - integer - код страны
+regionCode - string - код региона
+cityCode - string - код города
+city - string - название города
+street - string - улица
+building - string - дом, строение
+apartment - string - № офиса
+subwayStation - string - название станции метро
+subwayStationId - integer - идентификатор станции метро
+subwayLine - string - название ветки метро
+subwayLineId - integer - идентификатор ветки метро
+gps - string - GPS координаты автосервиса (Например: 55.739276,37.508265)
+Объект Department
+​
+departmentId - integer - глобальный идентификатор бокса
+name - string - название бокса
+workingTime - object
+WorkingTime
+- данные о рабочем времени
+phones - array of string - телефоны
+reservationStepInMinutes - integer - шаг резервирования в минутах
+workplaceCount - integer - количество подъёмников (рабочих мест)
+availableWorks - array of
+Work
+- данные о видах работ и их продолжительности
+isHidden - boolean - видимость бокса
+Объект Work
+​
+workId - integer - глобальный идентификатор работы
+name - string - название (описание) вида работы
+duration - integer - длительность работы
+(не используется)
+manufacturers - array - массив марок автомобилей для которых выполняется эта работа конкретным боксом
+isDelete - признак "Удалена"
+Пример:
+[
+{
+"workId"
+:
+1
+,
+"name"
+:
+"Мойка"
+,
+"duration"
+:
+20
+,
+"isDelete"
+:
+0
+,
+"manufacturers"
+:
+[
+{
+"code"
+:
+"HYUND"
+,
+"name"
+:
+"HYUNDAI"
+}
+]
+}
+,
+{
+"workId"
+:
+2
+,
+"name"
+:
+"Вулканизация"
+,
+"duration"
+:
+50
+,
+"isDelete"
+:
+0
+,
+"manufacturers"
+:
+[
+]
+}
+,
+...
+]
+Объект ReservationWork
+​
+reservationWorkId - integer - глобальный идентификатор зарезервированной работы
+carCareId - integer - глобальный идентификатор автосервиса
+carCareName - string - название автосервиса
+departmentId - integer - глобальный идентификатор бокса
+departmentName - string - название бокса
+works - array of
+Work
+- массив объектов Work
+date - string - формат: ДД-ММ-ГГГГ - дата резервирования
+timeStart - string - формат: ЧЧ:ММ - время начала резервирования
+timeStop - string - формат: ЧЧ:ММ - время окончания резервирования
+intervals - array of array - массив с забронированными интервалами работы в формате array(0 => array("start" => "ЧЧ:ММ", "stop" => "ЧЧ:ММ"), ...)
+customerGid - integer - глобальный идентификатор клиента
+customer -
+Customer
+- информация о забронировавшем пользователе
+comment - string - комментарий клиента при резервировании
+isDelete - bool - флаг "Удален"
+isCancel - bool - значение 1 или 0 - если isCancel=1 при isDelete=0 значит отправлен запрос на удаление резерва. Если isCancel=1 при isDelete=1 значит запрос на отмену резерва подтвержден сотрудником автосервиса. Если isDelete=1 при isCancel=0 значит резерв удален сотрудником без запроса со стороны клиента
+Объект Customer
+​
+fullName - string - ФИО клиента делающего резерв
+phoneNumber - string - номер телефона
+email - string - адрес электронной почты
+modificationId - integer - идентификатор модификации выбранного автомобиля
+(не используется)
+manufacture - string - марка автомобиля, например: BMW
+model - string - модель автомобиля, например - 118i
+registrationNumber - string - государственный регистрационный номер автомобиля
+Операции
+​
+Получение информации об автосервисах
+​
+GET /car-cares/
+Параметры запроса
+Параметр
+Описание
+sitelogin
+Логин сайта
+sitepsw
+md5-хэш пароля сайта
+Результат выполнения
+Результатом успешного выполнения данной операции будет массив объектов
+CarCare
+.
+Пример
+Запрос
+GET https://car-care.abcp.ru/car-cares/?sitelogin=demo.abcp.ru&sitepsw=66786abcd78789f1e
+Ответ
+[
+{
+"carCareId"
+:
+40239
+,
+"url"
+:
+""
+,
+"name"
+:
+"МойБМВ (на ул. рябиновой)"
+,
+"workingTime"
+:
+{
+"1"
+:
+{
+"start"
+:
+"10:00:00"
+,
+"stop"
+:
+"20:00:00"
+}
+,
+"2"
+:
+{
+"start"
+:
+"10:00:00"
+,
+"stop"
+:
+"20:00:00"
+}
+,
+"3"
+:
+{
+"start"
+:
+"10:00:00"
+,
+"stop"
+:
+"20:00:00"
+}
+,
+"4"
+:
+{
+"start"
+:
+"10:00:00"
+,
+"stop"
+:
+"20:00:00"
+}
+,
+"5"
+:
+{
+"start"
+:
+"10:00:00"
+,
+"stop"
+:
+"20:00:00"
+}
+,
+"6"
+:
+{
+"start"
+:
+"10:00:00"
+,
+"stop"
+:
+"20:00:00"
+}
+,
+"7"
+:
+{
+"start"
+:
+"10:00:00"
+,
+"stop"
+:
+"20:00:00"
+}
+,
+"holiday"
+:
+{
+}
+}
+,
+"address"
+:
+{
+"countryId"
+:
+643
+,
+"regionCode"
+:
+"77"
+,
+"cityCode"
+:
+"77_0_000_000_000_000"
+,
+"city"
+:
+"Москва"
+,
+"street"
+:
+"Рябиновая"
+,
+"building"
+:
+"45"
+,
+"apartment"
+:
+""
+,
+"subwayLineId"
+:
+"6"
+,
+"subwayLine"
+:
+"Филёвская линия"
+,
+"subwayStationId"
+:
+"47"
+,
+"subwayStation"
+:
+"Кунцевская"
+,
+"gps"
+:
+"55.702723176135,37.43234803915"
+}
+,
+"timeZone"
+:
+"Europe/Moscow"
+,
+"phones"
+:
+[
+"8-495-922-06-69"
+]
+,
+"reservationStepInMinutes"
+:
+60
+,
+"status"
+:
+3
+,
+"conditions"
+:
+""
+,
+"departmentCount"
+:
+1
+,
+"departments"
+:
+[
+{
+"departmentId"
+:
+80819
+,
+"name"
+:
+"Первый Бокс"
+,
+"phones"
+:
+{
+}
+,
+"workingTime"
+:
+{
+}
+,
+"reservationStepInMinutes"
+:
+60
+,
+"workplaceCount"
+:
+3
+,
+"availableWorks"
+:
+[
+{
+"workId"
+:
+14
+,
+"name"
+:
+"Слесарные работы"
+,
+"duration"
+:
+0
+,
+"parentId"
+:
+null
+,
+"isDelete"
+:
+0
+,
+"id"
+:
+null
+,
+"manufacturers"
+:
+[
+{
+"code"
+:
+"BMW"
+,
+"name"
+:
+"BMW"
+}
+]
+}
+,
+{
+"workId"
+:
+15
+,
+"name"
+:
+"Двигатель"
+,
+"duration"
+:
+0
+,
+"parentId"
+:
+null
+,
+"isDelete"
+:
+0
+,
+"id"
+:
+null
+,
+"manufacturers"
+:
+[
+{
+"code"
+:
+"BMW"
+,
+"name"
+:
+"BMW"
+}
+]
+}
+,
+{
+"workId"
+:
+16
+,
+"name"
+:
+"Электрика"
+,
+"duration"
+:
+0
+,
+"parentId"
+:
+null
+,
+"isDelete"
+:
+0
+,
+"id"
+:
+null
+,
+"manufacturers"
+:
+[
+{
+"code"
+:
+"BMW"
+,
+"name"
+:
+"BMW"
+}
+]
+}
+]
+,
+"isHidden"
+:
+0
+}
+]
+,
+"notificationsPhone"
+:
+""
+,
+"inNetwork"
+:
+0
+,
+"informerSite"
+:
+""
+,
+"notificationEmails"
+:
+[
+"xxx@nodasoft.com"
+,
+"yyy@nodasoft.com"
+]
+}
+,
+{
+"carCareId"
+:
+40342
+,
+"url"
+:
+""
+,
+"name"
+:
+"ТвойБМВ"
+,
+"workingTime"
+:
+{
+"1"
+:
+{
+"start"
+:
+"05:30:00"
+,
+"stop"
+:
+"08:30:00"
+}
+,
+"2"
+:
+{
+"start"
+:
+"05:30:00"
+,
+"stop"
+:
+"08:30:00"
+}
+,
+"3"
+:
+{
+"start"
+:
+"05:30:00"
+,
+"stop"
+:
+"08:30:00"
+}
+,
+"4"
+:
+{
+"start"
+:
+"05:30:00"
+,
+"stop"
+:
+"08:30:00"
+}
+,
+"5"
+:
+{
+"start"
+:
+"05:30:00"
+,
+"stop"
+:
+"08:30:00"
+}
+,
+"6"
+:
+{
+"start"
+:
+"05:30:00"
+,
+"stop"
+:
+"08:30:00"
+}
+,
+"7"
+:
+{
+"start"
+:
+"05:30:00"
+,
+"stop"
+:
+"08:30:00"
+}
+,
+"holiday"
+:
+{
+}
+}
+,
+"address"
+:
+{
+"countryId"
+:
+643
+,
+"regionCode"
+:
+"01"
+,
+"cityCode"
+:
+"01_0_000_001_000_000"
+,
+"city"
+:
+"Майкоп"
+,
+"street"
+:
+"Ленина"
+,
+"building"
+:
+"2"
+,
+"apartment"
+:
+""
+,
+"subwayLineId"
+:
+"0"
+,
+"subwayLine"
+:
+""
+,
+"subwayStationId"
+:
+"0"
+,
+"subwayStation"
+:
+""
+,
+"gps"
+:
+""
+}
+,
+"timeZone"
+:
+"Europe/Kiev"
+,
+"phones"
+:
+{
+}
+,
+"reservationStepInMinutes"
+:
+30
+,
+"status"
+:
+3
+,
+"conditions"
+:
+""
+,
+"departmentCount"
+:
+0
+,
+"departments"
+:
+{
+}
+,
+"notificationsPhone"
+:
+"79000000000"
+,
+"inNetwork"
+:
+0
+,
+"informerSite"
+:
+""
+,
+"notificationEmails"
+:
+[
+"xxx@nodasoft.com"
+,
+"yyy@nodasoft.com"
+]
+}
+]
+Получение списка резервированных работ
+​
+GET /reservation/
+Параметры запроса
+Параметр
+Описание
+sitelogin
+Логин сайта [обязательный]
+sitepsw
+md5-хэш пароля сайта [обязательный]
+filter
+Массив параметров фильтрации резервов [необязательный]
+skip
+Количество пропускаемых резервированных работ для постраничной навигации. По умолчанию skip = 0 [необязательный]
+limit
+Количество возвращаемых резервированных работ для постраничной навигации. По умолчанию limit = 30 [необязательный]
+Параметры фильтрации
+Параметр
+Описание
+carCareId
+Идентификатор автосервиса, без его указания вернутся данные по всем автосервисам
+departmentId
+Идентификатор бокса, без указания этого параметра вернется информация по резервированию для всех боксов автосервиса
+dateStart
+Формат: ДД.ММ.ГГГГ - дата с который смотреть график забронированных работ, если параметр не указан, то возвращаются все зарезервированные работы с текущего дня. День считается с учетом часового пояса автосервиса, а время берется начала дня, т.е. с 00:00:00. dateStart и dateStop могут использоваться только вместе.
+dateStop
+Формат: ДД.ММ.ГГГГ - дата до которой смотреть график забронированных работ, если параметр не указан, то возвращаются все зарезервированные работы с текущего дня. День считается с учетом часового пояса автосервиса, а время берется конца дня, т.е. до 23:59:59. dateStart и dateStop могут использоваться только вместе.
+customerGid
+Массив с глобальными идентификаторами клиентов
+customerData
+Строка для поиска по частичному совпадению в любом из полей: fullName, phoneNumber, email или точное соответствие customerGid клиента резерва
+registrationNumber
+Массив с глобальными идентификаторами клиентов
+reservationWorkIds
+Массив с идентификаторами резервов
+Результат выполнения
+Результатом будет являться объект, содержащий два свойства:
+count - общее кол-во резервируемых работ для постраничной навигации
+response - массив объектов
+ReservationWork
+Пример
+Запрос
+GET `https://car-care.abcp.ru/reservation/?sitelogin=id2245&sitepsw=7658340968acb57&filter[dateStart]=01.01.2014&filter[dateStop]=01.01.2015&customerData=nata@nodasoft.com&limit=5`
+Ответ
+{
+"response"
+:
+[
+{
+"reservationWorkId"
+:
+112621
+,
+"carCareId"
+:
+40239
+,
+"carCareName"
+:
+"МойБМВ (на ул. рябиновой)"
+,
+"departmentId"
+:
+80819
+,
+"departmentName"
+:
+"Первый Бокс"
+,
+"works"
+:
+[
+{
+"workId"
+:
+14
+,
+"name"
+:
+"Слесарные работы"
+,
+"duration"
+:
+0
+}
+]
+,
+"date"
+:
+"05-08-2014"
+,
+"timeStart"
+:
+"17:00"
+,
+"timeStop"
+:
+"18:00"
+,
+"intervals"
+:
+[
+{
+"start"
+:
+"17:00"
+,
+"stop"
+:
+"18:00"
+}
+]
+,
+"comment"
+:
+"Подъеду чуть раньше"
+,
+"customerGid"
+:
+400270
+,
+"isCancel"
+:
+0
+,
+"customer"
+:
+{
+"fullName"
+:
+"Ната"
+,
+"phoneNumber"
+:
+"22222"
+,
+"email"
+:
+"nata@nodasoft.com"
+,
+"modificationId"
+:
+165
+,
+"manufacture"
+:
+"BMW"
+,
+"model"
+:
+"3 (E90, E90N) 316i 116 л.с."
+,
+"registrationNumber"
+:
+"н222мр"
+}
+}
+,
+{
+"reservationWorkId"
+:
+112629
+,
+"carCareId"
+:
+40239
+,
+"carCareName"
+:
+"МойБМВ (на ул. рябиновой)"
+,
+"departmentId"
+:
+80819
+,
+"departmentName"
+:
+"Первый Бокс"
+,
+"works"
+:
+[
+{
+"workId"
+:
+14
+,
+"name"
+:
+"Слесарные работы"
+,
+"duration"
+:
+0
+}
+]
+,
+"date"
+:
+"06-08-2014"
+,
+"timeStart"
+:
+"12:00"
+,
+"timeStop"
+:
+"13:00"
+,
+"intervals"
+:
+[
+{
+"start"
+:
+"12:00"
+,
+"stop"
+:
+"13:00"
+}
+]
+,
+"comment"
+:
+""
+,
+"customerGid"
+:
+400270
+,
+"isCancel"
+:
+0
+,
+"customer"
+:
+{
+"fullName"
+:
+"Татьяна"
+,
+"phoneNumber"
+:
+"1111"
+,
+"email"
+:
+"nata@nodasoft.com"
+,
+"modificationId"
+:
+33425
+,
+"manufacture"
+:
+"BMW"
+,
+"model"
+:
+"6 (F13) Купе 650i xDrive 407 л.с."
+,
+"registrationNumber"
+:
+"п878па"
+}
+}
+]
+,
+"count"
+:
+2
+}
+Добавление резерва
+​
+POST /reservation/insert/
+Параметры запроса
+Параметр
+Описание
+sitelogin
+Логин сайта [обязательный]
+sitepsw
+md5-хэш пароля сайта [обязательный]
+departmentId
+Идентификатор бокса [обязательный]
+date
+Формат: ДД.ММ.ГГГГ - дата бронирования [обязательный]
+time
+Формат: ЧЧ:ММ - время бронирования [обязательный]
+works
+Массив идентификаторов работ [обязательный]
+customerGid
+Глобальный идентификатор клиента [необязательный]
+customer
+Объект
+Customer
+[обязательный].
+comment
+Комментарий клиента при резервировании [необязательный]
+Результат выполнения
+Результатом будет являться объект
+ReservationWork
+Пример
+Запрос
+POST https://car-care.abcp.ru/reservation/insert/
+sitelogin=id2245&sitepsw=4537895724958902&date=20.01.2015&time=12:00&customer[fullName]=Инакентий&customer[phoneNumber]=+79000000000&customer[manufacture]=BMW&customer[model]=X5&customer[registrationNumber]=x777xx777&departmentId=80819&works[]=14
+Ответ
+[
+{
+"reservationWorkId"
+:
+113044
+,
+"carCareId"
+:
+40239
+,
+"carCareName"
+:
+"МойБМВ (на ул. рябиновой)"
+,
+"departmentId"
+:
+80819
+,
+"departmentName"
+:
+"Первый Бокс"
+,
+"works"
+:
+[
+{
+"workId"
+:
+14
+,
+"name"
+:
+"Слесарные работы"
+,
+"duration"
+:
+0
+}
+]
+,
+"date"
+:
+"20-01-2015"
+,
+"timeStart"
+:
+"12:00"
+,
+"timeStop"
+:
+"13:00"
+,
+"intervals"
+:
+[
+{
+"start"
+:
+"12:00"
+,
+"stop"
+:
+"13:00"
+}
+]
+,
+"comment"
+:
+""
+,
+"customerGid"
+:
+0
+,
+"isCancel"
+:
+0
+,
+"customer"
+:
+{
+"fullName"
+:
+"Инакентий"
+,
+"phoneNumber"
+:
+"79000000000"
+,
+"email"
+:
+""
+,
+"modificationId"
+:
+0
+,
+"manufacture"
+:
+"BMW"
+,
+"model"
+:
+"X5"
+,
+"registrationNumber"
+:
+"x777xx777"
+}
+}
+]
+Редактирование зарезервированного времени
+​
+POST /reservation/edit/
+Параметры запроса
+Параметр
+Описание
+sitelogin
+Логин сайта [обязательный]
+sitepsw
+md5-хэш пароля сайта [обязательный]
+reservationWorkId
+Идентификатор резерва [обязательный]
+date
+Формат: ДД.ММ.ГГГГ - дата бронирования [обязательный]
+time
+Массив времени в формате: ЧЧ:ММ. Указывать нужно только время начала интервала, которое необходимо забронировать [обязательный]
+customer
+объект Customer. Достаточно указать только те свойства, которые необходимо изменить. [необязательный]
+comment
+комментарий к бронированию [необязательный]
+Свойства Customer, которые можно изменять
+​
+fullName
+phoneNumber
+email
+manufacture
+model
+registrationNumber
+Важные моменты:
+При указании интервалов, задается только время его начала. Время окончания определяется из длительности интервала работы бокса, а если у него интервал не указан, то берется значение автосервиса.
+Результат выполнения
+Результатом будет являться объект
+ReservationWork
+Пример
+Запрос
+POST https://car-care.abcp.ru/reservation/edit/
+sitelogin=id2245&sitepsw=46d45c56324&date=20.01.2015&time[]=12:00&time[]=13:00&time[]=14:00&reservationWorkId=113044&customer[fullName]=Инакентий&comment=Комментарий
+Ответ
+[
+{
+"reservationWorkId"
+:
+113044
+,
+"carCareId"
+:
+40239
+,
+"carCareName"
+:
+"МойБМВ (на ул. рябиновой)"
+,
+"departmentId"
+:
+80819
+,
+"departmentName"
+:
+"Первый Бокс"
+,
+"works"
+:
+[
+{
+"workId"
+:
+14
+,
+"name"
+:
+"Слесарные работы"
+,
+"duration"
+:
+0
+}
+]
+,
+"date"
+:
+"20-01-2015"
+,
+"timeStart"
+:
+"12:00"
+,
+"timeStop"
+:
+"15:00"
+,
+"intervals"
+:
+[
+{
+"start"
+:
+"12:00"
+,
+"stop"
+:
+"13:00"
+}
+,
+{
+"start"
+:
+"13:00"
+,
+"stop"
+:
+"14:00"
+}
+,
+{
+"start"
+:
+"14:00"
+,
+"stop"
+:
+"15:00"
+}
+]
+,
+"comment"
+:
+"Комментарий"
+,
+"customerGid"
+:
+0
+,
+"isCancel"
+:
+0
+,
+"customer"
+:
+{
+"fullName"
+:
+"Инакентий"
+,
+"phoneNumber"
+:
+"79000000000"
+,
+"email"
+:
+""
+,
+"modificationId"
+:
+0
+,
+"manufacture"
+:
+"BMW"
+,
+"model"
+:
+"X5"
+,
+"registrationNumber"
+:
+"x777xx777"
+}
+}
+]
+Отмена резервирования работ
+​
+POST /reservation/delete/
+Параметры запроса
+Параметр
+Описание
+sitelogin
+Логин сайта [обязательный]
+sitepsw
+md5-хэш пароля сайта [обязательный]
+reservationWorkId
+Идентификатор резерва [обязательный]
+Результат выполнения
+Результатом будет являться объект
+ReservationWork
+Пример
+Запрос
+POST https://car-care.abcp.ru/reservation/delete/
+sitelogin=id2245&sitepsw=46d45c56324&reservationWorkId=113044
+Ответ
+[
+{
+"reservationWorkId"
+:
+113044
+,
+"carCareId"
+:
+40239
+,
+"carCareName"
+:
+"МойБМВ (на ул. рябиновой)"
+,
+"departmentId"
+:
+80819
+,
+"departmentName"
+:
+"Первый Бокс"
+,
+"works"
+:
+[
+{
+"workId"
+:
+14
+,
+"name"
+:
+"Слесарные работы"
+,
+"duration"
+:
+0
+}
+]
+,
+"date"
+:
+"20-01-2015"
+,
+"timeStart"
+:
+"12:00"
+,
+"timeStop"
+:
+"15:00"
+,
+"intervals"
+:
+[
+{
+"start"
+:
+"12:00"
+,
+"stop"
+:
+"13:00"
+}
+,
+{
+"start"
+:
+"13:00"
+,
+"stop"
+:
+"14:00"
+}
+,
+{
+"start"
+:
+"14:00"
+,
+"stop"
+:
+"15:00"
+}
+]
+"comment"
+:
+""
+,
+"customerGid"
+:
+0
+,
+"isCancel"
+:
+0
+,
+"customer"
+:
+{
+"fullName"
+:
+"Инакентий"
+,
+"phoneNumber"
+:
+"79000000000"
+,
+"email"
+:
+""
+,
+"modificationId"
+:
+0
+,
+"manufacture"
+:
+"BMW"
+,
+"model"
+:
+"X5"
+,
+"registrationNumber"
+:
+"x777xx777"
+}
+}
+]
+Получение свободных мест для бокса на конкретную дату
+​
+GET /schedule/free/
+sitelogin - string [обязательный] - логин сайта, на котором размещён каталог
+sitepsw - string [обязательный] - хеш пароля сайта, полученный с помощью функции md5
+departmentId - integer [обязательный] - идентификатор бокса
+date - string [обязательный] - дата в формате ДД.ММ.ГГГГ
+customerGid - integer [необязательный] - глобальный идентификатор клиента. При указании этого параметра, кол-во свободных мест будет отображаться для конкретного клиента. Если клиент уже сделал резерв в этом боксе, например на 10:00, то этот интервал будет отображаться с кол-ом рабочих мест равным нулю. Тем самым предотвращая повторную запись клиента на то же самое время.
+Параметры запроса
+Параметр
+Описание
+sitelogin
+Логин сайта [обязательный]
+sitepsw
+md5-хэш пароля сайта [обязательный]
+departmentId
+Идентификатор бокса [обязательный]
+date
+Формат: ДД.ММ.ГГГГ - дата для получения информации [обязательный]
+customerGid
+Глобальный идентификатор клиента. При указании этого параметра, кол-во свободных мест будет отображаться для конкретного клиента. Если клиент уже сделал резерв в этом боксе, например на 10:00, то этот интервал будет отображаться с кол-ом рабочих мест равным нулю. Тем самым предотвращая повторную запись клиента на тоже самое время. [необязательный]
+Результат выполнения
+Результатом будет являться объект содержащий два свойства:
+date - дата информации
+intervals - массив объектов интервалов со свойствами:
+start - время начала интервала
+stop - время окончания интервала
+freePlaces - количество свободных рабочих мест
+Пример
+Запрос
+GET `https://car-care.abcp.ru/schedule/free/?sitelogin=id2245&sitepsw=46d45c56324&departmentId=80819&date=20.01.2015`
+Ответ
+{
+"date"
+:
+"20-01-2015"
+,
+"intervals"
+:
+[
+{
+"start"
+:
+"10:00"
+,
+"stop"
+:
+"11:00"
+,
+"freePlaces"
+:
+3
+}
+,
+{
+"start"
+:
+"11:00"
+,
+"stop"
+:
+"12:00"
+,
+"freePlaces"
+:
+3
+}
+,
+{
+"start"
+:
+"12:00"
+,
+"stop"
+:
+"13:00"
+,
+"freePlaces"
+:
+3
+}
+,
+{
+"start"
+:
+"13:00"
+,
+"stop"
+:
+"14:00"
+,
+"freePlaces"
+:
+3
+}
+,
+{
+"start"
+:
+"14:00"
+,
+"stop"
+:
+"15:00"
+,
+"freePlaces"
+:
+3
+}
+,
+{
+"start"
+:
+"15:00"
+,
+"stop"
+:
+"16:00"
+,
+"freePlaces"
+:
+3
+}
+,
+{
+"start"
+:
+"16:00"
+,
+"stop"
+:
+"17:00"
+,
+"freePlaces"
+:
+3
+}
+,
+{
+"start"
+:
+"17:00"
+,
+"stop"
+:
+"18:00"
+,
+"freePlaces"
+:
+3
+}
+,
+{
+"start"
+:
+"18:00"
+,
+"stop"
+:
+"19:00"
+,
+"freePlaces"
+:
+3
+}
+,
+{
+"start"
+:
+"19:00"
+,
+"stop"
+:
+"20:00"
+,
+"freePlaces"
+:
+3
+}
+]
+}

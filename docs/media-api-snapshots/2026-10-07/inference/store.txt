@@ -1,0 +1,132 @@
+Browse approved apps and skills from the public Grid and skill registry.
+These endpoints power Apps and the skill registry. They return store listings (metadata, category, rank, tags) — not full app manifests or skill instructions.
+No API key is required. See REST overview — response format.
+→ Search API — semantic discovery across apps, skills, and knowledge
+→ Skills API — skill content, versions, and management
+→ Apps API: your workspace's apps and deploy workflows
+List approved apps
+GET /store/apps or POST /store/apps/list
+Returns apps with an approved store version, sorted by rank (descending) when you omit sort. Apps with status retired are excluded. Other statuses (active, maintenance, deprecated) may appear when the underlying app is public — see Apps API — App lifecycle status.
+Query parameters (GET)
+| Parameter | Description
+| cursor | Pagination cursor
+| limit | Page size (default 10)
+| direction | forward or backward (default forward)
+| filters | JSON array of { "field", "value", "operator" } filters
+| sort | JSON array of { "field", "dir" } sort orders
+| search | JSON object { "term", "fields", "exact" } for text search (term is the query string)
+POST accepts the same fields in the JSON body.
+Response (PublicAppStoreDTO)
+| Field | Description
+| id | App / listing ID (same as app ID)
+| namespace, name | App ref (namespace/name)
+| description | Short description
+| category, subcategory | Grid grouping
+| tags | Store tags
+| images | App card images
+| is_featured | Featured in the Grid
+| rank | Sort rank (higher = more prominent)
+| has_approved_version | Always true for this endpoint
+| page_id | Optional docs page link
+bashcopy
+1curl "https://api.inference.sh/store/apps?limit=20"
+bashcopy
+1curl -X POST https://api.inference.sh/store/apps/list \2  -H "Content-Type: application/json" \3  -d '{"limit": 20, "search": {"term": "whisper", "fields": ["name", "description"]}}'
+Pagination matches other cursor list endpoints (items, next_cursor, has_next, total_items, …).
+Get app store listing
+GET /store/apps/{appId}
+Returns store metadata for one approved app (AppStoreListingDTO). Use this when you already have an app ID from a list response.
+| Field | Description
+| allows_private_workers | Whether the app can run on private engines
+| allows_cloud_workers | Whether the app can run on cloud workers
+| max_concurrency | Global cap on concurrent runs for this app across the platform (0 = no cap)
+| max_concurrency_per_team | Per-workspace cap on concurrent runs (0 = no cap)
+| min_concurrency | Minimum number of cloud workers that must keep this app loaded (0 = no floor). See Reserved cloud capacity below.
+| required_feature | Optional entitlement resource (for example feature:seedance) your workspace must have explicitly granted (enabled: true) to run this app. A missing entitlement row is denied, not treated as unrestricted. When blocked, task dispatch returns feature_not_available (403) with addon plan metadata when an addon unlocks the feature. See Entitlements API.
+| category, subcategory, tags, rank, is_featured | Store presentation metadata
+bashcopy
+1curl "https://api.inference.sh/store/apps/app_abc123"
+Reserved cloud capacity (min_concurrency)
+When min_concurrency is greater than zero, the scheduler keeps at least that many cloud workers loaded with the app. Other apps cannot displace those workers if doing so would drop the app below its floor.
+| Behavior | Detail
+| Cloud workers only | Private workers are not protected by min_concurrency
+| Same-app tasks | Workers already running the app can still accept new tasks for that app
+| Displacement | A worker can be reclaimed only when more than min_concurrency workers currently have the app loaded
+| Task failure | If matching cloud workers exist but are all reserved, a queued task may fail after ~10 minutes with no available workers — capacity reserved for higher-priority apps
+This is a platform scheduling guarantee for store apps, not a setting you configure per workspace. See Workers concept and Task failure messages.
+Get app pricing
+GET /store/apps/{appId}/pricing
+Returns the published pricing config for the app's current store version (AppPricing — CEL expressions, price variables, rendered description). Used by public app pages.
+bashcopy
+1curl "https://api.inference.sh/store/apps/app_abc123/pricing"
+→ Usage-based pricing · Get task cost
+Estimate app cost
+POST /store/apps/{appId}/estimate
+Preview run cost before dispatch. Evaluates pricing expressions that only depend on task inputs (task_inputs, prices, fees, task_function). When fee expressions need post-execution data (outputs, elapsed_seconds, resource_fee, and so on), the API falls back to the app's estimate CEL expression if one is configured in AppPricing.
+No authentication required.
+Request body
+| Field | Type | Description
+| input | object | Task input map (same shape as POST /run)
+| function | string | Optional function name for multi-function apps
+Response (EstimateCostResponse)
+| Field | Type | Description
+| confidence | string | exact (all fees input-based), range (estimate returned min/max), or unknown (post-execution data required)
+| microcents | int64 | Set when confidence is exact
+| min, max | int64 | Set when confidence is range
+| depends_on | string[] | Post-execution variables needed when confidence is unknown
+| estimate_error | string | Present when an estimate expression exists but failed to evaluate; confidence is unknown and depends_on is still populated
+| pricing_description | string | Rendered human-readable pricing string
+Example (exact estimate):
+bashcopy
+1curl -X POST "https://api.inference.sh/store/apps/app_abc123/estimate" \2  -H "Content-Type: application/json" \3  -d '{"input": {"n": 4}}'
+jsoncopy
+1{2  "confidence": "exact",3  "microcents": 2000000,4  "pricing_description": "$0.02 per image"5}
+Example (range estimate via estimate expression):
+jsoncopy
+1{2  "confidence": "range",3  "min": 150000,4  "max": 1500000,5  "pricing_description": "About $0.0015–$0.015 per run"6}
+Example (unknown — output-dependent pricing, no estimate expression):
+jsoncopy
+1{2  "confidence": "unknown",3  "depends_on": ["outputs"]4}
+Example (estimate_error — estimate expression failed):
+jsoncopy
+1{2  "confidence": "unknown",3  "estimate_error": "no such key: max_tokens",4  "depends_on": ["outputs"]5}
+→ Usage-based pricing — authoring estimate expressions
+→ Evaluate CEL pricing — preview draft formulas with sample output_meta
+List approved skills
+GET /store/skills or POST /store/skills/list
+Returns skills with an approved store listing. Same cursor, filter, sort, and search parameters as List approved apps.
+Response (PublicSkillStoreDTO)
+| Field | Description
+| id | Skill / listing ID
+| namespace, name | Skill ref (namespace/name)
+| description | Short description
+| category | Registry grouping
+| tags | Store tags
+| is_featured | Featured in the registry
+| rank | Sort rank
+| has_approved_version | Always true for this endpoint
+bashcopy
+1curl "https://api.inference.sh/store/skills?limit=20&filters=%5B%7B%22field%22%3A%22namespace%22%2C%22value%22%3A%22inferencesh%22%2C%22operator%22%3A%22eq%22%7D%5D"
+Example filters value (URL-encoded above):
+jsoncopy
+1[{"field": "namespace", "value": "inferencesh", "operator": "eq"}]
+Get skill store listing
+GET /store/skills/{skillId}
+Returns store metadata for one skill (SkillStoreListingDTO), including installs and uses counts.
+bashcopy
+1curl "https://api.inference.sh/store/skills/skill_abc123"
+To fetch skill content (instructions and files), use Skills API (GET /skills/{namespace}/{name}/content).
+Store vs search vs resource APIs
+| Need | Endpoint
+| Browse approved Grid apps with category/rank | GET /store/apps
+| Browse approved registry skills | GET /store/skills
+| Autocomplete / unified discovery | GET /suggest
+| Full-text search with scores | GET /search
+| Run an app | POST /run (Tasks)
+| Read skill instructions | GET /skills/{namespace}/{name}/content
+| Manage your workspace's apps or skills | Apps / Skills (authenticated)
+Related
+| Guide | Topic
+| Browsing the Grid | App discovery in the web app
+| Skill registry | Workspace skill discovery
+| Search concept | Suggest vs search

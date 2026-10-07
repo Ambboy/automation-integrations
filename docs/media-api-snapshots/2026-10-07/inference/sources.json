@@ -1,0 +1,360 @@
+[
+  {
+    "url": "https://inference.sh/docs/api/rest/agents",
+    "final_url": "https://inference.sh/docs/api/rest/agents",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/agents.txt",
+    "sha256": "8498445a6bf5f28c11d0a5df1b6490a06950db6892608209c90c8ee5b3dea4d6",
+    "retrieved_at": "2026-10-07T16:14:35.164528+00:00",
+    "raw_html_sha256": "6f0d6124bb9c1d313582f9060e2bb61a656bb4547ffd618f8e080c00b8a123e3",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/api-keys",
+    "final_url": "https://inference.sh/docs/api/rest/api-keys",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/api-keys.txt",
+    "sha256": "165ea3847457d19eb7ba58303b763b3dc1d66653402065891943816eaa77c5a4",
+    "retrieved_at": "2026-10-07T16:14:34.436492+00:00",
+    "raw_html_sha256": "76ee8fa1eeb523aa0cc91d640c6a72ffd06382913ff4b3c040991dd53e712f29",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/apps",
+    "final_url": "https://inference.sh/docs/api/rest/apps",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/apps.txt",
+    "sha256": "219de0a2a2095df4c1b73ddcf05966eac206fd8d3f585d8c5bd68abb56157d0d",
+    "retrieved_at": "2026-10-07T16:14:34.788510+00:00",
+    "raw_html_sha256": "2f8faad5a21a737cac6bc1c2675db16f0623b92a2c52c9be5d4b27b797147737",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/artifacts",
+    "final_url": "https://inference.sh/docs/api/rest/artifacts",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/artifacts.txt",
+    "sha256": "50bffe836382f4df765b51d9c86a84037f4267905f780eaf3b399cd158657156",
+    "retrieved_at": "2026-10-07T16:14:34.948518+00:00",
+    "raw_html_sha256": "a88000a2267a2e6d0dbe68ac408b84be6278b664bd59ee8894cd1ba5d0703b27",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/billing",
+    "final_url": "https://inference.sh/docs/api/rest/billing",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/billing.txt",
+    "sha256": "10ff81af364a7db6b48e8cadd086157a46c0a06195ae7d968b8c7bce59428e4b",
+    "retrieved_at": "2026-10-07T16:14:34.708506+00:00",
+    "raw_html_sha256": "998117dc0c80ead5801e69f0612387ea9459d42934595ee61d160f88ab8d8cde",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/credentials",
+    "final_url": "https://inference.sh/docs/api/rest/credentials",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/credentials.txt",
+    "sha256": "1f56421bfc7b8601a039bca2f63a16e2f31231eb98e3f8016c868d458746ea35",
+    "retrieved_at": "2026-10-07T16:14:34.860513+00:00",
+    "raw_html_sha256": "d03aacca9852f18a9cb84de3f62ae527853c8e607693801502a1ecd4a2cd9958",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/device-auth",
+    "final_url": "https://inference.sh/docs/api/rest/device-auth",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/device-auth.txt",
+    "sha256": "e306ae8b51d026f16386ec836c7b03229b9e1aade261a701e10705e09e9f7314",
+    "retrieved_at": "2026-10-07T16:14:35.196530+00:00",
+    "raw_html_sha256": "66feb03e4cc243afd694e0a42c920322e6da9e210ea7f4a9e2a8147122d01dd6",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/embed",
+    "final_url": "https://inference.sh/docs/api/rest/embed",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/embed.txt",
+    "sha256": "ac09dd4e65a758969c18fb91750c34c2cf8ac236f146ad7d1efc0442f47a9c67",
+    "retrieved_at": "2026-10-07T16:14:35.356538+00:00",
+    "raw_html_sha256": "879a3f79fc7e7bd0b0b9678dc877ca50f63ce343a01a419040a71a604043160b",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/engines",
+    "final_url": "https://inference.sh/docs/api/rest/engines",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/engines.txt",
+    "sha256": "d96d7f1213327d4bd437b5cd0eff832631e7a46e75b96410d148c45b0ba08758",
+    "retrieved_at": "2026-10-07T16:14:35.208531+00:00",
+    "raw_html_sha256": "e0b9d6e5fd91252511fe3300148459f9c8c7777001435ee9325df85002cc175e",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/entitlements",
+    "final_url": "https://inference.sh/docs/api/rest/entitlements",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/entitlements.txt",
+    "sha256": "99ef5378ba9bb21e7a252ac83f07ed9c98835879f007be65b69d6c10e3d50c7a",
+    "retrieved_at": "2026-10-07T16:14:35.296535+00:00",
+    "raw_html_sha256": "6f6dc4bb9635531cf7bfad006115d778192fd39165cd23a2d055e4f18044c244",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/exec-runs",
+    "final_url": "https://inference.sh/docs/api/rest/exec-runs",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/exec-runs.txt",
+    "sha256": "0df0dc6313c79ffd3cf8d8c0703a6e100dde10140d98012dd8beb44d1dc3b4c5",
+    "retrieved_at": "2026-10-07T16:14:35.412541+00:00",
+    "raw_html_sha256": "45c3c33028a73861f55b27b19af5662f4bbd0ac2147dfd3f2509656726ebf621",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/files",
+    "final_url": "https://inference.sh/docs/api/rest/files",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/files.txt",
+    "sha256": "4c74f9be740d7d9fd0fe82313e7269c91923e6e468848394b18c1b7411aa8424",
+    "retrieved_at": "2026-10-07T16:14:35.404540+00:00",
+    "raw_html_sha256": "c7bbea32b4a41170ea70dba1423ef2b4d2c2366af2a84df9121e00137889f261",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/flow-runs",
+    "final_url": "https://inference.sh/docs/api/rest/flow-runs",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/flow-runs.txt",
+    "sha256": "1c5031a2031125fd1f96674bc04c53b0a140fdba1c0e06c0efd43a3deaf5f66c",
+    "retrieved_at": "2026-10-07T16:14:35.448543+00:00",
+    "raw_html_sha256": "03684b500fdd050676db114fce65a40e95dac6cfff0f8b815b2f35b9c19dace2",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/flows",
+    "final_url": "https://inference.sh/docs/api/rest/flows",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/flows.txt",
+    "sha256": "762b620600dc11857ede4f09b355d410197dd08c38751235957e9d6b46c83c56",
+    "retrieved_at": "2026-10-07T16:14:35.820561+00:00",
+    "raw_html_sha256": "0db5d20def73b8edb755fc98777de6a4a99793cb9bf05fb1075309b8d143ba94",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/instances",
+    "final_url": "https://inference.sh/docs/api/rest/instances",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/instances.txt",
+    "sha256": "f51179b726ba934d5fccf98d570381dbd328b64c791bd62eb2b260aafce558db",
+    "retrieved_at": "2026-10-07T16:14:35.652553+00:00",
+    "raw_html_sha256": "e11b003fb0147e044e1ee51c3e242c67572553bd89e9527f834158e7462dc052",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/knowledge",
+    "final_url": "https://inference.sh/docs/api/rest/knowledge",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/knowledge.txt",
+    "sha256": "71210a75bb673101c6ee2168ca13c8aab6e2170e3e53146d6bd8cc01127a4ba8",
+    "retrieved_at": "2026-10-07T16:14:35.624551+00:00",
+    "raw_html_sha256": "65199a1342b960242dad024f11c0f357c6a72be1f8e82d56f6510733351da9e1",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/magic-link",
+    "final_url": "https://inference.sh/docs/api/rest/magic-link",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/magic-link.txt",
+    "sha256": "359fc8286a2676a57b78f3398de639162dece28fc83b80807db953dfe753f34e",
+    "retrieved_at": "2026-10-07T16:14:35.792560+00:00",
+    "raw_html_sha256": "31ac4b8eae4fd2be3281143c425482a266e95f9f7f7cd5adaa626c3e660d2322",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/mcp-servers",
+    "final_url": "https://inference.sh/docs/api/rest/mcp-servers",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/mcp-servers.txt",
+    "sha256": "db616b53f059c952543d3bfe0285fc1f37ee29e0623ce2d8c75e8efb4838b9fa",
+    "retrieved_at": "2026-10-07T16:14:35.856563+00:00",
+    "raw_html_sha256": "9173c55e1ed02cce33ada11fef934839856d54a27e066d7e1d8a3bd48976391c",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/openai",
+    "final_url": "https://inference.sh/docs/api/rest/openai",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/openai.txt",
+    "sha256": "7e2063a6bc18a3e56717e9ee9d485511a52abcc305485db871e716e258addb21",
+    "retrieved_at": "2026-10-07T16:14:36.008570+00:00",
+    "raw_html_sha256": "cbc093502edb6bce108ad09e25075e32f22270b4d18676308e4da8ffe0e14951",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/overview",
+    "final_url": "https://inference.sh/docs/api/rest/overview",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/overview.txt",
+    "sha256": "23a80fcd763835d659a14190191afe76befd585de75abc26966811b6e6632c80",
+    "retrieved_at": "2026-10-07T16:14:35.920566+00:00",
+    "raw_html_sha256": "e95b9e820c748b4e6f00ca17831eebceaaf0f559acaa4ef01c6c89a7123232d2",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/pages",
+    "final_url": "https://inference.sh/docs/api/rest/pages",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/pages.txt",
+    "sha256": "af4de250edfcf1dfa9b207da68d3dd1f7e3b3e6365a0ebea75f2e5f7d888598a",
+    "retrieved_at": "2026-10-07T16:14:36.012571+00:00",
+    "raw_html_sha256": "14f79cdb357ecbc2d2dcebf99fd172b66f27805aefa7898f048adfbcff6b9fea",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/publications",
+    "final_url": "https://inference.sh/docs/api/rest/publications",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/publications.txt",
+    "sha256": "786bba82a9b35a9caaf3e8dbcaebd44433a7bb97ac56f138cc8aa8e2072349cc",
+    "retrieved_at": "2026-10-07T16:14:36.032572+00:00",
+    "raw_html_sha256": "25356e40d7bb07e8103d25c9d42cbb75c6561519f8038345a12913de026137d6",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/remotes",
+    "final_url": "https://inference.sh/docs/api/rest/remotes",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/remotes.txt",
+    "sha256": "835f3742f46af5b3d812b48d4558be9ba4808b134ab694c3e6700a86f3e4d63b",
+    "retrieved_at": "2026-10-07T16:14:36.252583+00:00",
+    "raw_html_sha256": "6a7798b0754d3c0cd1e3fdd222804ed659fc6ccb2e409cc07577803fad7794c2",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/search",
+    "final_url": "https://inference.sh/docs/api/rest/search",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/search.txt",
+    "sha256": "e6157ce7c1022b062b76dcc307a7cddbdc1e69b427740718af7ee5fc178601a8",
+    "retrieved_at": "2026-10-07T16:14:36.368588+00:00",
+    "raw_html_sha256": "a528bce95d1778f940b91f3edc1bad4a50ef726457f14a7482baec5a81b7116c",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/secrets",
+    "final_url": "https://inference.sh/docs/api/rest/secrets",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/secrets.txt",
+    "sha256": "cc7d78699827386cc84c81092410438743618a34080f35875c575785be773fc7",
+    "retrieved_at": "2026-10-07T16:14:36.280584+00:00",
+    "raw_html_sha256": "6f1cafc9949c7f437817b8afc40808e0a35b8c3f26c7265dd3a9895dd4624692",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/sessions",
+    "final_url": "https://inference.sh/docs/api/rest/sessions",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/sessions.txt",
+    "sha256": "614745f1fd9190b5f4a97b014133a463a8f959c6a1a68032a7a807ecdd61d39a",
+    "retrieved_at": "2026-10-07T16:14:36.404590+00:00",
+    "raw_html_sha256": "cb0a76e8cfda33303bf5601e6040b5e9e06e5a09b9ea45a016241cf080d7a3bf",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/skills",
+    "final_url": "https://inference.sh/docs/api/rest/skills",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/skills.txt",
+    "sha256": "45d6064568be663c3eedd9ca3eb24c2aaf54bd55f44863e4bfe928e017852768",
+    "retrieved_at": "2026-10-07T16:14:36.240582+00:00",
+    "raw_html_sha256": "29777172d197eb2b7b632f265b24efc18b16981a412af9db09cac271ed381913",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/store",
+    "final_url": "https://inference.sh/docs/api/rest/store",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/store.txt",
+    "sha256": "59ff492fd40593fe9f10a5b75a42152de5fc4e5f9985b851faf7c806a457d9a1",
+    "retrieved_at": "2026-10-07T16:14:36.564598+00:00",
+    "raw_html_sha256": "86b03bbdaf6ff3d91765d022905645ef5935ee52874bcba9ed36fe2d50f27be6",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/streaming",
+    "final_url": "https://inference.sh/docs/api/rest/streaming",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/streaming.txt",
+    "sha256": "8d0b99604381af7bf96943477ac589db18a801b72b4830554881a806ff0b1787",
+    "retrieved_at": "2026-10-07T16:14:36.472594+00:00",
+    "raw_html_sha256": "23af97955ade5d699d1d858effb8e2f4240a80e77d6a21a626fca50f4cdeae94",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/subscription",
+    "final_url": "https://inference.sh/docs/api/rest/subscription",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/subscription.txt",
+    "sha256": "f91d4742ea7784ccede217b9d52b70a4b6c9b9206b1fed5e31b321b2cb06563a",
+    "retrieved_at": "2026-10-07T16:14:36.528596+00:00",
+    "raw_html_sha256": "ec2163c694118cadc2e15d5acafbcbe9d63953615b1d0b1263d654784556c850",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/tasks",
+    "final_url": "https://inference.sh/docs/api/rest/tasks",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/tasks.txt",
+    "sha256": "fa9725d0d8bd689c998d56404e2fd7f37f9f8b38f809d998ec64abc162638f15",
+    "retrieved_at": "2026-10-07T16:14:36.752608+00:00",
+    "raw_html_sha256": "7384a9408de2f63074bccd1d643287b73c83134d855e97d84987fd6c2e3fe085",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/teams",
+    "final_url": "https://inference.sh/docs/api/rest/teams",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/teams.txt",
+    "sha256": "c7990ded7754534e32e1557657e0353ef7bcbde098a4b24d40b31af19feb2df5",
+    "retrieved_at": "2026-10-07T16:14:36.844612+00:00",
+    "raw_html_sha256": "70df56dc59ff1aebed1cee340f17d56dce26f2a4f3e6e1a8f25d37be69ccf80b",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/triggers",
+    "final_url": "https://inference.sh/docs/api/rest/triggers",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/triggers.txt",
+    "sha256": "2510e34ca59c4f53a11897e62cee8212324747f76fabfa15d8f4b846ce38a8db",
+    "retrieved_at": "2026-10-07T16:14:36.768608+00:00",
+    "raw_html_sha256": "9284d825be72ff59e63e4785d0de6d042b88b0d572b1698fb3f9909a2a5c7e5c",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/usage",
+    "final_url": "https://inference.sh/docs/api/rest/usage",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/usage.txt",
+    "sha256": "50049908c0359bed4b6a7fa1a5ba2ce107c93ecfd97aee1e2c27272c497553ea",
+    "retrieved_at": "2026-10-07T16:14:36.868613+00:00",
+    "raw_html_sha256": "16dea7eb54a389400dce078c356166f581fb7929e791b42727cb8d83b6f2160f",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/rest/vaults",
+    "final_url": "https://inference.sh/docs/api/rest/vaults",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/vaults.txt",
+    "sha256": "ba2f41964b484c4ed5041f40ec989fe45682aeee89404ba66b3adeb5eefb95ef",
+    "retrieved_at": "2026-10-07T16:14:36.912616+00:00",
+    "raw_html_sha256": "422d33b200d03b90919a985425969b7b4c0c7654f51e554b1699708a37fb3da1",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/authentication",
+    "final_url": "https://inference.sh/docs/api/authentication",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/authentication.txt",
+    "sha256": "3ee1aaea7c72832182088855e4ad7e4ac33f3e36237c72c202798cc6dc11b32b",
+    "retrieved_at": "2026-10-07T16:14:36.540597+00:00",
+    "raw_html_sha256": "251d033a7a85ae3d2b11525695c71aae742b3e910a9938e32cf4410b1472ba2d",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/concepts/tasks",
+    "final_url": "https://inference.sh/docs/concepts/tasks",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/concepts-tasks.txt",
+    "sha256": "b2ed10c513fd88b1cb10fe9d1c2854a0fce938b1ea7921891d177c5483161d6f",
+    "retrieved_at": "2026-10-07T16:14:37.028621+00:00",
+    "raw_html_sha256": "a9b7b244579887b4d85c1a238263d820dedfaea562aa63c5301a8c4d5ed9baa0",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/api/sdk/files",
+    "final_url": "https://inference.sh/docs/api/sdk/files",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/sdk-files.txt",
+    "sha256": "3e9b793205e31893c6afc9fe01643ca9b82ca563cd8cf5924242341fb48f4cdf",
+    "retrieved_at": "2026-10-07T16:14:36.608600+00:00",
+    "raw_html_sha256": "3b4d9ea5df6b4805504c6993d837e31f0201563e3c52c872d7211fe19c0bc65c",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://inference.sh/docs/extend/multi-function-apps",
+    "final_url": "https://inference.sh/docs/extend/multi-function-apps",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/multi-function-apps.txt",
+    "sha256": "6a76a719461a60f28ec4eafff385bc87e94a30558b82113954385df619194ee5",
+    "retrieved_at": "2026-10-07T16:14:37.104625+00:00",
+    "raw_html_sha256": "4b47780a3404d4873669f4264421b223cc1943fb249f07e15e1021aca6d678fa",
+    "extraction": "article element text; block and table boundaries retained; HTMLParser"
+  },
+  {
+    "url": "https://api.inference.sh/openapi.json",
+    "final_url": "https://api.inference.sh/openapi.json",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/inference/openapi.json",
+    "sha256": "10aef5a712102931173dd6d4260f8b688ff5f5ad754ae2a68a5a310ee691aa65",
+    "retrieved_at": "2026-10-07T16:14:36.848612+00:00"
+  }
+]

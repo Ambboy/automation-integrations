@@ -1,0 +1,5495 @@
+{
+  "schema_version": 1,
+  "service": "yandex_go",
+  "retrieved_at": "2026-10-04",
+  "scope": "All endpoint pages linked from API 2.0 request index; roles explanatory page excluded. TLS verified through taxi-business-api.docs-viewer.yandex.ru with canonical Host header. Always use HTTPS for API calls.",
+  "sources": [
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/auth-list.md",
+      "sha256": "113b36471f4a783b93e64cc37104536090ad6b67a0df56f4d6d708f946803ebe",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/auth-list.md",
+      "retrieved_at": "2026-10-04T07:18:09.943896+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/change-destinations.md",
+      "sha256": "9dcd3bbc52c6cfeb469588bccfd36dfe6127068d5c3a6aee5bdc4ca973fd880b",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/change-destinations.md",
+      "retrieved_at": "2026-10-04T07:18:09.948146+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/cost-center-create.md",
+      "sha256": "1a7ca61af103ccb9f45c3cba269cccd86487d7a2f96e25a32b4821e06f701590",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/cost-center-create.md",
+      "retrieved_at": "2026-10-04T07:18:09.975047+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/cost-center-list.md",
+      "sha256": "6f7f209ca88ec54bdfed5652ae5fb6cc4e91432b3afa6eadca05daec182dbc82",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/cost-center-list.md",
+      "retrieved_at": "2026-10-04T07:18:09.985498+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/cost-center-update.md",
+      "sha256": "d391521af271aabc1509752e137ace9102730367ba8199693652bad4f20771e4",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/cost-center-update.md",
+      "retrieved_at": "2026-10-04T07:18:10.250977+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/department-archive.md",
+      "sha256": "6c5f0f5e6cb1b4a23bd8f3bbc672673125255f30aaf1d6d6a182ce4c75f3d7f4",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/department-archive.md",
+      "retrieved_at": "2026-10-04T07:18:10.319014+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/department-create.md",
+      "sha256": "961edc3fabfa9a7af4ec7c03ffbb1f2feaa78af1e807754dc0f69e0f7959275e",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/department-create.md",
+      "retrieved_at": "2026-10-04T07:18:10.262029+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/department-limits-get.md",
+      "sha256": "604b294c898420dfdb45d4239a3fae37438428b1168aaeefcbe0935ff97ac5cd",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/department-limits-get.md",
+      "retrieved_at": "2026-10-04T07:18:10.295464+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/department-limits-update.md",
+      "sha256": "90f546a4a110221b7d69b179cf99db60ec5118bea134619431f72b31ca53b8b2",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/department-limits-update.md",
+      "retrieved_at": "2026-10-04T07:18:10.579204+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/department-list.md",
+      "sha256": "c49ba1b5d48824d1284716560ec8a0d7fa3664676a215a14a1222931c89d631c",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/department-list.md",
+      "retrieved_at": "2026-10-04T07:18:10.536482+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/department-update.md",
+      "sha256": "8d4eba6d2ed48b2f4790c3c2378303629739951064189cf759713c50286bcecf",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/department-update.md",
+      "retrieved_at": "2026-10-04T07:18:10.573397+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/food-list.md",
+      "sha256": "1822130a8f2baabe485d6c9c9302b11d60917dcdf44f1ae8d287a544cda7e39b",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/food-list.md",
+      "retrieved_at": "2026-10-04T07:18:12.170025+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/limit-info.md",
+      "sha256": "d01253bb976864b7e0bea710675834965bbf34b04930ab253a2fd8a039f8a6ef",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/limit-info.md",
+      "retrieved_at": "2026-10-04T07:18:10.830048+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/limit-list.md",
+      "sha256": "b1d8029c555b075c2e0feaf83c4f7c4fba16081cb9301888b089c268edfa990b",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/limit-list.md",
+      "retrieved_at": "2026-10-04T07:18:10.845595+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/limit-update.md",
+      "sha256": "f0c1d017ae1823a73f26dbc827affe891912d4610f138cd4a3a3931384f92f51",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/limit-update.md",
+      "retrieved_at": "2026-10-04T07:18:10.991040+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-active.md",
+      "sha256": "6f629034dac17b479121a6a7a01aa3a1b246c4f039f0aee1ff8da356e70bb8cd",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/order-active.md",
+      "retrieved_at": "2026-10-04T07:18:11.133130+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-cancel.md",
+      "sha256": "495c86d0ecc7894f9358c13793483295ca052ab048816058cf8ce388bf22b826",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/order-cancel.md",
+      "retrieved_at": "2026-10-04T07:18:11.130590+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-create.md",
+      "sha256": "2d150258b8ea001d10d6407892fbc620e7cf8644fc24de1127deb3851641e22d",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/order-create.md",
+      "retrieved_at": "2026-10-04T07:18:11.293830+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-feedback.md",
+      "sha256": "94736d5de78d0baa561f18f69e9d91bc55b968e96bea159d124581b2e32eba51",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/order-feedback.md",
+      "retrieved_at": "2026-10-04T07:18:11.708666+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-info.md",
+      "sha256": "ddb50f8303dd71c9019de26be3db6d144ee3fde73a631920dd980aa76222e061",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/order-info.md",
+      "retrieved_at": "2026-10-04T07:18:11.418406+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-list.md",
+      "sha256": "22aa0e74ee5baafc27ea6f81c71d449493bbdcd6544518b70562cd2b19faa903",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/order-list.md",
+      "retrieved_at": "2026-10-04T07:18:11.616572+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-progress.md",
+      "sha256": "248cb70cd1e2e2763cbede6956e2b7b505ad37548f244bd9d8a40dd15b294152",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/order-progress.md",
+      "retrieved_at": "2026-10-04T07:18:11.720264+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/promocodes-cancel.md",
+      "sha256": "55056c336ce61ee2615372ff72014fdbb7474fa6cbfe6712491170864fbbe087",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/promocodes-cancel.md",
+      "retrieved_at": "2026-10-04T07:18:12.171082+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/promocodes-codes-list.md",
+      "sha256": "085ef17321ef90c6b57caf7ca5daa4fbfa7c3d38806ea88d725bab9406c88fef",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/promocodes-codes-list.md",
+      "retrieved_at": "2026-10-04T07:18:11.971454+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/promocodes-create.md",
+      "sha256": "0ef6d5bc4a67943edd306a16df894a132a793b17224faba773ad60fe4d4808ee",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/promocodes-create.md",
+      "retrieved_at": "2026-10-04T07:18:12.009464+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/promocodes-info.md",
+      "sha256": "be5720a9f2a0790610940a72e805a2c22062bdfb12bc8545f3415592617bfda9",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/promocodes-info.md",
+      "retrieved_at": "2026-10-04T07:18:12.235969+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/promocodes-list.md",
+      "sha256": "fbbdded2dc378bbee1c7894623205f86b1fe66d6c5a8e00c3f7f747bdd115f84",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/promocodes-list.md",
+      "retrieved_at": "2026-10-04T07:18:12.285582+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/region-create.md",
+      "sha256": "8663f5b88e56e8a6d06b579b473d71335222b7a1f58b4ac81626e1edac665cec",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/region-create.md",
+      "retrieved_at": "2026-10-04T07:18:12.446983+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/region-delete.md",
+      "sha256": "41cb3040aa4f3e4d9c9b76582bfb7109f8aa71170d31a2f3671c56a95d009d11",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/region-delete.md",
+      "retrieved_at": "2026-10-04T07:18:12.463985+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/region-edit.md",
+      "sha256": "6f2410f63ce69ea53b69bb06fae5ef9a895da88bde37d0db617376b93a5f4200",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/region-edit.md",
+      "retrieved_at": "2026-10-04T07:18:12.515652+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/region-list.md",
+      "sha256": "f3e27ff8674c61a7472dedb967198ab921ecf0647129f06bdecc64eb21c8ac76",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/region-list.md",
+      "retrieved_at": "2026-10-04T07:18:12.599111+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/role-create.md",
+      "sha256": "67602197facc045131e965fbbfe665441ea23b7e0e1127e7c1077701c5c1ec95",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/role-create.md",
+      "retrieved_at": "2026-10-04T07:18:12.990242+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/role-delete.md",
+      "sha256": "8d03fddf3469c8e61530ea711432ba569da76dd9dce4f420d53b3fca913362a9",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/role-delete.md",
+      "retrieved_at": "2026-10-04T07:18:12.851976+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/role-list.md",
+      "sha256": "9fdd40e5348b96353204a08a4bfd55412d4e04b8c2b9903d25ac0fe583543084",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/role-list.md",
+      "retrieved_at": "2026-10-04T07:18:12.823440+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/role-update.md",
+      "sha256": "f619732396db0460db75c87bd008bafbf7a842f862c8c02d5a2a70dbdfd85580",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/role-update.md",
+      "retrieved_at": "2026-10-04T07:18:12.875124+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/routestats.md",
+      "sha256": "60b3707cac366c88f77418e6f8634d8a07ab8abb04e8f3b147b6edba883e3dad",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/routestats.md",
+      "retrieved_at": "2026-10-04T07:18:13.070090+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/tanker-info.md",
+      "sha256": "7d4dc04b557de9496cd0a5ed8b2940c979fc7dbe71cd8497e16713096b27b0bf",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/tanker-info.md",
+      "retrieved_at": "2026-10-04T07:18:13.180173+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/taxi-report.md",
+      "sha256": "1c73d6bf7926558981f22ebefe58853a6372ef082a0470e40831e225819bff42",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/taxi-report.md",
+      "retrieved_at": "2026-10-04T07:18:13.178195+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/travels-list.md",
+      "sha256": "24eb74fff33bf528ddfff4cff49e341b9034793bc9341a8317e9f4c972ac054e",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/travels-list.md",
+      "retrieved_at": "2026-10-04T07:18:13.319378+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-archive.md",
+      "sha256": "5ed2fd36d191574fee4e4b63e478286d4424c75f2e21634362a8b5f12251d747",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/user-archive.md",
+      "retrieved_at": "2026-10-04T07:18:13.336983+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-create.md",
+      "sha256": "99bfde6b6135108d4a10c8ac9dc4055e20dbd75e34aa680ce3ad6c235dfda41e",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/user-create.md",
+      "retrieved_at": "2026-10-04T07:18:13.455490+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-info.md",
+      "sha256": "44ad5d1c45f1f45a39ac378dd1ad978d46dbd0e3e7ce6eb3204b5ef3c91ec6f1",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/user-info.md",
+      "retrieved_at": "2026-10-04T07:18:13.521442+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-list.md",
+      "sha256": "1c501cc7736b05ec2efe0464eb065c6dabb706471c695eae0541960dcce4e2b5",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/user-list.md",
+      "retrieved_at": "2026-10-04T07:18:13.586165+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-phone.md",
+      "sha256": "3676896a0ca4bde8be9651adf131179f5e10d3e8f9c71248296e485cb226fe22",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/user-phone.md",
+      "retrieved_at": "2026-10-04T07:18:13.698978+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-update-patch.md",
+      "sha256": "68174d0bdfc05797351bd4e21a342b2aa7eacb07143d7a1c90a0e5233aff011f",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/user-update-patch.md",
+      "retrieved_at": "2026-10-04T07:18:13.766649+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-update-put.md",
+      "sha256": "fe3b95f29d07aa669f49edc859a43aa3f6473e9a40a1b4ba0e0fa80e521da567",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/user-update-put.md",
+      "retrieved_at": "2026-10-04T07:18:13.774373+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/users-spending-details.md",
+      "sha256": "7cc30d16db7ff088cf21e8b3514d1fea1949c780cdcfe556fbc688b2f0c33df9",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/users-spending-details.md",
+      "retrieved_at": "2026-10-04T07:18:13.859341+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/vehicles-bulk-archive.md",
+      "sha256": "a115ff7edd70af191c0c883f4757e8a4500193b18078e9bcb892275d4edf4f34",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/vehicles-bulk-archive.md",
+      "retrieved_at": "2026-10-04T07:18:13.971965+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/vehicles-bulk-create.md",
+      "sha256": "7fba3a689a2293bc31ee8f2b4eaf7f40e075a78c7532da60e49e9c4ea02370b8",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/vehicles-bulk-create.md",
+      "retrieved_at": "2026-10-04T07:18:14.014476+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/vehicles-bulk-update.md",
+      "sha256": "71860e674dd516e0a24a9cde207ca91df8453075570e0a63ced0ea9d2e0f83b6",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/vehicles-bulk-update.md",
+      "retrieved_at": "2026-10-04T07:18:14.357464+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/vehicles-list.md",
+      "sha256": "6b469b1c29c389979874b46c8575d24ff77ebba8d6ac67f8a5002a23f103e73f",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/vehicles-list.md",
+      "retrieved_at": "2026-10-04T07:18:14.215646+00:00"
+    },
+    {
+      "url": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/zone-info.md",
+      "sha256": "f06a2fcb6936b0a18cf98dbe09c4db89df92bd8771f7b6772c26271ee88215c2",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/yandex/zone-info.md",
+      "retrieved_at": "2026-10-04T07:18:14.218040+00:00"
+    }
+  ],
+  "total": 52,
+  "capabilities": [
+    {
+      "id": "auth-list",
+      "method": "GET",
+      "path": "/integration/2.0/auth/list",
+      "summary": "Получение списка доступных клиентов по токену",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/auth-list",
+      "adapter": "auth_list",
+      "execution": "integration_read",
+      "access": "observed_success",
+      "live_check": {
+        "ok": true,
+        "error": null,
+        "http_status": null,
+        "checked_at": "2026-10-03T21:29:03.241146+00:00",
+        "coverage": "One read response or page with a real fixture; not exhaustive business data coverage."
+      }
+    },
+    {
+      "id": "change-destinations",
+      "method": "POST",
+      "path": "/orders/change-destinations",
+      "summary": "Изменение маршрута",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Accept-Language",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "order_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/change-destinations",
+      "adapter": "change_destinations",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "change_destinations": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "order_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "order_id"
+                ],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "created_time": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "destinations": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "geopoint": {
+                          "type": "array",
+                          "items": {
+                            "type": "number"
+                          },
+                          "minItems": 2,
+                          "maxItems": 2,
+                          "x-coordinates": true
+                        },
+                        "fullname": {
+                          "type": "string",
+                          "maxLength": 65536
+                        }
+                      },
+                      "required": [
+                        "geopoint",
+                        "fullname"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "created_time",
+                  "destinations"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query",
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/change-destinations.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "cost-center-create",
+      "method": "POST",
+      "path": "/cost_centers/create",
+      "summary": "Создание центра затрат",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "mixed",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "select",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "text",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/cost-center-create",
+      "adapter": "cost_center_create",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "cost_center_create": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "default": {
+                    "type": "boolean"
+                  },
+                  "field_settings": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "hidden": {
+                          "type": "boolean"
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "required": {
+                          "type": "boolean"
+                        },
+                        "services": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "taxi",
+                              "eats2",
+                              "grocery",
+                              "drive",
+                              "tanker",
+                              "cargo",
+                              "travel",
+                              "scooters"
+                            ]
+                          }
+                        },
+                        "format": {
+                          "type": "string",
+                          "enum": [
+                            "select",
+                            "text",
+                            "mixed"
+                          ]
+                        },
+                        "values": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "maxLength": 65536
+                          }
+                        }
+                      },
+                      "required": [
+                        "title",
+                        "required",
+                        "services",
+                        "format",
+                        "values"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "name",
+                  "default",
+                  "field_settings"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/cost-center-create.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "cost-center-list",
+      "method": "GET",
+      "path": "/cost_centers/list",
+      "summary": "Получение списка центров затрат клиента",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "limit",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "offset",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/cost-center-list",
+      "adapter": "cost_centers",
+      "execution": "integration_read",
+      "access": "observed_success",
+      "live_check": {
+        "ok": true,
+        "error": null,
+        "http_status": null,
+        "checked_at": "2026-10-03T21:29:18.615981+00:00",
+        "coverage": "One read response or page with a real fixture; not exhaustive business data coverage."
+      },
+      "additional_adapters": [
+        "cost_center_list"
+      ],
+      "executable_contracts": {
+        "cost_center_list": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "offset": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/cost-center-list.md",
+          "response_kind": "json"
+        }
+      },
+      "implementation_status": "compiled_and_validated"
+    },
+    {
+      "id": "cost-center-update",
+      "method": "POST",
+      "path": "/cost_centers/update",
+      "summary": "Обновление центра затрат",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "mixed",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "select",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "text",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/cost-center-update",
+      "adapter": "cost_center_update",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "cost_center_update": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "default": {
+                    "type": "boolean"
+                  },
+                  "field_settings": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "hidden": {
+                          "type": "boolean"
+                        },
+                        "title": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "required": {
+                          "type": "boolean"
+                        },
+                        "services": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "taxi",
+                              "eats2",
+                              "grocery",
+                              "drive",
+                              "tanker",
+                              "cargo",
+                              "travel",
+                              "scooters"
+                            ]
+                          }
+                        },
+                        "format": {
+                          "type": "string",
+                          "enum": [
+                            "select",
+                            "text",
+                            "mixed"
+                          ]
+                        },
+                        "values": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "maxLength": 65536
+                          }
+                        }
+                      },
+                      "required": [
+                        "title",
+                        "required",
+                        "services",
+                        "format",
+                        "values"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "name",
+                  "default",
+                  "field_settings"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query",
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/cost-center-update.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "department-archive",
+      "method": "POST",
+      "path": "/departments/archive",
+      "summary": "Удаление департамента",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "department_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/department-archive",
+      "adapter": "department_archive",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "department_archive": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "department_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "department_id"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/department-archive.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "department-create",
+      "method": "POST",
+      "path": "/departments/create",
+      "summary": "Создание департамента",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/department-create",
+      "adapter": "department_create",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "department_create": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "parent_id": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1024
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 65536
+                  }
+                },
+                "required": [
+                  "parent_id",
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/department-create.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "department-limits-get",
+      "method": "GET",
+      "path": "/departments/limits/taxi",
+      "summary": "Получение лимита департамента на поездки",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "department_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/department-limits-get",
+      "adapter": "department_limits_get",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "department_limits_get": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "department_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "department_id"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/department-limits-get.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "department-limits-update",
+      "method": "POST",
+      "path": "/departments/limits/taxi/update",
+      "summary": "Изменение лимита департамента на поездки",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "200",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "400",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "401",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "403",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "404",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "department_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/department-limits-update",
+      "adapter": "department_limits_update",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "department_limits_update": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "department_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "department_id"
+                ],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "budget": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "period": {
+                    "type": "string",
+                    "enum": [
+                      "month",
+                      "quarter"
+                    ]
+                  }
+                },
+                "required": [
+                  "budget"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query",
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/department-limits-update.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "department-list",
+      "method": "GET",
+      "path": "/departments/list",
+      "summary": "Получение списка департаментов клиента",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "limit",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "offset",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/department-list",
+      "adapter": "departments",
+      "execution": "integration_read",
+      "access": "observed_success",
+      "live_check": {
+        "ok": true,
+        "error": null,
+        "http_status": null,
+        "checked_at": "2026-10-03T21:29:14.885197+00:00",
+        "coverage": "One read response or page with a real fixture; not exhaustive business data coverage."
+      },
+      "additional_adapters": [
+        "department_list"
+      ],
+      "executable_contracts": {
+        "department_list": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "offset": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/department-list.md",
+          "response_kind": "json"
+        }
+      },
+      "implementation_status": "compiled_and_validated"
+    },
+    {
+      "id": "department-update",
+      "method": "PUT",
+      "path": "/departments/update",
+      "summary": "Редактирование департамента",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "200",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "400",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "401",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "403",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "406",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "409",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "department_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/department-update",
+      "adapter": "department_update",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "department_update": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "department_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "department_id"
+                ],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "parent_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "name": {
+                    "type": "string",
+                    "maxLength": 65536
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query",
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/department-update.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "food-list",
+      "method": "POST",
+      "path": "/orders/eats/list",
+      "summary": "Получить список заказов в сервисе «Еда»",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "cursor",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "limit",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/food-list",
+      "adapter": "food_list",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "food_list": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "cursor": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "user_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    }
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/food-list.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "limit-info",
+      "method": "GET",
+      "path": "/limits",
+      "summary": "Получение информации о лимите",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "limit_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/limit-info",
+      "adapter": "limit_info",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "limit_info": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "limit_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/limit-info.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "limit-list",
+      "method": "GET",
+      "path": "/limits/search",
+      "summary": "Получение списка лимитов клиента",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "department_id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "limit",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "offset",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "search",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "service",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "user_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/limit-list",
+      "adapter": "limit_list",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "limit_list": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "offset": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "search": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "department_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "user_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "service": {
+                    "type": "string",
+                    "enum": [
+                      "taxi",
+                      "eats2",
+                      "grocery",
+                      "drive",
+                      "tanker",
+                      "cargo",
+                      "travel"
+                    ]
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/limit-list.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "limit-update",
+      "method": "PUT",
+      "path": "/integration/2.0/limits/personal",
+      "summary": "Редактирование персонального лимита сотрудника",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "child_tariff",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "drive",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "eats2",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "fr",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "lite_b2b",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "maybach",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "minivan",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "mo",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "optimum_b2b",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "premium_van",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "range_date",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "sa",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "standart_b2b",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "su",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "tanker",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "taxi",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "th",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "travel",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "tu",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "ultimate",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "user_id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "vip",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "we",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "weekly_date",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/limit-update",
+      "adapter": null,
+      "execution": "not_implemented",
+      "access": "unverified",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "Business effects are not tested"
+      },
+      "unsupported_reasons": [
+        "The provider page has contradictory nested types and categories spelling; not executable without a verified request contract."
+      ],
+      "implementation_status": "blocked"
+    },
+    {
+      "id": "order-active",
+      "method": "GET",
+      "path": "/orders/active",
+      "summary": "Список активных заказов",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "user_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-active",
+      "adapter": "active_orders",
+      "execution": "integration_read",
+      "access": "observed_success",
+      "live_check": {
+        "ok": true,
+        "error": null,
+        "http_status": null,
+        "checked_at": "2026-10-03T21:30:18.329488+00:00",
+        "coverage": "One read response or page with a real fixture; not exhaustive business data coverage."
+      },
+      "additional_adapters": [
+        "order_active"
+      ],
+      "executable_contracts": {
+        "order_active": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "user_id"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-active.md",
+          "response_kind": "json"
+        }
+      },
+      "implementation_status": "compiled_and_validated"
+    },
+    {
+      "id": "order-cancel",
+      "method": "POST",
+      "path": "/integration/2.0/orders/cancel",
+      "summary": "Отмена заказа",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Accept-Language",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "order_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-cancel",
+      "adapter": "order_cancel",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "No explicit authorization to create/cancel production test orders; no applicable sandbox confirmed"
+      },
+      "implemented": true,
+      "documented": true,
+      "adapter_parameter_schema": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          }
+        },
+        "required": [
+          "order_id"
+        ],
+        "additionalProperties": false
+      },
+      "mock_verification": "passed",
+      "documentation_sha256": "495c86d0ecc7894f9358c13793483295ca052ab048816058cf8ce388bf22b826"
+    },
+    {
+      "id": "order-create",
+      "method": "POST",
+      "path": "/integration/2.0/orders/create",
+      "summary": "Создание заказа",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-Idempotency-Token",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-create",
+      "adapter": "order_create",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "No explicit authorization to create/cancel production test orders; no applicable sandbox confirmed"
+      },
+      "implemented": true,
+      "documented": true,
+      "adapter_parameter_schema": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "class": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "route": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "properties": {
+                "geopoint": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number"
+                  },
+                  "description": "[longitude -180..180, latitude -90..90]"
+                },
+                "fullname": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "required": [
+                "geopoint",
+                "fullname"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "comment": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "cost_center_values": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "value": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "value"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "user_id",
+          "class",
+          "route"
+        ],
+        "additionalProperties": false
+      },
+      "mock_verification": "passed",
+      "documentation_sha256": "2d150258b8ea001d10d6407892fbc620e7cf8644fc24de1127deb3851641e22d"
+    },
+    {
+      "id": "order-feedback",
+      "method": "POST",
+      "path": "/orders/feedback",
+      "summary": "Оставить отзыв водителю",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "200",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "400",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "403",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "404",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "409",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "410",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "order_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-feedback",
+      "adapter": "order_feedback",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "order_feedback": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "order_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "order_id"
+                ],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "rating": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5
+                  },
+                  "msg": {
+                    "type": "string",
+                    "maxLength": 65536
+                  }
+                },
+                "required": [
+                  "rating"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query",
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-feedback.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "order-info",
+      "method": "GET",
+      "path": "/orders/info",
+      "summary": "Информация о заказе",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Accept-Language",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "order_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-info",
+      "adapter": "order_info",
+      "execution": "integration_read",
+      "access": "observed_success",
+      "live_check": {
+        "ok": true,
+        "error": null,
+        "http_status": null,
+        "checked_at": "2026-10-03T21:30:22.068690+00:00",
+        "coverage": "One read response or page with a real fixture; not exhaustive business data coverage."
+      },
+      "documentation_sha256": "ddb50f8303dd71c9019de26be3db6d144ee3fde73a631920dd980aa76222e061",
+      "additional_adapters": [
+        "order_get"
+      ],
+      "executable_contracts": {
+        "order_get": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "order_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "order_id"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-info.md",
+          "response_kind": "json"
+        }
+      },
+      "implementation_status": "compiled_and_validated"
+    },
+    {
+      "id": "order-list",
+      "method": "GET",
+      "path": "/orders/list",
+      "summary": "Список заказов клиента",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Accept-Language",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "limit",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "offset",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "since_datetime",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "sorting_direction",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "sorting_field",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "till_datetime",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "user_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-list",
+      "adapter": "orders",
+      "execution": "integration_read",
+      "access": "observed_success",
+      "live_check": {
+        "ok": true,
+        "error": null,
+        "http_status": null,
+        "checked_at": "2026-10-03T21:29:10.927027+00:00",
+        "coverage": "One read response or page with a real fixture; not exhaustive business data coverage."
+      },
+      "additional_adapters": [
+        "order_list"
+      ],
+      "executable_contracts": {
+        "order_list": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "offset": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "user_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "sorting_field": {
+                    "type": "string",
+                    "enum": [
+                      "due_date",
+                      "finished_date"
+                    ]
+                  },
+                  "sorting_direction": {
+                    "type": "integer",
+                    "enum": [
+                      -1,
+                      1
+                    ]
+                  },
+                  "since_datetime": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "till_datetime": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-list.md",
+          "response_kind": "json"
+        }
+      },
+      "implementation_status": "compiled_and_validated"
+    },
+    {
+      "id": "order-progress",
+      "method": "GET",
+      "path": "/orders/progress",
+      "summary": "Отслеживание заказа",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "order_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-progress",
+      "adapter": "order_progress",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "order_progress": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "order_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "order_id"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/order-progress.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "promocodes-cancel",
+      "method": "POST",
+      "path": "/promocodes/orders/cancel",
+      "summary": "Отмена заказа промокодов",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "order_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/promocodes-cancel",
+      "adapter": "promocodes_cancel",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "promocodes_cancel": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "order_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "order_id"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/promocodes-cancel.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "promocodes-codes-list",
+      "method": "GET",
+      "path": "/promocodes/orders/codes/list",
+      "summary": "Список промокодов в заказе",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "cursor",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "limit",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "order_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/promocodes-codes-list",
+      "adapter": "promocodes_codes_list",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "promocodes_codes_list": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "cursor": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "order_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "order_id"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/promocodes-codes-list.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "promocodes-create",
+      "method": "POST",
+      "path": "/promocodes/orders/create",
+      "summary": "Создание серии промокодов",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-Idempotency-Token",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "cargo",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "eats",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "fuel",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "grocery",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "taxi",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/promocodes-create",
+      "adapter": "promocodes_create",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "promocodes_create": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  },
+                  "value": {
+                    "type": "number",
+                    "minimum": 100,
+                    "maximum": 30000
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 5,
+                    "maximum": 1000
+                  },
+                  "service": {
+                    "type": "string",
+                    "enum": [
+                      "taxi",
+                      "grocery",
+                      "eats",
+                      "fuel",
+                      "cargo"
+                    ]
+                  },
+                  "active_from": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "active_until": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "bank_name": {
+                    "type": "object",
+                    "properties": {
+                      "ru": {
+                        "type": "string",
+                        "maxLength": 65536
+                      },
+                      "en": {
+                        "type": "string",
+                        "maxLength": 65536
+                      }
+                    },
+                    "required": [
+                      "ru",
+                      "en"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "geo_restrictions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "source": {
+                          "type": "object",
+                          "properties": {
+                            "geo_restriction_id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 1024
+                            }
+                          },
+                          "required": [
+                            "geo_restriction_id"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "destination": {
+                          "type": "object",
+                          "properties": {
+                            "geo_restriction_id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 1024
+                            }
+                          },
+                          "required": [
+                            "geo_restriction_id"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "max_intermediate_points": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "required": [],
+                      "additionalProperties": false
+                    }
+                  },
+                  "classes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 65536
+                    }
+                  }
+                },
+                "required": [
+                  "value",
+                  "count",
+                  "active_until"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [
+            "bin_ranges is rejected because the documented pair element type is unspecified."
+          ],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/promocodes-create.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "promocodes-info",
+      "method": "GET",
+      "path": "/promocodes/orders/info",
+      "summary": "Получение информации о заказе промокодов",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/promocodes-info",
+      "adapter": "promocodes_info",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "promocodes_info": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "order_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "order_id"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/promocodes-info.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "promocodes-list",
+      "method": "GET",
+      "path": "/promocodes/orders/list",
+      "summary": "Список заказов промокодов",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "cursor",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "limit",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/promocodes-list",
+      "adapter": "promocodes_list",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "promocodes_list": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "cursor": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  }
+                },
+                "required": [
+                  "limit"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/promocodes-list.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "region-create",
+      "method": "POST",
+      "path": "/geo_restrictions/create",
+      "summary": "Создание нового района",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/region-create",
+      "adapter": "region_create",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "region_create": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "geo_type": {
+                    "type": "string",
+                    "enum": [
+                      "circle"
+                    ]
+                  },
+                  "geo": {
+                    "type": "object",
+                    "properties": {
+                      "center": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 2,
+                        "maxItems": 2,
+                        "x-coordinates": true
+                      },
+                      "radius": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "center",
+                      "radius"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "name",
+                  "geo_type",
+                  "geo"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/region-create.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "region-delete",
+      "method": "POST",
+      "path": "/geo_restrictions/delete",
+      "summary": "Удаление района",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/region-delete",
+      "adapter": "region_delete",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "region_delete": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/region-delete.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "region-edit",
+      "method": "POST",
+      "path": "/geo_restrictions/update",
+      "summary": "Изменение района",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/region-edit",
+      "adapter": "region_edit",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "region_edit": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "geo_type": {
+                    "type": "string",
+                    "enum": [
+                      "circle"
+                    ]
+                  },
+                  "geo": {
+                    "type": "object",
+                    "properties": {
+                      "center": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 2,
+                        "maxItems": 2,
+                        "x-coordinates": true
+                      },
+                      "radius": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "center",
+                      "radius"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "name",
+                  "geo_type",
+                  "geo"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query",
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/region-edit.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "region-list",
+      "method": "GET",
+      "path": "/geo_restrictions/list",
+      "summary": "Список районов",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "limit",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "offset",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/region-list",
+      "adapter": "region_list",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "region_list": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "offset": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/region-list.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "role-create",
+      "method": "POST",
+      "path": "/managers/create",
+      "summary": "Создание роли",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/role-create",
+      "adapter": "role_create",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "role_create": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "fullname": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "pattern": "^\\+[1-9][0-9]{6,14}$"
+                  },
+                  "yandex_login": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "department_manager",
+                      "department_secretary",
+                      "client_manager"
+                    ]
+                  },
+                  "department_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "fullname",
+                  "email",
+                  "phone",
+                  "yandex_login",
+                  "role"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/role-create.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "role-delete",
+      "method": "POST",
+      "path": "/managers/delete",
+      "summary": "Удаление роли",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/role-delete",
+      "adapter": "role_delete",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "role_delete": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/role-delete.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "role-list",
+      "method": "GET",
+      "path": "/managers/list",
+      "summary": "Список ролей менеджеров подразделения",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "cursor",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "department_id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "limit",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "roles",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/role-list",
+      "adapter": "roles",
+      "execution": "integration_read",
+      "access": "observed_success",
+      "live_check": {
+        "ok": true,
+        "error": null,
+        "http_status": null,
+        "checked_at": "2026-10-03T21:29:22.329436+00:00",
+        "coverage": "One read response or page with a real fixture; not exhaustive business data coverage."
+      },
+      "additional_adapters": [
+        "role_list"
+      ],
+      "executable_contracts": {
+        "role_list": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100
+                  },
+                  "cursor": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "department_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "roles": {
+                    "type": "string",
+                    "pattern": "^(department_manager|department_secretary|client_manager)(,(department_manager|department_secretary|client_manager))*$"
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/role-list.md",
+          "response_kind": "json"
+        }
+      },
+      "implementation_status": "compiled_and_validated"
+    },
+    {
+      "id": "role-update",
+      "method": "POST",
+      "path": "/managers/update",
+      "summary": "Обновление роли",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/role-update",
+      "adapter": "role_update",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "role_update": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "fullname": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "pattern": "^\\+[1-9][0-9]{6,14}$"
+                  },
+                  "yandex_login": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "department_manager",
+                      "department_secretary",
+                      "client_manager"
+                    ]
+                  },
+                  "department_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "fullname",
+                  "email",
+                  "phone",
+                  "yandex_login",
+                  "role"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query",
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/role-update.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "routestats",
+      "method": "POST",
+      "path": "/orders/routestats",
+      "summary": "Получить информацию о предстоящей поездке",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Accept-Language",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/routestats",
+      "adapter": "routestats",
+      "execution": "integration_read",
+      "access": "observed_success",
+      "live_check": {
+        "service": "yandex_go",
+        "operation": "routestats",
+        "checked_at": "2026-10-03T22:09:42.978227+00:00",
+        "business_write": false,
+        "ok": true,
+        "keys": [
+          "offer",
+          "service_levels"
+        ],
+        "tariff_count": 9,
+        "offer_present": true
+      },
+      "implemented": true,
+      "documented": true,
+      "adapter_parameter_schema": {
+        "type": "object",
+        "properties": {
+          "route": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 10,
+            "items": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number"
+              },
+              "description": "[longitude -180..180, latitude -90..90]"
+            }
+          },
+          "user_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "use_toll_roads": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "route"
+        ],
+        "additionalProperties": false
+      },
+      "documentation_sha256": "60b3707cac366c88f77418e6f8634d8a07ab8abb04e8f3b147b6edba883e3dad",
+      "additional_adapters": [
+        "route_estimate"
+      ],
+      "executable_contracts": {
+        "route_estimate": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "route": {
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "number"
+                      },
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "x-coordinates": true
+                    },
+                    "minItems": 2
+                  },
+                  "user_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "use_toll_roads": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "route"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [
+            "City-specific requirements are not accepted: their value schema is not defined on the request page."
+          ],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/routestats.md",
+          "response_kind": "json"
+        }
+      },
+      "implementation_status": "compiled_and_validated"
+    },
+    {
+      "id": "tanker-info",
+      "method": "GET",
+      "path": "/orders/tanker",
+      "summary": "Получение отчетности об операциях в сервисе «Заправки»",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "limit",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "since_datetime",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "till_datetime",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "user_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/tanker-info",
+      "adapter": "tanker_info",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "tanker_info": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1000
+                  },
+                  "since_datetime": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d\\.\\d{3}$"
+                  },
+                  "till_datetime": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d\\.\\d{3}$"
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/tanker-info.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "taxi-report",
+      "method": "POST",
+      "path": "/orders/taxi/report",
+      "summary": "Информация о заказах такси для отчета",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Accept-Language",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/taxi-report",
+      "adapter": "taxi_report",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "taxi_report": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "maxItems": 100
+                  }
+                },
+                "required": [
+                  "ids"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/taxi-report.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "travels-list",
+      "method": "POST",
+      "path": "/travels/list",
+      "summary": "Получение списка командировок",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/travels-list",
+      "adapter": "travels",
+      "execution": "integration_read",
+      "access": "observed_success",
+      "live_check": {
+        "ok": true,
+        "error": null,
+        "http_status": null,
+        "checked_at": "2026-10-03T21:29:26.291570+00:00",
+        "coverage": "One read response or page with a real fixture; not exhaustive business data coverage."
+      },
+      "documentation_sha256": "24eb74fff33bf528ddfff4cff49e341b9034793bc9341a8317e9f4c972ac054e",
+      "additional_adapters": [
+        "travels_list"
+      ],
+      "executable_contracts": {
+        "travels_list": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "date_from": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "date_to": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "cursor": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 10
+                  },
+                  "updated_at_from": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "updated_at_to": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/travels-list.md",
+          "response_kind": "json"
+        }
+      },
+      "implementation_status": "compiled_and_validated"
+    },
+    {
+      "id": "user-archive",
+      "method": "POST",
+      "path": "/users/archive",
+      "summary": "Архивирование сотрудника",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "user_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-archive",
+      "adapter": "user_archive",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "user_archive": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "user_id"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-archive.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "user-create",
+      "method": "POST",
+      "path": "/users",
+      "summary": "Создание сотрудника",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-create",
+      "adapter": "user_create",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "user_create": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "fullname": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "phone": {
+                    "type": "string",
+                    "pattern": "^\\+[1-9][0-9]{6,14}$"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  },
+                  "cost_centers_id": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "nickname": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "department_id": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "limits": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "limit_id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1024
+                        },
+                        "service": {
+                          "type": "string",
+                          "enum": [
+                            "taxi",
+                            "eats2",
+                            "grocery",
+                            "drive",
+                            "tanker",
+                            "cargo",
+                            "travel",
+                            "scooters"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "limit_id",
+                        "service"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "documents": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "citizenship": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "first_name": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "last_name": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "middle_name": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "first_name_lat": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "last_name_lat": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "middle_name_lat": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "number": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "document_type": {
+                          "type": "string",
+                          "enum": [
+                            "passport_rus",
+                            "birth_certificate",
+                            "seafarer_passport",
+                            "foreign_passport_rus",
+                            "foreign_document",
+                            "cosmopolit_certificate"
+                          ]
+                        },
+                        "gender": {
+                          "type": "string",
+                          "enum": [
+                            "male",
+                            "female"
+                          ]
+                        },
+                        "actual_to_str": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "birth_date_str": {
+                          "type": "string",
+                          "format": "date"
+                        }
+                      },
+                      "required": [
+                        "document_type"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "fullname",
+                  "phone",
+                  "is_active"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-create.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "user-info",
+      "method": "GET",
+      "path": "/users",
+      "summary": "Детальная информация о сотруднике",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "user_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-info",
+      "adapter": "user_info",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "user_info": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "user_id"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-info.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "user-list",
+      "method": "GET",
+      "path": "/users",
+      "summary": "Список сотрудников клиента",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "cursor",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "limit",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-list",
+      "adapter": "users",
+      "execution": "integration_read",
+      "access": "observed_success",
+      "live_check": {
+        "ok": true,
+        "error": null,
+        "http_status": null,
+        "checked_at": "2026-10-03T21:29:07.435317+00:00",
+        "coverage": "One read response or page with a real fixture; not exhaustive business data coverage."
+      },
+      "additional_adapters": [
+        "user_list"
+      ],
+      "executable_contracts": {
+        "user_list": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "cursor": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-list.md",
+          "response_kind": "json"
+        }
+      },
+      "implementation_status": "compiled_and_validated"
+    },
+    {
+      "id": "user-phone",
+      "method": "POST",
+      "path": "/users/by_phone",
+      "summary": "Получение информации о сотруднике по номеру телефона",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-phone",
+      "adapter": "user_phone",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "user_phone": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "phone": {
+                    "type": "string",
+                    "pattern": "^\\+[1-9][0-9]{6,14}$"
+                  }
+                },
+                "required": [
+                  "phone"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-phone.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "user-update-patch",
+      "method": "PATCH",
+      "path": "/users",
+      "summary": "Обновление данных сотрудника (PATCH)",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "user_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-update-patch",
+      "adapter": "user_update_patch",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "user_update_patch": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "user_id"
+                ],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "fullname": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "phone": {
+                    "type": "string",
+                    "pattern": "^\\+[1-9][0-9]{6,14}$"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  },
+                  "cost_centers_id": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "nickname": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "department_id": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "limits": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "limit_id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1024
+                        },
+                        "service": {
+                          "type": "string",
+                          "enum": [
+                            "taxi",
+                            "eats2",
+                            "grocery",
+                            "drive",
+                            "tanker",
+                            "cargo",
+                            "travel",
+                            "scooters"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "limit_id",
+                        "service"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "documents": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "citizenship": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "first_name": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "last_name": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "middle_name": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "first_name_lat": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "last_name_lat": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "middle_name_lat": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "number": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "document_type": {
+                          "type": "string",
+                          "enum": [
+                            "passport_rus",
+                            "birth_certificate",
+                            "seafarer_passport",
+                            "foreign_passport_rus",
+                            "foreign_document",
+                            "cosmopolit_certificate"
+                          ]
+                        },
+                        "gender": {
+                          "type": "string",
+                          "enum": [
+                            "male",
+                            "female"
+                          ]
+                        },
+                        "actual_to_str": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "birth_date_str": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1024
+                        },
+                        "user_id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1024
+                        },
+                        "is_deleted": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "document_type"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "is_deleted": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query",
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-update-patch.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "user-update-put",
+      "method": "PUT",
+      "path": "/users",
+      "summary": "Обновление данных сотрудника (PUT)",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "user_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-update-put",
+      "adapter": "user_update_put",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "user_update_put": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "user_id"
+                ],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "fullname": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "phone": {
+                    "type": "string",
+                    "pattern": "^\\+[1-9][0-9]{6,14}$"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "is_active": {
+                    "type": "boolean"
+                  },
+                  "cost_centers_id": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "nickname": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "department_id": {
+                    "type": "string",
+                    "maxLength": 65536
+                  },
+                  "limits": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "limit_id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1024
+                        },
+                        "service": {
+                          "type": "string",
+                          "enum": [
+                            "taxi",
+                            "eats2",
+                            "grocery",
+                            "drive",
+                            "tanker",
+                            "cargo",
+                            "travel",
+                            "scooters"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "limit_id",
+                        "service"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "documents": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "citizenship": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "first_name": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "last_name": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "middle_name": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "first_name_lat": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "last_name_lat": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "middle_name_lat": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "number": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "document_type": {
+                          "type": "string",
+                          "enum": [
+                            "passport_rus",
+                            "birth_certificate",
+                            "seafarer_passport",
+                            "foreign_passport_rus",
+                            "foreign_document",
+                            "cosmopolit_certificate"
+                          ]
+                        },
+                        "gender": {
+                          "type": "string",
+                          "enum": [
+                            "male",
+                            "female"
+                          ]
+                        },
+                        "actual_to_str": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "birth_date_str": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1024
+                        },
+                        "user_id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1024
+                        },
+                        "is_deleted": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "document_type"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "is_deleted": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "fullname",
+                  "phone",
+                  "is_active",
+                  "cost_centers_id"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query",
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/user-update-put.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "users-spending-details",
+      "method": "POST",
+      "path": "/users-spending-details",
+      "summary": "Детализация затрат сотрудников",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/users-spending-details",
+      "adapter": "users_spending_details",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "users_spending_details": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "user_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    },
+                    "maxItems": 100
+                  }
+                },
+                "required": [
+                  "user_ids"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/users-spending-details.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "vehicles-bulk-archive",
+      "method": "POST",
+      "path": "/vehicles/bulk-archive",
+      "summary": "Массовое удаление автомобилей",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-Idempotency-Token",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/vehicles-bulk-archive",
+      "adapter": "vehicles_bulk_archive",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "vehicles_bulk_archive": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "vehicle_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1024
+                    }
+                  }
+                },
+                "required": [
+                  "vehicle_ids"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/vehicles-bulk-archive.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "vehicles-bulk-create",
+      "method": "POST",
+      "path": "/vehicles/bulk-create",
+      "summary": "Массовое создание автомобилей",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-Idempotency-Token",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/vehicles-bulk-create",
+      "adapter": "vehicles_bulk_create",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "vehicles_bulk_create": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "vehicles": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "license_plate": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "model": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "limit_id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1024
+                        },
+                        "access_type": {
+                          "type": "string",
+                          "enum": [
+                            "anyone",
+                            "custom"
+                          ]
+                        },
+                        "access": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "entity_type": {
+                                "type": "string",
+                                "enum": [
+                                  "user",
+                                  "department"
+                                ]
+                              },
+                              "entity_id": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 1024
+                              }
+                            },
+                            "required": [
+                              "entity_type",
+                              "entity_id"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "license_plate",
+                        "model",
+                        "limit_id",
+                        "access_type"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "vehicles"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/vehicles-bulk-create.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "vehicles-bulk-update",
+      "method": "POST",
+      "path": "/vehicles/bulk-update",
+      "summary": "Массовое обновление автомобилей",
+      "effect": "business_write",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-Idempotency-Token",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/vehicles-bulk-update",
+      "adapter": "vehicles_bulk_update",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "vehicles_bulk_update": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "vehicles": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "license_plate": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "model": {
+                          "type": "string",
+                          "maxLength": 65536
+                        },
+                        "limit_id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1024
+                        },
+                        "access_type": {
+                          "type": "string",
+                          "enum": [
+                            "anyone",
+                            "custom"
+                          ]
+                        },
+                        "access": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "entity_type": {
+                                "type": "string",
+                                "enum": [
+                                  "user",
+                                  "department"
+                                ]
+                              },
+                              "entity_id": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 1024
+                              }
+                            },
+                            "required": [
+                              "entity_type",
+                              "entity_id"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "vehicle_id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1024
+                        }
+                      },
+                      "required": [
+                        "vehicle_id",
+                        "license_plate",
+                        "model",
+                        "limit_id",
+                        "access_type"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "vehicles"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "body"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/vehicles-bulk-update.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "vehicles-list",
+      "method": "GET",
+      "path": "/vehicles/list",
+      "summary": "Получение списка автомобилей",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "cursor",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "include_deleted",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "limit",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "user_id",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/vehicles-list",
+      "adapter": "vehicles_list",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "vehicles_list": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "cursor": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "user_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "include_deleted": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/vehicles-list.md",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "zone-info",
+      "method": "GET",
+      "path": "/zoneinfo",
+      "summary": "Получение информации о зоне",
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "Authorization: Bearer <OAuth-токен>",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-Request-Language: en",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "X-YaTaxi-Selected-Corp-Client-Id",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "lat",
+          "details": "See official source for requiredness/type"
+        },
+        {
+          "name": "lon",
+          "details": "See official source for requiredness/type"
+        }
+      ],
+      "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/zone-info",
+      "adapter": "zone_info",
+      "execution": "integration_read",
+      "access": "observed_success",
+      "live_check": {
+        "service": "yandex_go",
+        "operation": "zone_info",
+        "checked_at": "2026-10-03T22:09:38.942477+00:00",
+        "business_write": false,
+        "ok": true,
+        "keys": [
+          "tariff_classes"
+        ]
+      },
+      "implemented": true,
+      "documented": true,
+      "adapter_parameter_schema": {
+        "type": "object",
+        "properties": {
+          "lon": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180
+          },
+          "lat": {
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90
+          }
+        },
+        "required": [
+          "lon",
+          "lat"
+        ],
+        "additionalProperties": false
+      },
+      "documentation_sha256": "f06a2fcb6936b0a18cf98dbe09c4db89df92bd8771f7b6772c26271ee88215c2",
+      "additional_adapters": [
+        "zone_lookup"
+      ],
+      "executable_contracts": {
+        "zone_lookup": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "lon": {
+                    "type": "number",
+                    "minimum": -180,
+                    "maximum": 180
+                  },
+                  "lat": {
+                    "type": "number",
+                    "minimum": -90,
+                    "maximum": 90
+                  }
+                },
+                "required": [
+                  "lon",
+                  "lat"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://taxi__business-api.docs-viewer.yandex.ru/ru/concepts/api20/zone-info.md",
+          "response_kind": "json"
+        }
+      },
+      "implementation_status": "compiled_and_validated"
+    }
+  ],
+  "limitations": {
+    "flight_search": "No consumer flight-search endpoint found in current Go Business API 2.0 index. Travel partners API is hotels; Webmaster airline protocol is inbound requests from Yandex to an airline/OTA supplier, not a callable Yandex flight-search API. Private partner availability would require separate provider confirmation, not inferred from Go credentials.",
+    "sandbox": "No applicable Business API sandbox documented in reviewed index/quickstart/method pages; Delivery/fleet sandboxes are different APIs."
+  },
+  "compiled_contract": "registry/contracts/yandex_go.json"
+}

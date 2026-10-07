@@ -1,0 +1,120 @@
+Dispatch commands to a connected remote and read their output. Each exec run is a stored record. Output is stored separately as sequenced chunks.
+Requires API key scopes remotes:read (list, get, read output) and remotes:write (dispatch, signal). Create keys in settings → workspace → api keys.
+→ Remotes API · Remotes guide
+Overview
+An exec run is one command executed on a remote. The API creates the run, asks the remote daemon to start the process over the WebSocket, and stores stdout/stderr as sequenced chunks.
+| Concern | Detail
+| Dispatch | POST /remotes/{id}/execs
+| Status | Poll GET /execs/{id}
+| Output | Poll GET /execs/{id}/output?after_seq=N
+| Cancel | POST /execs/{id}/signal
+| Resume cursor | last_seq on the run. Pass it as after_seq when reconnecting.
+The remote must be connected and have exec_enabled: true (start it with belt remote start --exec).
+While a run is in progress. Dispatch requires a live connection, but a command already running on the host keeps going if the daemon drops the WebSocket briefly. The API fails unfinished exec runs when the remote reaches stopped (about 30 seconds after disconnect), not when it is merely disconnected. Reconnect the daemon within that window to keep long-running commands alive.
+Dispatch exec run
+POST /remotes/{remote_id}/execs
+Starts a command on a remote the caller owns. Requires remotes:write.
+Request
+| Field | Type | Required | Description
+| command | string | Yes | Program to run (for example bash, ls)
+| args | string[] | No | Arguments passed to the command
+| cwd | string | No | Working directory on the remote
+| env | string[] | No | Extra environment variables (KEY=value)
+| pty | boolean | No | Run under a pseudo-terminal
+| timeout_ms | integer | No | Timeout in milliseconds (0 = no limit)
+jsoncopy
+1{2  "command": "bash",3  "args": ["-c", "echo hello && uname -a"],4  "cwd": "/home/dev/project",5  "timeout_ms": 600006}
+bashcopy
+1curl -X POST https://api.inference.sh/remotes/remote_abc123/execs \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"command":"ls","args":["-la"]}'
+Response
+Returns an ExecRunDTO. The run is already running when dispatch succeeds.
+| Field | Type | Description
+| id | string | Exec run ID
+| remote_id | string | Target remote
+| command | string | Program
+| args | string[] | Arguments
+| cwd | string | Working directory
+| env | string[] | Extra environment
+| pty | boolean | Pseudo-terminal flag
+| timeout_ms | integer | Requested timeout
+| status | string | Lifecycle state (see status values)
+| exit_code | integer | Process exit code. Omitted until the process exits.
+| error | string | Error message. Omitted when empty.
+| timed_out | boolean | true when killed by timeout
+| started_at | string | ISO timestamp when execution began. Omitted until set.
+| ended_at | string | ISO timestamp when the run finished. Omitted until set.
+| duration_ms | integer | Run duration. Omitted until the run finishes.
+| requested_by | string | Who initiated the run: user, loop, or agent. This endpoint always records user.
+| agent_run_id | string | Agent run the command belongs to, for agent-initiated runs. Omitted otherwise.
+| last_seq | integer | Highest output sequence number stored. Use it as the resume cursor.
+Errors
+| Code | HTTP | When
+| invalid_request | 400 | command is empty or the body is not valid JSON
+| exec_disabled | 403 | Remote has not opted in (exec_enabled: false)
+| remote_offline | 409 | Remote is not connected
+Get exec run
+GET /execs/{id}
+Returns a single exec run. Requires remotes:read.
+bashcopy
+1curl https://api.inference.sh/execs/exec_abc123 \2  -H "Authorization: Bearer inf_your_key"
+Poll this endpoint until status is terminal (exited, killed, or denied).
+List exec runs
+GET /execs or POST /execs/list
+Cursor-paginated list. Requires remotes:read. See REST overview: cursor pagination.
+Read output
+GET /execs/{id}/output?after_seq={n}
+Returns output chunks with seq greater than after_seq, in ascending order. Requires remotes:read.
+| Query | Type | Description
+| after_seq | integer | Return chunks after this sequence (default 0, from the start)
+Each item is an ExecRunOutputDTO:
+| Field | Type | Description
+| id | string | Chunk ID
+| created_at | string | ISO timestamp when the chunk was stored
+| exec_run_id | string | Parent exec run
+| seq | integer | Sequence number within the run
+| stream | string | stdout or stderr
+| data | string | Output bytes as a base64 string. Decode it to get the raw output.
+jsoncopy
+1{2  "id": "out_abc123",3  "created_at": "2026-01-01T12:00:00Z",4  "exec_run_id": "exec_abc123",5  "seq": 1,6  "stream": "stdout",7  "data": "aGVsbG8K"8}
+A request returns at most 2000 chunks.
+Resume after disconnect
+Read last_seq from GET /execs/{id}, or track the highest seq you have processed.
+Call GET /execs/{id}/output?after_seq={seq} to fetch only newer chunks.
+Repeat until the run reaches a terminal status.
+last_seq only moves forward. A late or duplicate frame with a lower seq does not rewind it.
+bashcopy
+1# Fetch chunks after sequence 422curl "https://api.inference.sh/execs/exec_abc123/output?after_seq=42" \3  -H "Authorization: Bearer inf_your_key"
+Signal (cancel)
+POST /execs/{id}/signal
+Asks the remote daemon to kill a running exec. Requires remotes:write.
+bashcopy
+1curl -X POST https://api.inference.sh/execs/exec_abc123/signal \2  -H "Authorization: Bearer inf_your_key"
+jsoncopy
+1{2  "ok": true3}
+The response is a bare JSON object without the standard envelope. The call does nothing when the run is already terminal.
+Exec run status values
+| Status | Terminal | Description
+| pending | No | Created, not yet sent to the host
+| running | No | Sent to the host
+| exited | Yes | Process ended. exit_code is set.
+| killed | Yes | Ended without an exit code: signal, timeout, cancel, remote disconnect, or the daemon refused the run
+| denied | Yes | The API could not deliver the command to the daemon
+Automatic termination
+Some terminal states are applied by the platform when the remote disconnects or you stop the chat:
+| Situation | Result
+| Remote goes disconnected or stopped | Every pending or running exec on that remote becomes killed. error is remote disconnected before the command finished. The heartbeat staleness sweep is the grace window—a short network blip that recovers before the remote is marked disconnected does not fail runs.
+| Chat stopped | Exec runs started from an agent's remote_exec in that chat (requested_by: loop, agent_run_id set) are signaled through their execution graph nodes when you stop the chat—the same sweep that cancels running app tasks. In-flight commands do not keep running on the remote after stop.
+| POST /execs/{id}/signal | Asks the daemon to kill the process; the run becomes killed when the remote reports exit.
+Valid transitions
+| From | To
+| pending | running, denied, killed
+| running | exited, killed
+Terminal states are final.
+CLI equivalent
+bashcopy
+1# On the remote machine: opt in to command execution2belt remote --exec34# From any authenticated client: run a command and stream output5belt remote exec remote_abc123 -- ls -la6belt remote exec remote_abc123 -- bash -c "echo hi && uname -a"
+belt remote exec dispatches via POST /remotes/{id}/execs, polls GET /execs/{id}/output with after_seq, and exits with the remote command's exit code.
+Flags: --cwd, --timeout (seconds), --pty. The command is destructive. belt prompts for confirmation unless --yes is set.
+Related
+→ Remotes API: register hosts, exec_enabled, WebSocket protocol
+→ REST overview: authentication, cursor pagination, response format

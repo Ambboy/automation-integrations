@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "state_dir": "/home/operator/.local/state/automation-integrations",
+  "listen": "127.0.0.1",
+  "port": 8787,
+  "dry_run": true,
+  "connections": {
+    "hermes-server": {
+      "token_file": "/home/operator/.config/automation-integrations/bridge-token",
+      "telegram_token_file": "/home/operator/.config/automation-integrations/telegram-token",
+      "max_event_age_seconds": 86400,
+      "modules": ["topic-icons", "voice-reply"],
+      "routes": [
+        {"profile": "server", "platform": "telegram", "chat_id": "REPLACE_CHAT",
+         "user_id": "REPLACE_USER", "thread_ids": ["REPLACE_THREAD"]}
+      ]
+    }
+  },
+  "telegram": {"base_url": "https://api.telegram.org"},
+  "voice": {
+    "tts_argv": ["/absolute/path/to/your-tts-command", "--output", "{output_file}"],
+    "timeout_seconds": 120,
+    "ffmpeg": "/usr/bin/ffmpeg",
+    "ffprobe": "/usr/bin/ffprobe"
+  }
+}

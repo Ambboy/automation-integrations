@@ -1,0 +1,247 @@
+Create automation rules that run an agent, app, or flow on a schedule or when an external webhook fires — or resolve a pending interrupt gate when an event arrives.
+Triggers are workspace-scoped resources. Cron triggers are evaluated by the platform scheduler on a recurring schedule; scheduled triggers fire once at a configured time; webhook triggers expose a public ingestion URL you can register with external services. Manual triggers have no automatic schedule or webhook ingestion; use POST /triggers/{id}/fire to run them.
+→ Entitlements — triggers plan limit
+→ Discord integration: OAuth event triggers in the web app
+Create triggers in the web app
+Use Triggers → New to build a trigger without calling the API directly:
+Type — schedule (cron) or webhook
+Action — run an agent, app, or flow (visual pickers)
+Schedule — for cron triggers, use the visual schedule builder: pick a frequency (every N minutes, hourly, daily, weekly, monthly, or custom), set time and day fields in an inline sentence (for example run daily at 09:00), and choose a timezone from the dropdown. Custom mode exposes five labeled cron fields (minute, hour, day, month, weekday) with a live expression preview. For webhook triggers, pick a provider source and signing strategy
+Filters (webhook) — optional match rules with operator picker; provider-specific fields come from GET /trigger-sources filter_fields
+Input — default JSON payload or input mapping for webhook events
+The trigger list links to a detail page with an activity feed of recent fires. See Execution log for the same data via API.
+Scopes
+| Scope | Endpoints
+| agents:read | List, get triggers; list, get trigger fires
+| agents:write | Create, update, delete
+| agents:execute | Fire (POST /triggers/{id}/fire)
+Create API keys with these scopes at settings → workspace → api keys.
+GET /trigger-sources is public (no API key required).
+Trigger object
+| Field | Type | Description
+| id | string | Trigger ID
+| name | string | Display name
+| type | string | cron, webhook, scheduled (one-shot), or manual
+| action | string | run_agent, run_app, run_flow, or resolve_interrupt
+| enabled | boolean | When false, cron ticks and webhook ingestion are skipped
+| agent_id | string | Required when action is run_agent
+| app_id | string | Required when action is run_app
+| flow_id | string | Required when action is run_flow
+| interrupt_id | string | Required when action is resolve_interrupt — pending interrupt to resolve on fire
+| config | object | Type-specific settings (see below)
+| input | object | Default JSON payload when fire requests omit a body
+| input_mapping | object | Map webhook payload fields into run input — see Input mapping
+| filters | array | Match rules applied before dispatch — see Event filtering
+| source | object | Webhook provider metadata (from source_id)
+| scheduled_at | string | RFC3339 one-shot fire time — present when type is scheduled
+| last_fired_at | string | ISO timestamp of last successful fire
+| fire_count | number | Total successful fires
+| webhook_url | string | Present on create for webhook triggers — your public ingestion URL
+config by type
+Cron (type: "cron"):
+| Field | Type | Required | Description
+| expression | string | Yes | Cron expression (e.g. 0 9 * * *)
+| timezone | string | No | IANA timezone for the expression
+Webhook (type: "webhook"):
+| Field | Type | Description
+| secret_ref | string | Key in Secrets used for signature verification
+Scheduled triggers (type: "scheduled")
+Set the top-level scheduled_at field (RFC3339) to the one-shot fire time. The platform checks due scheduled triggers every 60 seconds. After the scheduled time passes, the platform fires the trigger once and sets enabled to false — whether dispatch succeeds or fails. Re-enable the trigger (with a new scheduled_at) to fire again.
+List triggers
+GET /triggers or POST /triggers/list
+Cursor-paginated list of your workspace's triggers. Requires agents:read.
+bashcopy
+1curl -X POST https://api.inference.sh/triggers/list \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"limit": 50}'
+Get trigger
+GET /triggers/{id}
+Returns a single trigger. Requires agents:read.
+Create trigger
+POST /triggers
+Requires agents:write.
+Request
+| Field | Type | Required | Description
+| name | string | Yes | Display name
+| type | string | Yes | cron, webhook, scheduled, or manual
+| action | string | Yes | run_agent, run_app, run_flow, or resolve_interrupt
+| agent_id | string | When action is run_agent | Agent to run
+| app_id | string | When action is run_app | App to run
+| flow_id | string | When action is run_flow | Flow to run
+| interrupt_id | string | When action is resolve_interrupt | Pending interrupt to resolve on fire
+| config | object | For cron | Must include expression (and optional timezone)
+| scheduled_at | string | When type is scheduled | RFC3339 one-shot fire time
+| source_id | string | No | Webhook provider from trigger sources
+| enabled | boolean | No | Defaults to true
+| input | object | No | Default payload
+| input_mapping | object | No | Payload field mapping — see Input mapping
+| filters | array | No | Match rules before dispatch — see Event filtering
+Cron example — run an app every day at 9:00:
+bashcopy
+1curl -X POST https://api.inference.sh/triggers \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "name": "daily-report",6    "type": "cron",7    "action": "run_app",8    "app_id": "app_abc123",9    "config": { "expression": "0 9 * * *", "timezone": "America/New_York" },10    "input": { "report_type": "daily" }11  }'
+Webhook example — run an agent when an external service POSTs:
+bashcopy
+1curl -X POST https://api.inference.sh/triggers \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "name": "slack-events",6    "type": "webhook",7    "action": "run_agent",8    "agent_id": "agent_abc123",9    "source_id": "<source_id from GET /trigger-sources>",10    "config": { "secret_ref": "SLACK_SIGNING_SECRET" }11  }'
+Scheduled example — run an agent once at a specific time:
+bashcopy
+1curl -X POST https://api.inference.sh/triggers \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "name": "launch-reminder",6    "type": "scheduled",7    "action": "run_agent",8    "agent_id": "agent_abc123",9    "scheduled_at": "2026-08-15T09:00:00Z",10    "input": { "message": "Launch day reminder" }11  }'
+Resolve-interrupt example — auto-approve a specific gate when a webhook fires:
+bashcopy
+1curl -X POST https://api.inference.sh/triggers \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "name": "approve-from-webhook",6    "type": "webhook",7    "action": "resolve_interrupt",8    "interrupt_id": "int_abc123",9    "source_id": "<source_id from GET /trigger-sources>",10    "config": { "secret_ref": "WEBHOOK_SIGNING_SECRET" },11    "input": { "resolution": "allow" }12  }'
+To choose allow vs deny from the webhook payload, map only resolution via input_mapping — interrupt_id is always read from the trigger object, not the fire payload.
+resolve_interrupt action
+When action is resolve_interrupt, the trigger dispatches POST /interrupts/{id}/resolve on your behalf instead of starting a new agent, app, or flow run. Set interrupt_id on the trigger at create time (required). No agent_id, app_id, or flow_id is required.
+The fire payload (from input, manual fire body, or mapped webhook payload) may include:
+| Field | Type | Required | Description
+| resolution | string | No | allow (default) or deny
+This is the trigger equivalent of Resolve interrupt. Use it to wire external approval workflows — for example, resolve a lifecycle hook gate when an ops webhook fires.
+Platform-managed gate expiry: When a lifecycle hook gate creates an interrupt, the platform automatically creates a type: scheduled trigger with this action (named expire-interrupt:<interrupt_id>). You do not need to create it yourself — it fires once at the gate's timeout and is disabled afterward.
+Response
+Returns the created trigger. Webhook triggers include webhook_url — the public URL to register with your provider:
+codecopy
+1https://api.inference.sh/triggers/{id}/hook
+Update trigger
+POST /triggers/{id}
+Partial update: only fields you include in the JSON body are changed; everything else stays as stored (including cron config when you toggle enabled). Requires agents:write.
+Common patch fields:
+| Field | Type | Description
+| name | string | Display name
+| enabled | boolean | Pause (false) or resume (true) cron, webhook, and scheduled triggers
+| config | object | Cron expression / timezone or webhook secret_ref
+| input | object | Default fire payload
+| input_mapping | object | Webhook payload mapping
+| filters | array | Webhook match rules
+| scheduled_at | string | RFC3339 one-shot time for type: scheduled
+Pause a webhook trigger (stops cron ticks and returns 410 on webhook ingestion until re-enabled):
+bashcopy
+1curl -X POST https://api.inference.sh/triggers/trigger_abc123 \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"enabled": false}'
+Returns the updated trigger object (TriggerDTO). An empty body returns 400 invalid_request.
+Delete trigger
+DELETE /triggers/{id}
+Permanently deletes a trigger. Requires agents:write.
+Fire trigger (manual)
+POST /triggers/{id}/fire
+Manually invoke a trigger. Requires agents:execute.
+Use this to test a trigger or run it on demand. All trigger types support manual fire, including manual triggers that only run on demand.
+Request body
+Optional JSON object. When omitted or empty, the trigger's configured input is used (if set).
+bashcopy
+1curl -X POST https://api.inference.sh/triggers/trigger_abc123/fire \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"event": "manual_test"}'
+Access and dispatch permissions
+Your API key needs agents:execute to call fire, and the caller must belong to the same workspace that owns the trigger. Cross-workspace fire requests are rejected: you cannot fire another workspace's trigger by ID even with a valid execute-scoped key.
+Once access is granted, the linked agent, app, or flow runs under the trigger owner's workspace permissions — not the caller's. You do not need direct access to the target resource.
+Webhook ingestion (POST /triggers/{id}/hook) is unaffected — it always dispatches with the trigger owner's permissions and does not require an API key.
+Response
+Success (200):
+jsoncopy
+1{ "fired": true }
+Failure (500):
+When dispatch fails (trigger not found, missing agent/app/flow, input mapping error, etc.), the API returns HTTP 500 with error code fire_error and a message containing the underlying error:
+jsoncopy
+1{2  "success": false,3  "status": 500,4  "error": {5    "code": "fire_error",6    "message": "trigger trigger_abc123 not found: record not found"7  }8}
+The same detail appears in the RFC 9457 detail field.
+Every fire attempt (cron tick, webhook ingestion, or manual fire) is recorded in the execution log. Failed dispatches and filter rejections appear there even when the ingestion endpoint returns 200.
+Execution log
+The platform records one trigger fire row per attempt — successful runs, dispatch errors, and events dropped by event filtering.
+Use this to debug webhook triggers, audit cron runs, and correlate fires with created chats, tasks, or flow runs.
+Trigger fire object
+| Field | Type | Description
+| id | string | Fire record ID
+| trigger_id | string | Parent trigger
+| trigger | object | Optional embedded trigger (included on list/get when preloaded)
+| status | string | success, error, or filtered
+| payload | object | Incoming webhook body or cron payload (when captured)
+| error | string | Dispatch or mapping error message (when status is error)
+| duration_ms | number | End-to-end dispatch time in milliseconds
+| chat_id | string | Created agent chat (when action is run_agent and dispatch succeeded)
+| task_id | string | Created task (when action is run_app and dispatch succeeded)
+| flow_run_id | string | Created flow run (when action is run_flow and dispatch succeeded)
+| created_at | string | ISO timestamp
+Status values:
+| Status | Meaning
+| success | Trigger dispatched successfully — linked a chat, task, or flow run, or resolved an interrupt
+| error | Dispatch failed (missing target, mapping error, permissions, etc.)
+| filtered | Payload did not match the trigger's filters — no run created
+List trigger fires
+GET /trigger-fires or POST /trigger-fires/list
+Cursor-paginated execution log for your workspace's triggers. Requires agents:read.
+bashcopy
+1curl -X POST https://api.inference.sh/trigger-fires/list \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "limit": 50,6    "filters": [7      { "field": "trigger_id", "operator": "eq", "value": "trigger_abc123" },8      { "field": "status", "operator": "eq", "value": "error" }9    ]10  }'
+Common filter fields: trigger_id, status, created_at, updated_at. Unknown filter or sort columns return 400. See Cursor pagination.
+Response
+| Field | Type | Description
+| items | array | Trigger fire objects
+| next_cursor | string | Cursor for the next page
+| prev_cursor | string | Cursor for the previous page
+| has_next | boolean | More results available
+| has_previous | boolean | Previous page available
+| total_items | number | Total matching records
+Get trigger fire
+GET /trigger-fires/{id}
+Returns a single execution log entry. Requires agents:read.
+Webhook ingestion
+POST /triggers/{id}/hook
+No authentication required. External services call this URL to fire a webhook trigger.
+| Response | When
+| 200 {"ok":true} | Accepted — dispatch runs asynchronously
+| 404 | Trigger not found
+| 410 | Trigger is disabled
+| 401 | Signature verification failed
+| 400 | Request body exceeds 1 MB or could not be read
+When the trigger's source defines a verification strategy (hmac-sha256, slack-v0, ed25519, or none), the platform validates the inbound signature using the secret referenced by config.secret_ref before dispatching.
+The request body is passed through as the trigger payload (subject to filters and input_mapping).
+Event filtering
+Webhook triggers can include a filters array. Each rule inspects a field in the parsed JSON payload using dot notation (for example event.type, repository.full_name). All rules must match (AND logic). When any rule fails, the webhook returns 200 {"ok":true} but the trigger does not dispatch.
+| Field | Type | Description
+| field | string | Dot-notation path into the payload
+| operator | string | Comparison operator (see below)
+| value | string | Expected value (exists ignores this)
+Operators:
+| Operator | Matches when
+| eq | Field value equals value (string comparison)
+| neq | Field value does not equal value
+| contains | Field is a string containing value
+| prefix | Field is a string starting with value
+| exists | Field is present and non-null
+Example — only fire on GitHub pushes to main:
+jsoncopy
+1{2  "filters": [3    { "field": "ref", "operator": "eq", "value": "refs/heads/main" },4    { "field": "action", "operator": "exists", "value": "" }5  ]6}
+When you set source_id, GET /trigger-sources returns a filter_fields array for that provider — suggested fields with labels, descriptions, and example values for the create UI.
+Input mapping
+input_mapping transforms the webhook payload into the JSON input passed to the agent, app, or flow. It uses the same shape as flow run inputs: an object with an action key mapping output field names to static values or payload connections.
+| Shape | Description
+| { "action": { "<output_key>": { "value": ... } } } | Static literal
+| { "action": { "<output_key>": { "connection": { "nodeId": "trigger", "key": "<path>" } } } } | Extract from payload via dot notation
+When input_mapping is omitted or empty, the raw webhook body is passed through unchanged.
+Example — map a GitHub PR webhook into agent input:
+jsoncopy
+1{2  "input_mapping": {3    "action": {4      "title": {5        "connection": { "nodeId": "trigger", "key": "pull_request.title" }6      },7      "repo": {8        "connection": { "nodeId": "trigger", "key": "repository.full_name" }9      },10      "channel": { "value": "#deployments" }11    }12  }13}
+Given a payload with pull_request.title and repository.full_name, the dispatched input becomes:
+jsoncopy
+1{2  "title": "fix: resolve race condition",3  "repo": "okaris/inference",4  "channel": "#deployments"5}
+Only nodeId: "trigger" is valid for webhook connections — other node IDs return a mapping error at fire time. Missing payload paths resolve to null.
+List trigger sources
+GET /trigger-sources
+Returns the catalog of webhook providers available when creating triggers. No API key required.
+bashcopy
+1curl https://api.inference.sh/trigger-sources
+Built-in providers:
+| Key | Verification | Typical use
+| github | hmac-sha256 (X-Hub-Signature-256) | Push, PR, and issue events
+| slack | slack-v0 | Event subscriptions and mentions
+| stripe | hmac-sha256 (Stripe-Signature) | Payment and subscription events
+| linear | hmac-sha256 (Linear-Signature) | Issue and comment webhooks
+| discord | ed25519 | Slash commands and interactions
+| grafana | hmac-sha256 (X-Grafana-Signature) | Alert notifications from Grafana webhook contact points
+| generic | none | Any service — no signature check
+For grafana, enable HMAC on the Grafana webhook contact point (hmacConfig) and set the header name to X-Grafana-Signature so it matches this source. Grafana signs the raw request body with HMAC-SHA256 (hex, no prefix). Use the same value for hmacConfig.secret and the secret referenced by config.secret_ref.
+Each source includes:
+| Field | Description
+| key | Provider identifier
+| name | Display name
+| strategy | Signature verification method
+| config_schema | JSON Schema for trigger config (typically secret_ref)
+| payload_schema | JSON Schema describing expected webhook body fields
+| filter_fields | Suggested filter fields with labels and examples for the UI
+Response example:
+jsoncopy
+1{2  "items": [3    {4      "id": "src_abc123",5      "key": "github",6      "name": "GitHub",7      "strategy": "hmac-sha256",8      "config_schema": { "type": "object", "properties": { "secret_ref": { "type": "string" } } },9      "payload_schema": { "type": "object", "properties": { "ref": { "type": "string" }, "action": { "type": "string" } } },10      "filter_fields": [11        { "field": "ref", "label": "branch ref", "examples": ["refs/heads/main"] },12        { "field": "action", "label": "action", "examples": ["opened", "closed"] }13      ]14    }15  ]16}
+Use each source's id as source_id when creating a webhook trigger. Store the signing secret in Secrets and reference it via config.secret_ref.

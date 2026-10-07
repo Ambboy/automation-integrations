@@ -1,0 +1,327 @@
+OAuth 2.0 device authorization flow (RFC 8628) for signing in from CLIs, IDEs, and other devices without a browser on the same machine.
+
+The belt and infsh CLIs use this flow by default when you run belt login or infsh login in a terminal. You can also call the endpoints directly — or point any off-the-shelf OAuth 2.0 client library at our standard endpoints (see Standard OAuth endpoints).
+
+No API key is required to start or poll a device authorization. Approving a request requires a logged-in web app session in the browser.
+
+→ Authentication · Magic link sign-in · CLI setup
+
+Credential kinds
+
+When you start device authorization, an optional token_kind field selects what the first successful poll returns after browser approval:
+
+ | token_kind | Returned field | Behavior
+
+ | session | session_token | Revocable CLI session (30-day expiry by default; configurable at approval). Acts as the signed-in user, supports switching workspaces with X-Team-ID, optional API key scopes at approval, and appears in settings → personal → sessions. Send as Authorization: Bearer … on API calls.
+
+ | (omit or api_key) | api_key | Legacy 30-day device-scoped API key (CLI, source: device-auth). Still returned for older CLIs that send no request body.
+
+New CLIs should request token_kind: "session". The API key path remains for backward compatibility until older CLIs are retired.
+
+Flow overview
+
+mermaidcopy
+
+1sequenceDiagram2    participant CLI as CLI or client3    participant API as api.inference.sh4    participant Browser as Browser (logged in)56    CLI->>API: POST /device/auth {"token_kind":"session"}7    API-->>CLI: user_code, device_code, approve_url, interval8    CLI->>Browser: Open approve_url (optional)9    Browser->>API: POST /device/auth/approve (session cookie)10    loop Every interval seconds11        CLI->>API: GET /device/auth/poll/{device_code}12        API-->>CLI: status pending | approved | denied | expired13    end14    Note over API,CLI: First approved poll mints and returns credential (one-shot)15    API-->>CLI: session_token or api_key
+
+Your client calls POST /device/auth and receives a short user code and a secret device code.
+
+The user opens approve_url in a browser (or enters the user code at the web app's device-auth page) and approves while signed in. Approval records the authorization only: no credential is created or stored yet.
+
+Your client polls GET /device/auth/poll/{device_code} every interval seconds until the status is approved, denied, or expired.
+
+On the first poll where status is approved, the API mints and returns a credential (one-shot delivery):
+
+session_token when the flow was started with token_kind: "session" — a revocable session you send as Authorization: Bearer …. Supports X-Team-ID like a web session. The session records the polling device's IP and user agent (not the approving browser's).
+
+api_key when no token_kind was sent (legacy) — a 30-day CLI key named CLI with source: device-auth.
+
+Browser approval only records authorization (user, workspace, scopes). The credential is minted at poll time and is not stored in the challenge record. A second poll for the same device_code returns status: expired even after a successful delivery.
+
+Codes expire after 300 seconds (5 minutes), including approved-but-never-collected authorizations. The recommended poll interval is 3 seconds.
+
+Standard OAuth endpoints (RFC 8628)
+
+For third-party clients we recommend the standards-compliant endpoints — any OAuth 2.0 library that supports the device authorization grant works unmodified. Endpoints are discoverable via /.well-known/oauth-authorization-server (RFC 8414).
+
+Start: POST /oauth/device_authorization
+
+Authentication: None. Always mints a session token.
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/oauth/device_authorization
+
+jsoncopy
+
+1{2  "device_code": "368bcb…",3  "user_code": "4XQA-HTM9",4  "verification_uri": "https://app.inference.sh/auth/device",5  "verification_uri_complete": "https://app.inference.sh/auth/device?code=4XQA-HTM9",6  "expires_in": 300,7  "interval": 38}
+
+Exchange: POST /oauth/token
+
+Poll the token endpoint with the device code grant:
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/oauth/token \2  -d "grant_type=urn:ietf:params:oauth:grant-type:device_code" \3  -d "device_code=DEVICE_CODE_HERE"
+
+While pending, the endpoint returns standard RFC 8628 errors:
+
+ | Error | Meaning
+
+ | authorization_pending | User has not approved yet — keep polling
+
+ | access_denied | User denied the request
+
+ | expired_token | Code expired, or the credential was already delivered (one-shot)
+
+ | invalid_grant | Unknown device code
+
+On approval:
+
+jsoncopy
+
+1{2  "access_token": "0zdzfx…",3  "token_type": "Bearer",4  "team_id": "team_abc123"5}
+
+team_id is an extension member identifying the workspace the user selected at approval. Send the token as Authorization: Bearer … on subsequent requests.
+
+Revoke a credential (RFC 7009)
+
+POST /oauth/revoke — possession of a token is the authority to revoke it. Works for session tokens and API keys. Unknown tokens still return 200 (per the RFC, so validity can't be probed).
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/oauth/revoke -d "token=TOKEN_HERE"
+
+Start device authorization
+
+POST /device/auth
+
+Authentication: None.
+
+Request (optional body)
+
+ | Field | Type | Required | Description
+
+ | token_kind | string | No | session for a revocable CLI session; omit for a legacy API key
+
+jsoncopy
+
+1{2  "token_kind": "session"3}
+
+An empty body or omitted token_kind keeps legacy behavior (API key on the first approved poll).
+
+Response
+
+ | Field | Type | Description
+
+ | user_code | string | Short code shown to the user (format XXXX-XXXX)
+
+ | device_code | string | Secret code used only for polling (do not display to the user)
+
+ | approve_url | string | Web app URL to open for one-click approval
+
+ | poll_url | string | Convenience URL (web app host); clients should poll the API path below
+
+ | expires_in | number | Seconds until the code expires (300)
+
+ | interval | number | Recommended seconds between poll requests (3)
+
+Example:
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/device/auth \2  -H "Content-Type: application/json" \3  -d '{"token_kind":"session"}'
+
+jsoncopy
+
+1{2  "user_code": "ABCD-2345",3  "device_code": "01HXYZ…",4  "approve_url": "https://app.inference.sh/auth/device?code=ABCD-2345&utm_source=cli&utm_medium=app",5  "poll_url": "https://app.inference.sh/device/auth/poll/01HXYZ…",6  "expires_in": 300,7  "interval": 38}
+
+Poll for approval
+
+GET /device/auth/poll/{device_code}
+
+Authentication: None.
+
+Poll until status is terminal (approved, denied, or expired). Wait at least interval seconds between requests.
+
+The credential is minted by — and delivered only to — the first poll that sees approved. Subsequent polls return expired with no credential. If you miss the response, restart the flow.
+
+Response
+
+ | Field | Type | Description
+
+ | status | string | pending, approved, denied, or expired
+
+ | session_token | string | Present when status is approved and the flow used token_kind: "session"
+
+ | api_key | string | Present when status is approved and the flow used the legacy API-key path (starts with 1nfsh-)
+
+ | team_id | string | Workspace context for the login (when approved)
+
+Only one credential field is set per flow. While status is pending, both are omitted.
+
+One-shot delivery: The first poll that observes status: approved atomically mints the credential and returns it. Later polls for the same device_code return status: expired. If the user approves in the browser but the client stops polling before the code expires, the authorization is lost when the 300-second window ends.
+
+Example:
+
+bashcopy
+
+1curl "https://api.inference.sh/device/auth/poll/DEVICE_CODE_HERE"
+
+jsoncopy
+
+1{2  "status": "approved",3  "session_token": "0zdzfx…",4  "team_id": "team_abc123"5}
+
+Using a session token
+
+After approval with token_kind: "session", store the session_token securely and send it on API requests:
+
+bashcopy
+
+1curl https://api.inference.sh/apps/my \2  -H "Authorization: Bearer SESSION_TOKEN_HERE"
+
+Session tokens are neither API keys (1nfsh-…) nor JWTs. The API resolves them as user sessions via the Authorization header.
+
+Switching workspaces: Send X-Team-ID to act as another workspace you belong to, with the same rules as a browser session. See Authentication: workspace context.
+
+Revocation: CLI sessions appear in settings → personal → sessions (auth_method: device-auth) with the polling device's IP and user agent. The belt and infsh CLIs send an RFC 7231 product token (belt/x.y.z or legacy inference-cli/x.y.z), which the API parses into client name and version for the session record. Revoke sessions from the web app or via the sign-in sessions API below.
+
+Sign-in sessions
+
+Manage browser and CLI authentication sessions (distinct from app sessions used for stateful POST /run).
+
+Routes are under /auth/ and require an authenticated session or bearer token.
+
+ | Endpoint | Scope
+
+ | GET /auth/sessions | user:read
+
+ | DELETE /auth/sessions/{id} | user:write
+
+ | POST /auth/sessions/revoke-all | user:write
+
+List sessions
+
+GET /auth/sessions
+
+Returns active sign-in sessions for the current user. The session making the request is marked current: true.
+
+ | Field | Type | Description
+
+ | id | string | Session ID
+
+ | created_at | string | ISO timestamp
+
+ | expires_at | string | ISO timestamp
+
+ | ip | string | Client IP
+
+ | browser | string | Browser or client name
+
+ | auth_method | string | magic-link, device-auth, api_key, etc.
+
+ | scopes | string[] | Active API key scopes when auth_method is api_key
+
+ | current | boolean | Whether this is the requesting session
+
+bashcopy
+
+1curl https://api.inference.sh/auth/sessions \2  -H "Authorization: Bearer inf_your_session_token"
+
+Revoke one session
+
+DELETE /auth/sessions/{id}
+
+Deletes a specific session. Use another valid session or token to call this endpoint.
+
+Revoke all other sessions
+
+POST /auth/sessions/revoke-all
+
+Deletes every session except the one making the request.
+
+You can also revoke bearer tokens with POST /oauth/revoke (RFC 7009).
+
+Check user code (approval page)
+
+GET /device/auth/code/{code}
+
+Authentication: None.
+
+Used by the web app's device-auth UI to validate a user code before approval. Accepts codes with or without the dash (ABCD2345 or ABCD-2345).
+
+Response
+
+ | Field | Type | Description
+
+ | user_code | string | Normalized code
+
+ | valid | boolean | Whether the code can still be approved
+
+ | status | string | pending, approved, or expired
+
+ | expires_at | string | ISO timestamp (when known)
+
+Approve device authorization
+
+POST /device/auth/approve
+
+Authentication: Web app session (browser cookie after SSO or magic link). Guests cannot approve.
+
+Approval records the authorization only (signed-in user, workspace, optional scopes, and optional credential TTL). It does not return a credential, so the client must keep polling. The token_kind from initiation determines what the first successful poll mints:
+
+token_kind: "session" — revocable CLI session (30-day expiry by default, or expires_in from approval).
+
+Legacy (no token_kind) — CLI API key (30-day expiry by default, or expires_in from approval).
+
+For both credential kinds, omit scopes for full access or pass an explicit scope list to restrict what the minted credential can do (same enforcement as API keys). Scoped session tokens are checked on every request the same way as scoped API keys.
+
+Nothing secret is stored server-side at approval; a minted session records the polling device's own IP and user agent.
+
+Request
+
+ | Field | Type | Required | Description
+
+ | code | string | Yes | User code from POST /device/auth
+
+ | team_id | string | No | Workspace to issue the credential for (defaults to the active workspace)
+
+ | scopes | string[] | No | Permission scopes for the minted credential (session or API key). Omit for full access.
+
+ | expires_in | number | No | Credential lifetime in seconds (default 2592000 — 30 days). Capped at one year.
+
+jsoncopy
+
+1{2  "code": "ABCD-2345",3  "scopes": ["apps:execute", "billing:read"],4  "expires_in": 72005}
+
+Response
+
+jsoncopy
+
+1{2  "success": true,3  "message": "Device authorized successfully"4}
+
+Errors include invalid_code, expired, and already_processed when the code is no longer pending.
+
+Web app approval UI
+
+When approving from app.inference.sh/auth/device, the consent form lets you pick permissions (scopes) and session expiration before authorizing. The expiration picker defaults to 1 year and offers 1 hour through 1 year (sessions cannot be set to never expire). The selected TTL is sent as expires_in on this endpoint. Programmatic callers that omit expires_in still get the 30-day API default.
+
+CLI usage
+
+bashcopy
+
+1belt login                # device flow → session token (supports belt auth switch)2belt login --key 1nfsh-…  # API key login — team-pinned, for CI / automation3belt auth token           # mint a 15m team-pinned API key to stdout (no newline) for scripts; --long-lived prints the stored credential4belt me                   # shows auth method: session vs api key (team-pinned)
+
+belt login stores a session token: it acts as you, works with belt auth switch, and shows up in your sessions list in settings, where it can be revoked. belt login --key (or INFSH_API_KEY) stores an API key: pinned to one workspace by design, so belt auth switch has no effect and will say so.
+
+In non-interactive environments (no TTY, CI set, or BELT_NON_INTERACTIVE=1), belt login without --key prints an approval URL instead of opening a browser. Approve it, then run belt login --code <6-digit code from the browser> on the same machine. The link and code expire after 5 minutes. For CI and scripts, pass --key or set INFSH_API_KEY. See CLI setup: Login. After login, use belt auth token in subshells: curl -H "Authorization: Bearer $(belt auth token)" ...
+
+Session-start hook: When the belt plugin is installed for Claude Code or Codex, the SessionStart hook calls belt plugin hook session-start. If no credential is configured (including anonymous guest sessions), the hook opens a browser for device authorization, prints the approval URL and user code into session context, and polls for up to 45 seconds. A 6-hour cooldown prevents reopening the browser on every session (~/.inferencesh/hook-auth-cooldown). When already logged in, the hook prints your account email instead.
+
+→ CLI setup — Login · Coding agents — SessionStart hook
+
+Related
+
+Authentication — API keys and SDK setup
+
+REST overview — Base URL and response format

@@ -1,0 +1,5 @@
+name: automation-api-catalog
+version: 0.8.0
+description: Business APIs, Wiren Board, fal.ai and inference.sh; durable tasks, provider catalogs and cost tracking
+provides_hooks:
+  - pre_llm_call

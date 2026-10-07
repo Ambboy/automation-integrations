@@ -1,0 +1,80 @@
+Read CMS pages — documentation, blog posts, and landing pages served on inference shell.
+Published pages are indexed in the pages search collection. Discover them via GET /suggest or GET /search?collection=pages. See Search API.
+List responses use cursor pagination. See REST overview — response format.
+Page object
+| Field | Type | Description
+| id | string | Page ID
+| short_id | string | Short ID (first 8 characters)
+| title | string | Page title
+| slug | string | URL slug (unique)
+| content | string | Markdown body
+| excerpt | string | Short summary
+| status | integer | 0 unknown, 1 draft, 2 published, 3 archived, 4 scheduled
+| type | string | doc, blog, or page
+| metadata | object | SEO and navigation metadata (title, description, image, tags, order, icon, hide_from_nav, publish_at)
+| publish_at | string | RFC 3339 go-live time for scheduled pages — mirrors metadata.publish_at for convenience on read
+| is_featured | boolean | Featured flag
+| visibility | string | Visibility scope (public, team, private)
+| created_at | string | RFC 3339 timestamp
+| updated_at | string | RFC 3339 timestamp
+Metadata fields
+| Field | Type | Description
+| publish_at | string | RFC 3339 timestamp when a scheduled page (status = 4) should go live. Write this field here; responses also surface it at the top level. Ignored for other statuses. A scheduled page with no publish_at never auto-publishes.
+Get page by slug
+GET /pages/slug/{slug}
+Returns a single page by slug path. No authentication required.
+The slug path can include slashes (for example api/rest/overview).
+bashcopy
+1curl https://api.inference.sh/pages/slug/api/rest/overview
+Errors
+| Status | Code | When
+| 400 | invalid_request | Slug path is empty
+| 404 | not_found | No page with that slug, the page was soft-deleted, or the page is draft, archived, or scheduled and the caller is not a platform admin
+Non-published pages (draft, archived, scheduled) return 404 to unauthenticated callers and non-admin API keys. Platform admins can fetch scheduled and draft pages by slug for preview.
+Soft-deleted pages are not returned. After a page is deleted, slug lookups respond with 404 even if the slug still appears in old links or caches. Search removes deleted pages on delete; allow a short propagation delay before assuming a slug is gone everywhere.
+Get page by ID
+GET /pages/{id}
+Returns a page by full ID or short ID. No authentication required for public pages.
+bashcopy
+1curl https://api.inference.sh/pages/page_abc123
+Soft-deleted pages are excluded and return 404.
+List pages
+GET /pages or POST /pages/list
+Returns published pages only (status = published). Draft, archived, and scheduled pages are omitted from list results.
+Query parameters
+| Field | Type | Description
+| cursor | string | Pagination cursor
+| limit | integer | Max results (default 50, max 100)
+Responses may include RFC 8288 Link headers (rel="next", rel="prev") with the same cursors.
+Comments
+GET /pages/{id}/comments or POST /pages/{id}/comments/list
+List comments on a page. Uses the same cursor pagination pattern as other list endpoints.
+Menus
+Navigation menus (for example docs sidebars) are served separately:
+| Endpoint | Description
+| GET /menus or POST /menus/list | List menus
+| GET /menus/{id} | Get menu by ID
+| GET /menus/slug/{slug} | Get menu by slug
+Menu items can reference pages by page_id or external url.
+Content management
+Creating, updating, and deleting pages requires platform admin credentials (POST /admin/pages, POST /admin/pages/{id}, DELETE /admin/pages/{id}). The inference shell docs site syncs from Markdown using belt pages sync — that workflow is internal to platform operators, not a general developer API.
+When a page is deleted, it is soft-deleted: removed from list and slug lookups, and dropped from the search index. The slug is released for reuse — only live pages reserve a slug, so you can create a new page at the same URL after deleting the old one.
+Check slug availability
+GET /admin/pages/check-slug
+Validates whether a slug is free before create or update. Requires platform admin credentials.
+| Query | Required | Description
+| slug | Yes | Proposed slug (normalized server-side)
+| exclude | No | Page ID to ignore — use when editing so the page's current slug does not count as a conflict
+bashcopy
+1curl "https://api.inference.sh/admin/pages/check-slug?slug=my-new-post&exclude=page_abc123" \2  -H "Authorization: Bearer $ADMIN_API_KEY"
+Response: AvailabilityResponse (same shape as workspace username availability):
+| Field | Type | Description
+| value | string | Normalized slug (lowercase, hyphenated)
+| available | boolean | true if no live page uses this slug (soft-deleted pages do not block reuse)
+| reason | string | When available is false: taken. Omitted when available.
+jsoncopy
+1{2  "value": "my-new-post",3  "available": true4}
+Create and update still enforce uniqueness among live pages — a conflicting slug returns 409 with code slug_taken.
+Scheduled publishing
+Set status to 4 (scheduled) and metadata.publish_at to an RFC 3339 timestamp. The page stays hidden from public list and slug endpoints until its publish time.
+A background job periodically promotes due scheduled pages to status = published and indexes them for search. Pages whose publish_at is still in the future remain scheduled; pages with status = scheduled but no publish_at are never auto-published.

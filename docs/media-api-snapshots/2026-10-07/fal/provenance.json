@@ -1,0 +1,202 @@
+[
+  {
+    "url": "https://docs.fal.ai/llms.txt",
+    "final_url": "https://fal.ai/docs/llms.txt",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/llms.txt",
+    "sha256": "eaf929a64bfca5905b693a546dc4f25abca6726bb5f2ae47f33e3999492c5e6a",
+    "retrieved_at": "2026-10-07T16:14:33.412441+00:00",
+    "file": "llms.txt"
+  },
+  {
+    "url": "https://api.fal.ai/v1/openapi.json",
+    "final_url": "https://api.fal.ai/v1/openapi.json",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/platform-openapi.json",
+    "sha256": "b8779f574492b0458ef44ff0736c43a60e0d140e74f982c9bdffcb22582f5e07",
+    "retrieved_at": "2026-10-07T16:14:34.408491+00:00",
+    "file": "platform-openapi.json"
+  },
+  {
+    "url": "https://fal.ai/docs/_llms/documentation.md",
+    "final_url": "https://fal.ai/docs/_llms/documentation.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/documentation-index.md",
+    "sha256": "dd7b577c9d48932da9c12562889cc2cd3650fcd37f07ae39b3b1eafed21326d6",
+    "retrieved_at": "2026-10-07T16:14:33.900465+00:00",
+    "file": "documentation-index.md"
+  },
+  {
+    "url": "https://fal.ai/docs/_llms/model-api-reference.md",
+    "final_url": "https://fal.ai/docs/_llms/model-api-reference.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/model-api-index.md",
+    "sha256": "ad931e1124eea94d17cb833a8ef9aaaa6728c23da47484ff4893b74e4a06c730",
+    "retrieved_at": "2026-10-07T16:14:34.556498+00:00",
+    "file": "model-api-index.md"
+  },
+  {
+    "url": "https://fal.ai/docs/api-reference/platform-apis/authentication.md",
+    "final_url": "https://fal.ai/docs/api-reference/platform-apis/authentication.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/auth.md",
+    "sha256": "7efdf026219009dab6a86245af684143c2c72559f3ee500b892a9cd5770a7b57",
+    "retrieved_at": "2026-10-07T16:14:33.372439+00:00",
+    "file": "auth.md"
+  },
+  {
+    "url": "https://fal.ai/docs/platform-apis/v1/models.md",
+    "final_url": "https://fal.ai/docs/platform-apis/v1/models.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/models.md",
+    "sha256": "0655f30df8f3167a9e50d659c9b14f62c9daeff2840c8ba31768669a677ecf63",
+    "retrieved_at": "2026-10-07T16:14:33.524447+00:00",
+    "file": "models.md"
+  },
+  {
+    "url": "https://fal.ai/docs/api-reference/client-libraries/python/fal_client.md",
+    "final_url": "https://fal.ai/docs/api-reference/client-libraries/python/fal_client.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/client-python.md",
+    "sha256": "057d71786e5d8385560126aba265edaf29520038b490339ebc404a9fa7dd4c16",
+    "retrieved_at": "2026-10-07T16:14:33.540447+00:00",
+    "file": "client-python.md"
+  },
+  {
+    "url": "https://fal.ai/docs/documentation/model-apis/inference/queue.md",
+    "final_url": "https://fal.ai/docs/documentation/model-apis/inference/queue.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/queue.md",
+    "sha256": "092009c0176c4fd5bf8e84bac4e25d95383652ac0088f7c1ad8869932d610542",
+    "retrieved_at": "2026-10-07T16:14:33.356438+00:00",
+    "file": "queue.md"
+  },
+  {
+    "url": "https://fal.ai/docs/documentation/model-apis/inference/synchronous.md",
+    "final_url": "https://fal.ai/docs/documentation/model-apis/inference/synchronous.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/synchronous.md",
+    "sha256": "0a0824ca7111dd75bc71db24d12bf844471411bb2d20bebe68c0d9451f1d5043",
+    "retrieved_at": "2026-10-07T16:14:33.564449+00:00",
+    "file": "synchronous.md"
+  },
+  {
+    "url": "https://fal.ai/docs/documentation/model-apis/inference/streaming.md",
+    "final_url": "https://fal.ai/docs/documentation/model-apis/inference/streaming.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/streaming.md",
+    "sha256": "5c2dabc7b7140d7081095509d2beca58f4be1f78685f3f7faad62576a7e50cc8",
+    "retrieved_at": "2026-10-07T16:14:33.604451+00:00",
+    "file": "streaming.md"
+  },
+  {
+    "url": "https://fal.ai/docs/documentation/model-apis/inference/real-time.md",
+    "final_url": "https://fal.ai/docs/documentation/model-apis/inference/real-time.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/real-time.md",
+    "sha256": "203efa18576322e479708f26baa2f5033a1beb34a892c6573100f3219aa1f7de",
+    "retrieved_at": "2026-10-07T16:14:33.652453+00:00",
+    "file": "real-time.md"
+  },
+  {
+    "url": "https://fal.ai/docs/documentation/model-apis/inference/websockets.md",
+    "final_url": "https://fal.ai/docs/documentation/model-apis/inference/websockets.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/websockets.md",
+    "sha256": "0c47ee093df5c3cee43d37b05461b0927bfe1e6b340012ceb0d4152803ad0540",
+    "retrieved_at": "2026-10-07T16:14:33.808461+00:00",
+    "file": "websockets.md"
+  },
+  {
+    "url": "https://fal.ai/docs/documentation/model-apis/inference/webhooks.md",
+    "final_url": "https://fal.ai/docs/documentation/model-apis/inference/webhooks.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/webhooks.md",
+    "sha256": "e8def5d04dfbdb905869644064aef5372b170857525bf534104a049ad7ea85dc",
+    "retrieved_at": "2026-10-07T16:14:33.648453+00:00",
+    "file": "webhooks.md"
+  },
+  {
+    "url": "https://fal.ai/docs/documentation/model-apis/common-parameters.md",
+    "final_url": "https://fal.ai/docs/documentation/model-apis/common-parameters.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/common-parameters.md",
+    "sha256": "6647d86e5c72f7660eea1c2c18d3dfd82fffb9a29d06a49bbea07d3df8bd0db8",
+    "retrieved_at": "2026-10-07T16:14:33.648453+00:00",
+    "file": "common-parameters.md"
+  },
+  {
+    "url": "https://fal.ai/docs/documentation/model-apis/fal-cdn.md",
+    "final_url": "https://fal.ai/docs/documentation/model-apis/fal-cdn.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/fal-cdn.md",
+    "sha256": "0c60d94075fbc055cb421a918095f472b804f4e6ec31a6f7d36f468c16e65547",
+    "retrieved_at": "2026-10-07T16:14:33.668454+00:00",
+    "file": "fal-cdn.md"
+  },
+  {
+    "url": "https://fal.ai/docs/documentation/model-apis/media-expiration.md",
+    "final_url": "https://fal.ai/docs/documentation/model-apis/media-expiration.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/media-expiration.md",
+    "sha256": "3e45d770f4fee31bcb0ebe4eae77485b5012a294cf4b6f2a629149cb36afd383",
+    "retrieved_at": "2026-10-07T16:14:33.720456+00:00",
+    "file": "media-expiration.md"
+  },
+  {
+    "url": "https://fal.ai/docs/documentation/model-apis/workflows.md",
+    "final_url": "https://fal.ai/docs/documentation/model-apis/workflows.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/workflows.md",
+    "sha256": "4ffe24bd5ff7f344b9c29c9a4f0b05b710c7e7b6e6b0c1035f023dd4dcf1542e",
+    "retrieved_at": "2026-10-07T16:14:33.924467+00:00",
+    "file": "workflows.md"
+  },
+  {
+    "url": "https://fal.ai/docs/documentation/setting-up/agent-surfaces.md",
+    "final_url": "https://fal.ai/docs/documentation/setting-up/agent-surfaces.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/agent-surfaces.md",
+    "sha256": "45d2ac88971f49991a6f11d1761e34e83c0878678bce6af357b1aad0fe73dc7a",
+    "retrieved_at": "2026-10-07T16:14:34.156478+00:00",
+    "file": "agent-surfaces.md"
+  },
+  {
+    "url": "https://fal.ai/docs/documentation/model-apis/authentication/key-based.md",
+    "final_url": "https://fal.ai/docs/documentation/model-apis/authentication/key-based.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/key-based.md",
+    "sha256": "9193cdb3cdb31fe426d99ceb89487584ae6c2f17ecb125d84994f57d846fbfbe",
+    "retrieved_at": "2026-10-07T16:14:33.744458+00:00",
+    "file": "key-based.md"
+  },
+  {
+    "url": "https://fal.ai/docs/documentation/setting-up/mcp.md",
+    "final_url": "https://fal.ai/docs/documentation/setting-up/mcp.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/mcp.md",
+    "sha256": "9400e0ca9a8e76599441f79e08f39b1c96bf7268f3db59b82c2ed1347aacf447",
+    "retrieved_at": "2026-10-07T16:14:33.812461+00:00",
+    "file": "mcp.md"
+  },
+  {
+    "url": "https://fal.ai/docs/documentation/setting-up/platform-mcp.md",
+    "final_url": "https://fal.ai/docs/documentation/setting-up/platform-mcp.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/platform-mcp.md",
+    "sha256": "3998ffadf2eb836172f312fd32aa4e4af973a91af8218a9df68b559375d3e07c",
+    "retrieved_at": "2026-10-07T16:14:33.960468+00:00",
+    "file": "platform-mcp.md"
+  },
+  {
+    "url": "https://fal.ai/docs/platform-apis/v1/compute/instances/create.md",
+    "final_url": "https://fal.ai/docs/platform-apis/v1/compute/instances/create.md",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/create.md",
+    "sha256": "eb821f4ebaaef6419d055b4391f73342896d2a1224c15a44ff083a002d0b458c",
+    "retrieved_at": "2026-10-07T16:14:34.088475+00:00",
+    "file": "create.md"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/fal-ai/fal/main/projects/fal_client/src/fal_client/client.py",
+    "final_url": "https://raw.githubusercontent.com/fal-ai/fal/main/projects/fal_client/src/fal_client/client.py",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/sdk-client.py",
+    "sha256": "b3722b1e7e7a8349ea2c6f25fa35ddddc6d061006ca0e8b82b649fe64f27316e",
+    "retrieved_at": "2026-10-07T16:14:34.028472+00:00",
+    "file": "sdk-client.py"
+  },
+  {
+    "url": "https://fal.ai/docs/api-reference/platform-apis/openapi/v1.json",
+    "final_url": "https://fal.ai/docs/api-reference/platform-apis/openapi/v1.json",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/platform-doc-openapi.json",
+    "sha256": "ecb1deaf7155562b89f4626ac15434d4fe293748a260f81496cd08da5580ea47",
+    "retrieved_at": "2026-10-07T16:14:34.516496+00:00",
+    "file": "platform-doc-openapi.json"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/fal-ai/fal/main/projects/fal_client/src/fal_client/_headers.py",
+    "final_url": "https://raw.githubusercontent.com/fal-ai/fal/main/projects/fal_client/src/fal_client/_headers.py",
+    "local_snapshot": "docs/media-api-snapshots/2026-10-07/fal/sdk-headers.py",
+    "sha256": "b1882a08b173e0cecca1463ea3f8930227d85e272f930ad918444ada07e744bf",
+    "retrieved_at": "2026-10-07T16:14:34.148478+00:00",
+    "file": "sdk-headers.py"
+  }
+]

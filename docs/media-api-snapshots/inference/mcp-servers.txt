@@ -1,0 +1,290 @@
+Browse the public MCP connector directory, register workspace-owned MCP servers, and call tools on connected servers.
+
+Three surfaces work together:
+
+ | Surface | Endpoints | Purpose
+
+ | Public directory | /mcps, /mcps/{slug} | Discover featured connectors (Linear, Slack, GitHub, …)
+
+ | Workspace registrations | /mcp-servers | Register custom MCP server URLs for your workspace
+
+ | Tool proxy | /mcps/{slug}/tools | List and invoke tools after OAuth or API-key connect
+
+Connecting (OAuth, API keys) uses POST /credentials with provider: "mcp" (requires credentials:write). This page covers directory browsing, workspace CRUD, discovery, and tool calls.
+
+See REST overview — response format.
+
+→ Browsing & connecting: CLI and web app workflows
+→ Using connector tools — belt mcp tools and agent tool setup
+
+Public directory
+
+No API key required.
+
+List MCP servers
+
+GET /mcps or POST /mcps/list
+
+Returns approved store listings sorted by rank. Accepts standard cursor-list parameters (cursor, limit, filters, sort, search) on POST.
+
+Response (PublicMCPServerDTO):
+
+ | Field | Description
+
+ | id | Server ID
+
+ | slug | Short identifier (used in URLs and belt mcp connect {slug})
+
+ | name, description | Display metadata
+
+ | icon_url | Server icon
+
+ | category | developer, productivity, data, communication, ai, or other
+
+ | server_url | MCP endpoint URL
+
+ | auth_type | oauth, api_key, or none
+
+ | default_scopes | OAuth scopes requested on connect
+
+ | documentation_url | Vendor docs link
+
+ | namespace | Publisher namespace
+
+ | is_featured, rank | Store placement
+
+ | installs, uses | Usage counters
+
+ | connection_status | connected when you or your workspace have a connected MCP credential for this server_url. Omitted otherwise. The match compares server_url with the credential's account_identifier.
+
+Send an API key or session on list and get calls to receive connection_status. Unauthenticated directory requests omit it.
+
+bashcopy
+
+1curl "https://api.inference.sh/mcps?limit=20"
+
+Get by slug
+
+GET /mcps/{slug}
+
+Returns one public listing. Responds 404 when the slug is not in the directory.
+
+bashcopy
+
+1curl https://api.inference.sh/mcps/linear
+
+Discover server metadata
+
+GET /mcps/discover?url={url}
+
+Proxy for MCP remote discovery. Use this from custom UIs when browser CORS blocks direct fetches to /.well-known/mcp-server-card or OAuth metadata endpoints.
+
+No API key required. The API tries, in order:
+
+GET {origin}/.well-known/mcp-server-card (MCP server card)
+
+OAuth protected-resource metadata on the URL
+
+Returns the JSON document with Cache-Control: public, max-age=300. Responds 404 when neither document is found.
+
+ | Query | Required | Description
+
+ | url | Yes | http or https URL (typically a bare origin like https://mcp.example.com)
+
+bashcopy
+
+1curl "https://api.inference.sh/mcps/discover?url=https://mcp.example.com"
+
+The same resolution runs automatically when you connect via CLI, the web app, or POST /credentials with a bare server_url origin.
+
+Workspace MCP server registrations
+
+Manage servers your workspace publishes or connects privately. Requires API key scopes credentials:read (list, get) and credentials:write (create, update, delete).
+
+List workspace servers
+
+GET /mcp-servers or POST /mcp-servers/list
+
+Cursor-paginated list of MCP servers owned by the authenticated workspace. Same pagination shape as Skills. Returns MCPServerDTO objects (see below).
+
+Get workspace server
+
+GET /mcp-servers/{id}
+
+Returns MCPServerDTO for one registration.
+
+MCPServerDTO fields
+
+ | Field | Description
+
+ | id | Server ID
+
+ | user_id, team_id, visibility | Ownership and sharing
+
+ | slug | URL-safe identifier
+
+ | name, description, icon_url | Display metadata
+
+ | server_url | MCP endpoint URL
+
+ | auth_type | oauth, api_key, or none
+
+ | oauth_client_id | BYOK OAuth client ID when set
+
+ | default_scopes | OAuth scopes to request on connect
+
+ | documentation_url | Vendor docs link
+
+ | connection_status | connected when you or your workspace have a connected MCP credential for this server_url. Omitted otherwise. The match compares server_url with the credential's account_identifier.
+
+List and get responses set connection_status from your MCP credentials, so a connect/disconnect UI does not need to merge GET /credentials/configs.
+
+Create workspace server
+
+POST /mcp-servers
+
+Register a custom MCP server URL. The API enriches missing fields from the remote server card and OAuth discovery metadata.
+
+Body (common fields):
+
+ | Field | Required | Description
+
+ | server_url | Yes | MCP endpoint or bare origin (resolved via discovery when needed)
+
+ | name | No | Display name (defaults from server card or hostname)
+
+ | slug | No | URL-safe identifier (auto-generated from name when omitted)
+
+ | description | No | Short summary
+
+ | auth_type | No | oauth (default), api_key, or none
+
+ | oauth_client_id | No | OAuth client ID when you bring your own client
+
+ | default_scopes | No | OAuth scopes to request
+
+ | documentation_url | No | Link to vendor docs
+
+ | visibility | No | private (default) or public — public servers get a store listing
+
+Response: MCPServerCreateResponse:
+
+ | Field | Description
+
+ | id, slug, name, … | Created MCPServerDTO
+
+ | discovery | Optional hints for the connect UI (ready_to_connect, needs_credentials, cross_domain, cross_domain_issuer)
+
+Errors:
+
+ | HTTP | Code | Cause
+
+ | 409 | already_exists | Duplicate slug within the workspace
+
+ | 400 | create_failed | Invalid slug, missing server_url, or validation error
+
+ | 402 / 403 | entitlement | Connector limit reached on your plan
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/mcp-servers \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{5    "server_url": "https://mcp.example.com",6    "name": "Example MCP",7    "visibility": "private"8  }'
+
+After create, connect with POST /credentials (provider: "mcp", metadata.server_url) or belt mcp connect — see Browsing & connecting.
+
+Update workspace server
+
+PUT /mcp-servers/{id}
+
+Send only fields to change. Same field names as create.
+
+Refresh workspace server metadata
+
+POST /mcp-servers/{id}/refresh
+
+Re-runs MCP server card and OAuth discovery against the stored server_url, then persists updated fields. Requires credentials:write.
+
+Use this when a registration has stale metadata — for example a hostname used as the display name, or an incorrect auth_type from before automatic discovery was wired in. The same enrichment logic runs on create; refresh applies it again without recreating the server.
+
+CLI equivalent: belt mcp refresh <slug> (resolves the public directory slug to the server ID).
+
+Response: same shape as Create workspace server: updated MCPServerDTO plus optional discovery hints.
+
+Errors:
+
+ | HTTP | Code | Cause
+
+ | 400 | refresh_failed | Server not found, discovery failed, or update error
+
+bashcopy
+
+1curl -X POST "https://api.inference.sh/mcp-servers/mcp_abc123/refresh" \2  -H "Authorization: Bearer inf_your_key"
+
+Delete workspace server
+
+DELETE /mcp-servers/{id}
+
+Returns { "deleted": true }.
+
+List and call tools
+
+Requires authentication and an active credential for the server (credentials:read to list, credentials:write to call).
+
+You must connect first — GET /mcps/{slug}/tools returns 400 mcp_error with not connected to {name} when no credential exists for that server's URL.
+
+List tools
+
+GET /mcps/{slug}/tools
+
+Returns an array of MCP tool definitions:
+
+ | Field | Description
+
+ | name | Tool identifier
+
+ | title | Display title (optional)
+
+ | description | What the tool does
+
+ | inputSchema | JSON Schema for arguments. Per MCP (SEP-1613), schemas without "$schema" use the 2020-12 dialect; an explicit "$schema" (including draft-07) is respected.
+
+ | outputSchema | JSON Schema for results (optional)
+
+bashcopy
+
+1curl https://api.inference.sh/mcps/linear/tools \2  -H "Authorization: Bearer inf_your_key"
+
+Call tool
+
+POST /mcps/{slug}/tools/{tool}
+
+Body — JSON object of tool arguments (empty object when the tool takes no input).
+
+Success — MCP tool result (content blocks and structured output).
+
+Tool-level error — HTTP 200 with { "error": true, "content": "..." } when the remote server reports isError.
+
+Connection errors — 400 not_connected or 502 mcp_error when the credential is missing or the remote call fails.
+
+bashcopy
+
+1curl -X POST https://api.inference.sh/mcps/linear/tools/list_issues \2  -H "Authorization: Bearer inf_your_key" \3  -H "Content-Type: application/json" \4  -d '{"teamId": "TEAM-123", "limit": 10}'
+
+JavaScript SDK
+
+typescriptcopy
+
+1import { inference } from '@inferencesh/sdk';23const client = inference({ apiKey: process.env.INFERENCE_API_KEY });45// Public directory6const directory = await client.mcpServers.list({ limit: 20 });7const linear = await client.mcpServers.get('linear');89// Team-owned registrations10const owned = await client.mcpServers.listOwned();11const created = await client.mcpServers.create({12  server_url: 'https://mcp.example.com',13  name: 'Example MCP',14});1516// Tools (requires connect first)17const tools = await client.mcpServers.listTools('linear');18const result = await client.mcpServers.callTool('linear', 'list_issues', { limit: 10 });
+
+→ JavaScript SDK
+
+Related APIs
+
+ | Need | Endpoint / guide
+
+ | OAuth connect and disconnect | POST /credentials with provider: "mcp" — Browsing & connecting
+
+ | Tool call audit history | GET /mcp-tool-calls (same credentials:read scope)
+
+ | Add tools to agents | Connector tools
+
+ | CLI workflows | Browsing & connecting

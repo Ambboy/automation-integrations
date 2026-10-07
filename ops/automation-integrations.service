@@ -1,0 +1,20 @@
+[Unit]
+Description=Owner integration service (separate from Hermes)
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/workspaces/automation-integrations
+ExecStart=/usr/bin/python3 -m automation_integrations.cli --config %h/.config/automation-integrations/config.json serve
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=45
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.local/state/automation-integrations
+
+[Install]
+WantedBy=default.target

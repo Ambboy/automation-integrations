@@ -1,0 +1,2592 @@
+{
+  "schema_version": 1,
+  "service": "etm",
+  "retrieved_at": "2026-10-04",
+  "scope": "All operations in the official published OpenAPI snapshot; documented availability does not establish account permissions.",
+  "sources": [
+    {
+      "url": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "sha256": "6482fa6694d46695f368aebfed2024a7695a4a5eeb12c3e4471ed41ed7484183",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/etm.yaml",
+      "retrieved_at": "2026-10-04T07:18:14.375580+00:00"
+    },
+    {
+      "url": "https://ipro.etm.ru/ns2000/yaml/components.yaml",
+      "sha256": "18ca12dfee897d24ef5428df3e42d64d43f534ac3072a636833ebec14fccec17",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/components.yaml",
+      "retrieved_at": "2026-10-04T07:18:14.555141+00:00"
+    },
+    {
+      "url": "https://ipro.etm.ru/ns2000/yaml/goods.yaml",
+      "sha256": "f1e8583029627ce65f3192fb12371b7cbe04c9f51a2294436048c7159b2effc8",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/goods.yaml",
+      "retrieved_at": "2026-10-04T07:18:14.597434+00:00"
+    },
+    {
+      "url": "https://ipro.etm.ru/ns2000/yaml/invoice.yaml",
+      "sha256": "8881b46ba9a100b868671e389e8618893130deffd43e0027c0d8c64fe5e6d4b5",
+      "local_snapshot": "docs/api-snapshots/2026-10-04/invoice.yaml",
+      "retrieved_at": "2026-10-04T07:18:14.703307+00:00"
+    }
+  ],
+  "total": 19,
+  "capabilities": [
+    {
+      "id": "POST /user/login",
+      "method": "POST",
+      "path": "/user/login",
+      "summary": "Авторизация",
+      "category": [
+        "user"
+      ],
+      "effect": "authentication",
+      "parameters": [
+        {
+          "name": "log",
+          "in": "query",
+          "description": "Имя пользователя",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "pwd",
+          "in": "query",
+          "description": "Пароль",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": {},
+      "security": [],
+      "response_codes": [
+        "200",
+        "403"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "login_check",
+      "execution": "integration_read",
+      "access": "observed_success",
+      "live_check": {
+        "ok": true,
+        "error": null,
+        "http_status": null,
+        "checked_at": "2026-10-03T21:29:30.116332+00:00",
+        "coverage": "One read response or page with a real fixture; not exhaustive business data coverage."
+      }
+    },
+    {
+      "id": "GET /catalog",
+      "method": "GET",
+      "path": "/catalog",
+      "summary": "Список товаров",
+      "category": [
+        "catalog"
+      ],
+      "effect": "read",
+      "parameters": [
+        {
+          "in": "query",
+          "name": "val",
+          "description": "Поисковый запрос",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "type",
+          "in": "query",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "code"
+            ]
+          },
+          "description": "по чему ищем:\n * `code` - по коду и артикулу\n"
+        },
+        {
+          "name": "mnf",
+          "in": "query",
+          "schema": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": "Код производителя"
+        }
+      ],
+      "request_body": {},
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "response_codes": [
+        "200"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "search",
+      "execution": "integration_read",
+      "access": "probe_failed",
+      "live_check": {
+        "ok": false,
+        "error": "provider_http_error",
+        "http_status": 404,
+        "checked_at": "2026-10-03T21:29:34.348509+00:00",
+        "coverage": "One read response or page with a real fixture; not exhaustive business data coverage."
+      },
+      "additional_adapters": [
+        "catalog_search"
+      ],
+      "executable_contracts": {
+        "catalog_search": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "val": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "code"
+                    ]
+                  },
+                  "mnf": {
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "headers": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+          "response_kind": "json"
+        }
+      },
+      "implementation_status": "compiled_and_validated"
+    },
+    {
+      "id": "GET /goods/{id}/price",
+      "method": "GET",
+      "path": "/goods/{id}/price",
+      "summary": "Цена товара",
+      "category": [
+        "goods"
+      ],
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Коды товара через запятую (не более 50 шт.)",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "type",
+          "in": "query",
+          "description": "Тип кода товара:\n * cli - код клиента (дефолт)\n * etm - код ЭТМ\n * mnf - код производителя (артикул)\n",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "cli",
+              "etm",
+              "mnf"
+            ]
+          }
+        }
+      ],
+      "request_body": {},
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "response_codes": [
+        "200"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "price",
+      "execution": "integration_read",
+      "access": "observed_success",
+      "live_check": {
+        "ok": true,
+        "error": null,
+        "http_status": null,
+        "checked_at": "2026-10-03T21:29:43.798872+00:00",
+        "coverage": "One read response or page with a real fixture; not exhaustive business data coverage."
+      },
+      "additional_adapters": [
+        "goods_price"
+      ],
+      "executable_contracts": {
+        "goods_price": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "id"
+                ]
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "cli",
+                      "etm",
+                      "mnf"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "headers": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "path"
+            ]
+          },
+          "limits": [],
+          "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+          "response_kind": "json"
+        }
+      },
+      "implementation_status": "compiled_and_validated"
+    },
+    {
+      "id": "GET /goods/{id}/remains",
+      "method": "GET",
+      "path": "/goods/{id}/remains",
+      "summary": "Доступность товара",
+      "category": [
+        "goods"
+      ],
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Код товара",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "type",
+          "in": "query",
+          "description": "Тип кода товара:\n * cli - код клиента (дефолт)\n * etm - код ЭТМ\n * mnf - код производителя (артикул)\n",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "cli",
+              "etm",
+              "mnf"
+            ]
+          }
+        }
+      ],
+      "request_body": {},
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "response_codes": [
+        "200"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "remains",
+      "execution": "integration_read",
+      "access": "observed_success",
+      "live_check": {
+        "ok": true,
+        "error": null,
+        "http_status": null,
+        "checked_at": "2026-10-03T21:29:48.340742+00:00",
+        "coverage": "One read response or page with a real fixture; not exhaustive business data coverage."
+      },
+      "additional_adapters": [
+        "goods_remains"
+      ],
+      "executable_contracts": {
+        "goods_remains": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "id"
+                ]
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "cli",
+                      "etm",
+                      "mnf"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "headers": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "path"
+            ]
+          },
+          "limits": [],
+          "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+          "response_kind": "json"
+        }
+      },
+      "implementation_status": "compiled_and_validated"
+    },
+    {
+      "id": "GET /goods/{id}",
+      "method": "GET",
+      "path": "/goods/{id}",
+      "summary": "Характеристики товара",
+      "category": [
+        "goods"
+      ],
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Код товара",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "type",
+          "in": "query",
+          "description": "Тип кода товара:\n * cli - код клиента (дефолт)\n * etm - код ЭТМ\n * mnf - код производителя (артикул)\n",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "cli",
+              "etm",
+              "mnf"
+            ]
+          }
+        },
+        {
+          "name": "mnf",
+          "in": "query",
+          "description": "Код производителя в ЭТМ (работает как фильтр для type=mnf)",
+          "schema": {
+            "type": "number"
+          }
+        }
+      ],
+      "request_body": {},
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "response_codes": [
+        "200"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "goods",
+      "execution": "integration_read",
+      "access": "observed_success",
+      "live_check": {
+        "ok": true,
+        "error": null,
+        "http_status": null,
+        "checked_at": "2026-10-03T21:29:38.671854+00:00",
+        "coverage": "One read response or page with a real fixture; not exhaustive business data coverage."
+      },
+      "additional_adapters": [
+        "goods_get"
+      ],
+      "executable_contracts": {
+        "goods_get": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "id"
+                ]
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "cli",
+                      "etm",
+                      "mnf"
+                    ]
+                  },
+                  "mnf": {
+                    "type": "number"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "headers": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "path"
+            ]
+          },
+          "limits": [],
+          "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+          "response_kind": "json"
+        }
+      },
+      "implementation_status": "compiled_and_validated"
+    },
+    {
+      "id": "GET /goods/remains",
+      "method": "GET",
+      "path": "/goods/remains",
+      "summary": "Остатки всех товаров",
+      "category": [
+        "goods"
+      ],
+      "effect": "read",
+      "parameters": [
+        {
+          "name": "store",
+          "in": "query",
+          "description": "Склад (если нужен ответ по конкретному, а не всем доступным)",
+          "schema": {
+            "type": "number"
+          }
+        }
+      ],
+      "request_body": {},
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "response_codes": [
+        "200"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "stock_remains",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "stock_remains": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "store": {
+                    "type": "number"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "headers": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "POST /job/create/{procedure}",
+      "method": "POST",
+      "path": "/job/create/{procedure}",
+      "summary": "Запуск формирования задачи (отчета)",
+      "category": [
+        "job"
+      ],
+      "effect": "report_generation",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "procedure",
+          "description": "Номер процедуры:\n * 40029846 - формирование списка товаров (формат - json массив c данными: id,name,brand,article,brand_code,cli_code,class)\n",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "40029846"
+            ]
+          }
+        }
+      ],
+      "request_body": {},
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "response_codes": [
+        "200"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "catalog_job_create",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "catalog_job_create": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {
+                  "procedure": {
+                    "type": "string",
+                    "enum": [
+                      "40029846"
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "procedure"
+                ]
+              },
+              "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              },
+              "headers": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "path"
+            ]
+          },
+          "limits": [
+            "Result URLs are returned as data; arbitrary download URLs are not executed."
+          ],
+          "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "GET /job/{uuid}",
+      "method": "GET",
+      "path": "/job/{uuid}",
+      "summary": "Состояние задачи",
+      "category": [
+        "job"
+      ],
+      "effect": "read",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "uuid",
+          "description": "uuid из ответа метода /job/create/",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": {},
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "response_codes": [
+        "200"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "catalog_job_get",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "catalog_job_get": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {
+                  "uuid": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "uuid"
+                ]
+              },
+              "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              },
+              "headers": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "path"
+            ]
+          },
+          "limits": [
+            "Result URLs are returned as data; arbitrary download URLs are not executed."
+          ],
+          "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "GET /info/search/{type}/",
+      "method": "GET",
+      "path": "/info/search/{type}/",
+      "summary": "Справочники",
+      "category": [
+        "info"
+      ],
+      "effect": "read",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "type",
+          "description": "Тип справочника:\n  * r-manuf - производители\n",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "r-manuf"
+            ]
+          }
+        },
+        {
+          "in": "query",
+          "name": "term",
+          "description": "контекст поиска:\n  * для type=r-manuf - код или наименование производителя              \n",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "page",
+          "in": "query",
+          "schema": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": "Номер страницы с данными"
+        },
+        {
+          "name": "rows",
+          "in": "query",
+          "schema": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": "Строк данных на странице"
+        }
+      ],
+      "request_body": {},
+      "security": [],
+      "response_codes": [
+        "200"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "manufacturers",
+      "execution": "integration_read",
+      "access": "observed_success",
+      "live_check": {
+        "ok": true,
+        "error": null,
+        "http_status": null,
+        "checked_at": "2026-10-03T21:34:29.704395+00:00",
+        "coverage": "One read response or page with a real fixture; not exhaustive business data coverage."
+      },
+      "additional_adapters": [
+        "reference_search"
+      ],
+      "executable_contracts": {
+        "reference_search": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "r-manuf"
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "type"
+                ]
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "term": {
+                    "type": "string"
+                  },
+                  "page": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "rows": {
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "headers": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "path"
+            ]
+          },
+          "limits": [],
+          "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+          "response_kind": "json"
+        }
+      },
+      "implementation_status": "compiled_and_validated"
+    },
+    {
+      "id": "GET /invoice",
+      "method": "GET",
+      "path": "/invoice",
+      "summary": "Список докуменов",
+      "category": [
+        "invoice"
+      ],
+      "effect": "read",
+      "parameters": [
+        {
+          "in": "query",
+          "name": "d1",
+          "description": "Начало периода",
+          "schema": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        {
+          "in": "query",
+          "name": "d2",
+          "description": "Конец периода",
+          "schema": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        {
+          "in": "query",
+          "name": "usr-inv-num",
+          "description": "Номер документа",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "status",
+          "description": "Статус документа",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "cprStatus",
+          "description": "Статус ЦПР\n * `rejected` - Отклонен\n * `agreed` - Согласован\n * `wait` - Ожидает согласования\n",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "rejected",
+              "agreed",
+              "wait"
+            ]
+          }
+        },
+        {
+          "name": "sidx",
+          "in": "query",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "inv-date",
+              "usr-inv-num",
+              "inv-store-sum"
+            ]
+          },
+          "description": "Поле сортировки:\n * `inv-date` - дата документа\n * `usr-inv-num` - номер документа\n * `inv-store-sum` - сумма докуемнта\n"
+        },
+        {
+          "name": "sord",
+          "in": "query",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          },
+          "description": "Порядок сортировки:\n * `asc` - по возрастанию\n * `desc` - по убыванию\n"
+        },
+        {
+          "name": "page",
+          "in": "query",
+          "schema": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": "Номер страницы с данными"
+        },
+        {
+          "name": "rows",
+          "in": "query",
+          "schema": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": "Строк данных на странице"
+        }
+      ],
+      "request_body": {},
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "response_codes": [
+        "200"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "invoices",
+      "execution": "integration_read",
+      "access": "observed_success",
+      "live_check": {
+        "ok": true,
+        "error": null,
+        "http_status": null,
+        "checked_at": "2026-10-03T21:34:34.433785+00:00",
+        "coverage": "One read response or page with a real fixture; not exhaustive business data coverage."
+      },
+      "additional_adapters": [
+        "invoice_list"
+      ],
+      "executable_contracts": {
+        "invoice_list": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "d1": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "d2": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "usr-inv-num": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "cprStatus": {
+                    "type": "string",
+                    "enum": [
+                      "rejected",
+                      "agreed",
+                      "wait"
+                    ]
+                  },
+                  "sidx": {
+                    "type": "string",
+                    "enum": [
+                      "inv-date",
+                      "usr-inv-num",
+                      "inv-store-sum"
+                    ]
+                  },
+                  "sord": {
+                    "type": "string",
+                    "enum": [
+                      "asc",
+                      "desc"
+                    ]
+                  },
+                  "page": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "rows": {
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "headers": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "limits": [],
+          "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+          "response_kind": "json"
+        }
+      },
+      "implementation_status": "compiled_and_validated"
+    },
+    {
+      "id": "GET /invoice/{id}/body",
+      "method": "GET",
+      "path": "/invoice/{id}/body",
+      "summary": "Документ (товарные строки)",
+      "category": [
+        "invoice"
+      ],
+      "effect": "read",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "id",
+          "description": "id документа",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "nodateotgr",
+          "description": "не считать возможную дату отгрузки",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "yes"
+            ]
+          }
+        },
+        {
+          "in": "query",
+          "name": "nobonus",
+          "description": "не считать возможные баллы",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "yes"
+            ]
+          }
+        },
+        {
+          "in": "query",
+          "name": "nosize",
+          "description": "не выводить размеры товара",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "yes"
+            ]
+          }
+        },
+        {
+          "in": "query",
+          "name": "detail",
+          "description": "Значения для вывода через запятую (seller,buyer,delivery,upd,country,price)",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": {},
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "response_codes": [
+        "200"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "invoice",
+      "execution": "integration_read",
+      "access": "observed_success",
+      "live_check": {
+        "ok": true,
+        "error": null,
+        "http_status": null,
+        "checked_at": "2026-10-03T21:34:39.138896+00:00",
+        "coverage": "One read response or page with a real fixture; not exhaustive business data coverage."
+      },
+      "additional_adapters": [
+        "invoice_get"
+      ],
+      "executable_contracts": {
+        "invoice_get": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "id"
+                ]
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "nodateotgr": {
+                    "type": "string",
+                    "enum": [
+                      "yes"
+                    ]
+                  },
+                  "nobonus": {
+                    "type": "string",
+                    "enum": [
+                      "yes"
+                    ]
+                  },
+                  "nosize": {
+                    "type": "string",
+                    "enum": [
+                      "yes"
+                    ]
+                  },
+                  "detail": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "headers": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "path"
+            ]
+          },
+          "limits": [],
+          "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+          "response_kind": "json"
+        }
+      },
+      "implementation_status": "compiled_and_validated"
+    },
+    {
+      "id": "POST /invoice/create",
+      "method": "POST",
+      "path": "/invoice/create",
+      "summary": "Создание документа",
+      "category": [
+        "invoice"
+      ],
+      "effect": "business_write",
+      "parameters": [
+        {
+          "in": "query",
+          "name": "TypeDoc",
+          "description": "вид документа",
+          "schema": {
+            "type": "number",
+            "enum": [
+              10,
+              250,
+              345
+            ]
+          }
+        }
+      ],
+      "request_body": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": null
+          },
+          "application/xml": {
+            "schema": null
+          }
+        }
+      },
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "response_codes": [
+        "200"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "invoice_create",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "No production orders created for deployment tests."
+      },
+      "implementation_status": "compiled_and_validated",
+      "supplemental_source": {
+        "local_snapshot": "docs/etm-order-research/ETM_Order_24_01_25.pdf",
+        "title": "ETM API. Работа с заказами, 24.01.2025",
+        "sha256": "2efc6b5beba945c8b63aaa0202eb01c0516e9b2e93a9197f8ea2a70070f7e262",
+        "provenance": "Vendor-authored order manual retained by the existing ETM integration; cross-checked with live OpenAPI and previous provider readbacks."
+      },
+      "additional_adapters": [],
+      "executable_contracts": {
+        "invoice_create": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "TypeDoc": {
+                    "type": "number",
+                    "enum": [
+                      10,
+                      250,
+                      345
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "headers": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              },
+              "body": {
+                "type": "object",
+                "properties": {
+                  "OrderNumber": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^[0-9A-ZБ-ЯЁ./-]+\\Z"
+                  },
+                  "OrderDate": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "ExpectedDeliveryDate": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "ContractNumber": {
+                    "type": "string"
+                  },
+                  "ContractDate": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "Currency": {
+                    "type": "string",
+                    "maxLength": 3,
+                    "pattern": "^[A-Z]{3}\\Z"
+                  },
+                  "DocumentFunctionCode": {
+                    "type": "string",
+                    "enum": [
+                      "P",
+                      "A",
+                      "D",
+                      "C"
+                    ]
+                  },
+                  "Remarks": {
+                    "type": "string"
+                  },
+                  "Buyer": {
+                    "type": "object",
+                    "properties": {
+                      "ILN": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "Seller": {
+                    "type": "object",
+                    "properties": {
+                      "ILN": {
+                        "const": "4660011519999"
+                      },
+                      "CodeByBuyer": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                      "ILN"
+                    ]
+                  },
+                  "DeliveryPoint": {
+                    "type": "object",
+                    "properties": {
+                      "ILN": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "Invoicee": {
+                    "type": "object",
+                    "properties": {
+                      "ILN": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "Order-Lines": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "LineNumber": {
+                          "anyOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 1
+                            },
+                            {
+                              "type": "string",
+                              "pattern": "^[1-9][0-9]*\\Z"
+                            }
+                          ]
+                        },
+                        "EAN": {
+                          "type": "string",
+                          "maxLength": 13,
+                          "pattern": "^[0-9]+\\Z"
+                        },
+                        "BuyerItemCode": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "SupplierItemCode": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "ManufacturerArticle": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "ManufacturerCod": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "ItemDescription": {
+                          "type": "string"
+                        },
+                        "ItemType": {
+                          "type": "string"
+                        },
+                        "OrderedQuantity": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            {
+                              "type": "string",
+                              "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                            }
+                          ]
+                        },
+                        "UnitOfMeasure": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "ExpectedDeliveryDate": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "OrderedUnitNetPrice": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            {
+                              "type": "string",
+                              "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                            }
+                          ]
+                        },
+                        "OrderedUnitGrossPrice": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            {
+                              "type": "string",
+                              "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                            }
+                          ]
+                        },
+                        "NetAmount": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            {
+                              "type": "string",
+                              "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                            }
+                          ]
+                        },
+                        "GrossAmount": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            {
+                              "type": "string",
+                              "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                            }
+                          ]
+                        },
+                        "TaxRate": {
+                          "anyOf": [
+                            {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            {
+                              "type": "string",
+                              "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "LineNumber",
+                        "OrderedQuantity"
+                      ],
+                      "anyOf": [
+                        {
+                          "required": [
+                            "SupplierItemCode"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "BuyerItemCode"
+                          ]
+                        },
+                        {
+                          "required": [
+                            "ManufacturerArticle"
+                          ]
+                        }
+                      ],
+                      "dependentRequired": {
+                        "ManufacturerArticle": [
+                          "ManufacturerCod"
+                        ]
+                      }
+                    }
+                  },
+                  "TotalLines": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^[1-9][0-9]*\\Z"
+                      }
+                    ]
+                  },
+                  "TotalOrderedAmount": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                      }
+                    ]
+                  },
+                  "TotalNetAmount": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                      }
+                    ]
+                  },
+                  "TotalGrossAmount": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                      }
+                    ]
+                  },
+                  "TotalTaxAmount": {
+                    "anyOf": [
+                      {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^[0-9]+(?:\\.[0-9]+)?\\Z"
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "OrderNumber",
+                  "DocumentFunctionCode",
+                  "Seller",
+                  "Order-Lines"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "body"
+            ]
+          },
+          "limits": [
+            "OrderNumber is the visible customer document number. Use an owner-provided reference or the durable customer reference generated by order_checkout; never present it as an ETM-assigned number. Website checkout uses native ETM numbering.",
+            "DocumentFunctionCode C cancels the old document and creates a new one; D refuses the existing order. Include this business effect in the preview.",
+            "Creation alone does not prove pickup, payment terms or delivery. Read every returned data.id/data.ids[].docid and any subsequent split document.",
+            "The manual marks ItemDescription required in its table but omits it in its own SupplierItemCode example; this contract accepts that documented example.",
+            "ManufacturerCod follows the field table; prose also spells it ManufacturerCode. Prefer a verified SupplierItemCode when ordering a known product."
+          ],
+          "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+          "supplemental_source": {
+            "local_snapshot": "docs/etm-order-research/ETM_Order_24_01_25.pdf",
+            "title": "ETM API. Работа с заказами, 24.01.2025",
+            "sha256": "2efc6b5beba945c8b63aaa0202eb01c0516e9b2e93a9197f8ea2a70070f7e262",
+            "provenance": "Vendor-authored order manual retained by the existing ETM integration; cross-checked with live OpenAPI and previous provider readbacks."
+          }
+        }
+      }
+    },
+    {
+      "id": "POST /invoice/{id}/print/{proc}",
+      "method": "POST",
+      "path": "/invoice/{id}/print/{proc}",
+      "summary": "Печать по документу(ам) формы печати",
+      "category": [
+        "invoice"
+      ],
+      "effect": "report_generation",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "id",
+          "description": "id документа",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "proc",
+          "description": "Вид формы печати:\n * `bill` - счет\n",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "ch2",
+          "description": "id второго документа при групповых операциях",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "ch3",
+          "description": "id третьего документа при групповых операциях (и так до 40)",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": {},
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "response_codes": [
+        "200",
+        "403",
+        "404"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "invoice_print",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "invoice_print": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "proc": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "proc"
+                ]
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "ch2": {
+                    "type": "string"
+                  },
+                  "ch3": {
+                    "type": "string"
+                  },
+                  "ch4": {
+                    "type": "string"
+                  },
+                  "ch5": {
+                    "type": "string"
+                  },
+                  "ch6": {
+                    "type": "string"
+                  },
+                  "ch7": {
+                    "type": "string"
+                  },
+                  "ch8": {
+                    "type": "string"
+                  },
+                  "ch9": {
+                    "type": "string"
+                  },
+                  "ch10": {
+                    "type": "string"
+                  },
+                  "ch11": {
+                    "type": "string"
+                  },
+                  "ch12": {
+                    "type": "string"
+                  },
+                  "ch13": {
+                    "type": "string"
+                  },
+                  "ch14": {
+                    "type": "string"
+                  },
+                  "ch15": {
+                    "type": "string"
+                  },
+                  "ch16": {
+                    "type": "string"
+                  },
+                  "ch17": {
+                    "type": "string"
+                  },
+                  "ch18": {
+                    "type": "string"
+                  },
+                  "ch19": {
+                    "type": "string"
+                  },
+                  "ch20": {
+                    "type": "string"
+                  },
+                  "ch21": {
+                    "type": "string"
+                  },
+                  "ch22": {
+                    "type": "string"
+                  },
+                  "ch23": {
+                    "type": "string"
+                  },
+                  "ch24": {
+                    "type": "string"
+                  },
+                  "ch25": {
+                    "type": "string"
+                  },
+                  "ch26": {
+                    "type": "string"
+                  },
+                  "ch27": {
+                    "type": "string"
+                  },
+                  "ch28": {
+                    "type": "string"
+                  },
+                  "ch29": {
+                    "type": "string"
+                  },
+                  "ch30": {
+                    "type": "string"
+                  },
+                  "ch31": {
+                    "type": "string"
+                  },
+                  "ch32": {
+                    "type": "string"
+                  },
+                  "ch33": {
+                    "type": "string"
+                  },
+                  "ch34": {
+                    "type": "string"
+                  },
+                  "ch35": {
+                    "type": "string"
+                  },
+                  "ch36": {
+                    "type": "string"
+                  },
+                  "ch37": {
+                    "type": "string"
+                  },
+                  "ch38": {
+                    "type": "string"
+                  },
+                  "ch39": {
+                    "type": "string"
+                  },
+                  "ch40": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "headers": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "path"
+            ]
+          },
+          "limits": [],
+          "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+          "response_kind": "pdf_or_json"
+        }
+      }
+    },
+    {
+      "id": "POST /invoice/{id}/order",
+      "method": "POST",
+      "path": "/invoice/{id}/order",
+      "summary": "Заказ на основе документа",
+      "category": [
+        "invoice"
+      ],
+      "effect": "business_write",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "id",
+          "description": "id документа",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "skl",
+          "in": "query",
+          "description": "код склада-получетеля (для доставки передавать 1000)",
+          "schema": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        {
+          "name": "tovzak",
+          "in": "query",
+          "description": "примечание",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": {},
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "response_codes": [
+        "200"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "invoice_order",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "invoice_order": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "id"
+                ]
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "skl": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "tovzak": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "headers": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "path"
+            ]
+          },
+          "limits": [],
+          "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "POST /invoice/{id}/delivery",
+      "method": "POST",
+      "path": "/invoice/{id}/delivery",
+      "summary": "Добавление документа в новую доставку",
+      "category": [
+        "invoice"
+      ],
+      "effect": "business_write",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "id",
+          "description": "id документа",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "required": true,
+          "name": "adr",
+          "description": "id точки доставки",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "required": true,
+          "name": "date",
+          "description": "дата разгрузки",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "required": true,
+          "name": "time",
+          "description": "время разгрузки с",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "required": true,
+          "name": "time_po",
+          "description": "время разгрузки по",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "required": true,
+          "name": "phone",
+          "description": "телефон",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": {},
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "response_codes": [
+        "200"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "invoice_delivery",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "invoice_delivery": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "id"
+                ]
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "adr": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "type": "string"
+                  },
+                  "time": {
+                    "type": "string"
+                  },
+                  "time_po": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "adr",
+                  "date",
+                  "time",
+                  "time_po",
+                  "phone"
+                ]
+              },
+              "headers": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "query"
+            ]
+          },
+          "limits": [],
+          "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "GET /invoice/{id}/ps",
+      "method": "GET",
+      "path": "/invoice/{id}/ps",
+      "summary": "Получение примечаний (записей в переписке) на документе",
+      "category": [
+        "invoice"
+      ],
+      "effect": "read",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "id",
+          "description": "id документа",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": {},
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "response_codes": [
+        "200"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "invoice_approvals",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "invoice_approvals": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "id"
+                ]
+              },
+              "query": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              },
+              "headers": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "path"
+            ]
+          },
+          "limits": [],
+          "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "POST /invoice/{id}/ps",
+      "method": "POST",
+      "path": "/invoice/{id}/ps",
+      "summary": "Добавление примечания (записи в переписке) к документу",
+      "category": [
+        "invoice"
+      ],
+      "effect": "business_write",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "id",
+          "description": "id документа",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "sg",
+          "description": "Согласования: * 1 - согласовано * 2 - рассогласовано * 3 - требует согласование\n",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "1",
+              "2",
+              "3"
+            ]
+          }
+        },
+        {
+          "in": "query",
+          "name": "text",
+          "description": "текст",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "docStatus",
+          "description": "Итоговый статус согласования * agreed - согласован  * rejected - отклонен * wait - ожидает согласования\n",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "service_message",
+          "description": "Внутреннее сообщение, не доступное для просмотра пользователями",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          }
+        }
+      ],
+      "request_body": {},
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "response_codes": [
+        "200"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "invoice_approval_update",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "invoice_approval_update": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "id"
+                ]
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "sg": {
+                    "type": "string",
+                    "enum": [
+                      "1",
+                      "2",
+                      "3"
+                    ]
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                  "docStatus": {
+                    "type": "string"
+                  },
+                  "service_message": {
+                    "type": "string",
+                    "enum": [
+                      "true",
+                      "false"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "headers": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "path"
+            ]
+          },
+          "limits": [],
+          "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "POST /delivery/point/create",
+      "method": "POST",
+      "path": "/delivery/point/create",
+      "summary": "Создание точки доставки",
+      "category": [
+        "delivery"
+      ],
+      "effect": "business_write",
+      "parameters": [
+        {
+          "in": "query",
+          "required": true,
+          "name": "t-adr",
+          "description": "Адрес",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "required": true,
+          "name": "t-gps",
+          "description": "Координаты (через запятую)",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "t-info",
+          "description": "Информация для водителя",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "t-kont",
+          "description": "ФИО",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "required": true,
+          "name": "t-tel",
+          "schema": {
+            "type": "string"
+          },
+          "description": "Телефон"
+        }
+      ],
+      "request_body": {},
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "response_codes": [
+        "200"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "delivery_point_create",
+      "execution": "integration_write",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "delivery_point_create": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "t-adr": {
+                    "type": "string"
+                  },
+                  "t-gps": {
+                    "type": "string"
+                  },
+                  "t-info": {
+                    "type": "string"
+                  },
+                  "t-kont": {
+                    "type": "string"
+                  },
+                  "t-tel": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "t-adr",
+                  "t-gps",
+                  "t-tel"
+                ]
+              },
+              "headers": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "query"
+            ]
+          },
+          "limits": [],
+          "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+          "response_kind": "json"
+        }
+      }
+    },
+    {
+      "id": "GET /delivery/point/{id}/date",
+      "method": "GET",
+      "path": "/delivery/point/{id}/date",
+      "summary": "Даты возможной доставки в выбранную точку",
+      "category": [
+        "delivery"
+      ],
+      "effect": "read",
+      "parameters": [
+        {
+          "in": "path",
+          "required": true,
+          "name": "id",
+          "description": "id точки доставки",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "query",
+          "name": "month",
+          "description": "месяц",
+          "schema": {
+            "type": "number"
+          }
+        },
+        {
+          "in": "query",
+          "name": "year",
+          "description": "год",
+          "schema": {
+            "type": "number"
+          }
+        }
+      ],
+      "request_body": {},
+      "security": [
+        {
+          "userAuth": []
+        }
+      ],
+      "response_codes": [
+        "200"
+      ],
+      "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+      "provider_version": "1.0.0",
+      "adapter": "delivery_point_dates",
+      "execution": "integration_read",
+      "access": "unknown_not_tested",
+      "live_check": {
+        "status": "not_tested",
+        "reason": "New compiled adapter; see dated test evidence."
+      },
+      "implementation_status": "compiled_and_validated",
+      "additional_adapters": [],
+      "executable_contracts": {
+        "delivery_point_dates": {
+          "params_schema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "id"
+                ]
+              },
+              "query": {
+                "type": "object",
+                "properties": {
+                  "month": {
+                    "type": "number"
+                  },
+                  "year": {
+                    "type": "number"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "headers": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "path"
+            ]
+          },
+          "limits": [],
+          "source": "https://ipro.etm.ru/ns2000/yaml/cli.yaml",
+          "response_kind": "json"
+        }
+      }
+    }
+  ],
+  "compiled_contract": "registry/contracts/etm.json",
+  "supplemental_operations": {
+    "checkout_options": {
+      "execution": "integration_read",
+      "source": "https://www.etm.ru/ipro3/cart",
+      "scope": "Verified region, portal offices, requested destination, contract, payment and route discovery"
+    },
+    "order_checkout": {
+      "execution": "integration_write",
+      "source": "https://www.etm.ru/ipro3/cart",
+      "scope": "Portal checkout or public API customer request with contract, allocation and final document verification"
+    }
+  }
+}
