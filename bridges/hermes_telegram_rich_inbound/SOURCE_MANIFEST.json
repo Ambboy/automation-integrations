@@ -1,0 +1,54 @@
+{
+  "plugin": "automation-telegram-rich-inbound",
+  "version": "0.1.1",
+  "hermes_version": "0.22.5",
+  "hermes_core_sha": "bf0203a794a07aac3ff764972ab9087baa4e4f4e",
+  "python_telegram_bot": "22.8",
+  "runtime_files": [
+    "__init__.py",
+    "plugin.py",
+    "plugin.yaml"
+  ],
+  "files": {
+    "__init__.py": {
+      "sha256": "94df7c5449e4d417b71dfdcc9ff97797a82ffe0bd3a58a7906c6d0dea8be7c15",
+      "size": 133
+    },
+    "plugin.py": {
+      "sha256": "5552e69c2460d898d1ff3aebb4402fe5e2c0f236ea8251d373041e26060c2f72",
+      "size": 13507
+    },
+    "plugin.yaml": {
+      "sha256": "dc66591d8725b4be100043aee9d37d10a35b6f7b3ae3020ac20cb588bf78eefe",
+      "size": 332
+    },
+    "run_tests.py": {
+      "sha256": "4ee0c8c2776d66cbe85ac62b09f8ec628b3324363c82098afa93a5bcc88d647d",
+      "size": 1510
+    },
+    "review_probes.py": {
+      "sha256": "18fe7e82b1898f61c0f9c244863ff95a2b56f6ad971720dec5aa9aeafea82d6c",
+      "size": 7802
+    },
+    "tests/__init__.py": {
+      "sha256": "6e8666cc5f3be6781746b3da917a00e507199b510b477df1c8f3eaf81fdbe159",
+      "size": 70
+    },
+    "tests/test_contract.py": {
+      "sha256": "82ac6e51d674a75ccc09a71bee7c7a4d7ba139460c5cbe8839cd7854865cd7e0",
+      "size": 1537
+    },
+    "tests/test_native.py": {
+      "sha256": "c3c1b18df96c0cf785ff3429b0d400a591838def3acb9ce1d596be6fb7e3989c",
+      "size": 14632
+    },
+    "tests/test_parser.py": {
+      "sha256": "76fbd3055ee2b6a982f93e7b0039dd1bb37513866c510fcf72a8840d0e698ef7",
+      "size": 4109
+    },
+    "tests/test_regressions.py": {
+      "sha256": "ee7edc4545ca439527c4afd3791e21d45d764bee8b93a0d67505988ff475a638",
+      "size": 9194
+    }
+  }
+}

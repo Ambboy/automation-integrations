@@ -1,0 +1,11 @@
+name: automation-telegram-rich-inbound
+version: 0.1.1
+manifest_version: 2
+api_version: 1
+kind: standalone
+description: Normalize rich-only Telegram messages through existing native handlers without changing core.
+author: Automation
+license: MIT
+requires_hermes: "==0.22.5"
+tags: [gateway, telegram, inbound]
+python_dependencies: []
